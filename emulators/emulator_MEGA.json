@@ -1,0 +1,8 @@
+{
+    "$schema": "./emulator_schema.json",
+    "control_method":"serial_emulator",
+    "ports":[
+        {"number":1, "name":"P4", "capabilities":["DO", "DI", "PWM_OUT"], "notes":"5V max"},
+        {"number":2, "name":"P5", "capabilities":["DO", "DI", "PWM_OUT"], "notes":"5V max"}
+    ]
+}
