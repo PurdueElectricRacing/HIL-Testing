@@ -2,6 +2,11 @@ import json
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 import sys
+import time
+
+def initGlobals():
+    global debug_mode
+    debug_mode = True
 
 # Logging helper functions
 class bcolors:
@@ -51,3 +56,16 @@ def clearDictItems(dictionary:dict):
             clearDictItems(value)
         else:
             value.clear()
+
+# Credit: https://stackoverflow.com/questions/1133857/how-accurate-is-pythons-time-sleep/76554895#76554895
+def high_precision_sleep(duration):
+    start_time = time.perf_counter()
+    while True:
+        elapsed_time = time.perf_counter() - start_time
+        remaining_time = duration - elapsed_time
+        if remaining_time <= 0:
+            break
+        if remaining_time > 0.02:  # Sleep for 5ms if remaining time is greater
+            time.sleep(max(remaining_time/2, 0.0001))  # Sleep for the remaining time or minimum sleep interval
+        else:
+            pass

@@ -1,0 +1,26 @@
+{
+    "$schema": "./emulator_schema.json",
+    "communication_mode":"serial",
+    "ports":[
+        {"port":2, "name":"DI1", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":4, "name":"DI2", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":8, "name":"DI3", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":15, "name":"DI4", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":14, "name":"DI5", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":16, "name":"DI6", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":1, "name":"DI7", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":0, "name":"DI8", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":0, "name":"AI1", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":1, "name":"AI2", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":2, "name":"AI3", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":3, "name":"AI4", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":10, "name":"RLY1", "capabilities":["DO"], "notes":"relay"},
+        {"port":11, "name":"RLY2", "capabilities":["DO"], "notes":"relay"},
+        {"port":12, "name":"RLY3", "capabilities":["DO"], "notes":"relay"},
+        {"port":13, "name":"RLY4", "capabilities":["DO"], "notes":"relay"},
+        {"port":11, "name":"DAC1", "capabilities":["DO", "AO"], "notes":"5V 8-bit DAC"},
+        {"port":11, "name":"DAC2", "capabilities":["DO", "AO"], "notes":"5V 8-bit DAC"},
+        {"port":11, "name":"DAC3", "capabilities":["DO", "AO"], "notes":"5V 8-bit DAC"},
+        {"port":11, "name":"DAC4", "capabilities":["DO", "AO"], "notes":"5V 8-bit DAC"}
+    ]
+}
