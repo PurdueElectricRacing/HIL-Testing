@@ -1,5 +1,6 @@
 import serial
 import serial.tools.list_ports
+import time
 
 class SerialManager():
     """ Manages hil device discovery and communication """
@@ -12,14 +13,28 @@ class SerialManager():
         self.devices = {}
         print('Arduinos found on ports ' + str(ports))
         for p in ports:
-            ard = serial.Serial(p,115200, timeout=.1)
-            # Get Tester id
-            ard.write(b'\x40\x00')
-            i = ard.read(1)
+            ard = serial.Serial(p,115200, timeout=0.1, 
+                                bytesize=serial.EIGHTBITS,
+                                parity=serial.PARITY_NONE,
+                                stopbits=serial.STOPBITS_ONE,
+                                xonxoff=0,
+                                rtscts=0)
+            ard.setDTR(False)
+            time.sleep(1)
+            ard.flushInput()
+            ard.setDTR(True)
+            # Uno takes a while startup, have to treat it nicely
+            for _ in range(5):
+                # Get Tester id
+                ard.write(b'\x40\x00')
+                i = ard.read(1)
+                if (len(i) == 1):
+                    break
+                time.sleep(1)
             if (len(i) == 1):
                 self.devices[int.from_bytes(i, "big")] = ard
             else:
-                print('Failed to receive tester id on port ' + str(p))
+                print('Failed to receive tester id on port ' + str(p) + ' ' + str(i))
                 ard.close()
         print('Tester ids: ' + str(list(self.devices.keys())))
 

@@ -7,8 +7,8 @@ class Component():
     When in measurement or emulation, a source must be specified.
     """
 
-    def __init__(self, config, hil):
-        self.name = config['name']
+    def __init__(self, name, hil_con, mode, hil):
+        self.name = name
 
         self._state = 0
         self.inv_meas = False
@@ -16,46 +16,70 @@ class Component():
         self.read_func  = None
         self.write_func = None
 
-        if "measure_source" in config:
-            me_src = config['measure_source']
-            self.me = hil.get_hil_device(me_src['device'])
-            if "inv" in me_src:
-                self.inv_meas = me_src["inv"]
+        # TODO: allow both measure and emulation source
+
+        # if "measure_source" in config:
+        #     me_src = config['measure_source']
+        #     self.me = hil.get_hil_device(me_src['device'])
+        #     if "inv" in me_src:
+        #         self.inv_meas = me_src["inv"]
             
-            if (me_src['mode'] == "DI"):
-                self.read_port = self.me.get_port_number(me_src['port'], me_src['mode'])
-                if self.inv_meas:
-                    self.read_func = lambda : not self.me.read_gpio(self.read_port)
-                else:
-                    self.read_func = lambda : self.me.read_gpio(self.read_port)
-            elif (me_src['mode'] == "AI"):
-                self.read_port = self.me.get_port_number(me_src['port'], me_src['mode'])
-                self.read_func = lambda : self.me.read_analog(self.read_port)
-            else:
-                utils.log_error(f"Unrecognized measure mode {me_src['mode']} for component {self.name}")
+        #     if (me_src['mode'] == "DI"):
+        #         self.read_port = self.me.get_port_number(me_src['port'], me_src['mode'])
+        #         if self.inv_meas:
+        #             self.read_func = lambda : not self.me.read_gpio(self.read_port)
+        #         else:
+        #             self.read_func = lambda : self.me.read_gpio(self.read_port)
+        #     elif (me_src['mode'] == "AI"):
+        #         self.read_port = self.me.get_port_number(me_src['port'], me_src['mode'])
+        #         self.read_func = lambda : self.me.read_analog(self.read_port)
+        #     else:
+        #         utils.log_error(f"Unrecognized measure mode {me_src['mode']} for component {self.name}")
 
+        # if "emulation_source" in config:
+        #     em_src = config['emulation_source']
+        #     self.em = hil.get_hil_device(em_src['device'])
 
-        if "emulation_source" in config:
-            em_src = config['emulation_source']
-            self.em = hil.get_hil_device(em_src['device'])
+        #     if "inv" in em_src:
+        #         self.inv_emul = em_src["inv"]
 
-            if "inv" in em_src:
-                self.inv_emul = em_src["inv"]
+        #     if (em_src['mode'] == "DO"):
+        #         self.write_port = self.em.get_port_number(em_src['port'], em_src['mode'])
+        #         if self.inv_emul:
+        #             self.write_func = lambda s: self.em.write_gpio(self.write_port, not s)
+        #         else:
+        #             self.write_func = lambda s: self.em.write_gpio(self.write_port, s)
+        #         self.state = self._state
+        #     elif(em_src['mode'] == "AO"):
+        #         self.write_port = self.em.get_port_number(em_src['port'], em_src['mode'])
+        #         self.write_func = lambda s: self.em.write_dac(self.write_port, s)
+        #     else:
+        #         utils.log_error(f"Unrecognized emulation mode {em_src['mode']} for component {self.name}")
 
-            if (em_src['mode'] == "DO"):
-                self.write_port = self.em.get_port_number(em_src['port'], em_src['mode'])
+        dev = hil.get_hil_device(hil_con[0])
+        hil_port_num = dev.get_port_number(hil_con[1], mode)
+        if (hil_port_num >= 0):
+            #print(f"Creating new component '{self.name}' of type {mode} on {hil_con}")
+            if (mode == "DI"):
+                    if self.inv_meas:
+                        self.read_func = lambda : not dev.read_gpio(hil_port_num)
+                    else:
+                        self.read_func = lambda : dev.read_gpio(hil_port_num)
+            elif (mode == "AI"):
+                    self.read_func = lambda : dev.read_analog(hil_port_num)
+            elif (mode == "DO"):
                 if self.inv_emul:
-                    self.write_func = lambda s: self.em.write_gpio(self.write_port, not s)
+                    self.write_func = lambda s: dev.write_gpio(hil_port_num, not s)
                 else:
-                    self.write_func = lambda s: self.em.write_gpio(self.write_port, s)
+                    self.write_func = lambda s: dev.write_gpio(hil_port_num, s)
                 self.state = self._state
-            elif(em_src['mode'] == "AO"):
-                self.write_port = self.em.get_port_number(em_src['port'], em_src['mode'])
-                self.write_func = lambda s: self.em.write_dac(self.write_port, s)
+            elif(mode == "AO"):
+                self.write_func = lambda s: dev.write_dac(hil_port_num, s)
             else:
-                utils.log_error(f"Unrecognized emulation mode {em_src['mode']} for component {self.name}")
+                utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
+        else:
+            utils.log_error(f"Failed to get hil port for component {self.name}")
 
-        #print(f"Created new component {self.name} of type {config['type']}")
         self.hil = hil
 
     @property

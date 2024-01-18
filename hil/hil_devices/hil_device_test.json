@@ -2,8 +2,9 @@
     "$schema": "./emulator_schema.json",
     "communication_mode":"serial",
     "ports":[
-        {"number":1, "name":"D4", "capabilities":["DO"], "notes":"just relay"},
-        {"number":2, "name":"D5", "capabilities":["DO"], "notes":"just relay"},
-        {"number":3, "name":"D13", "capabilities":["DO, DI"], "notes":"simple port"}
+        {"port":1, "name":"D4", "capabilities":["DO"], "notes":"just relay"},
+        {"port":2, "name":"D5", "capabilities":["DO"], "notes":"just relay"},
+        {"port":3, "name":"D13", "capabilities":["DO","DI"], "notes":"simple port"},
+        {"port":4, "name":"D12", "capabilities":["DI"], "notes":"simple port"}
     ]
 }

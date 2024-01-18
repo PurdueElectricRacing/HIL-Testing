@@ -6,7 +6,7 @@
 const int DIGITAL_PIN_COUNT = 14;
 const int ANALOG_PIN_COUNT = 5;
 
-const int TESTER_ID = 1;
+const int TESTER_ID = 0;
 
 //#define DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;

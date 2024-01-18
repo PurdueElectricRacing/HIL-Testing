@@ -1,0 +1,30 @@
+{
+    "$schema": "./emulator_schema.json",
+    "communication_mode":"serial",
+    "ports":[
+        {"port":0,  "name":"D0",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":1,  "name":"D1",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":2,  "name":"D2",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":3,  "name":"D3",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":4,  "name":"D4",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":5,  "name":"D5",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":6,  "name":"D6",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":7,  "name":"D7",  "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":8,  "name":"D8",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":9,  "name":"D9",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":10, "name":"D10", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":11, "name":"D11", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":12, "name":"D12", "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":13, "name":"D13", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":14, "name":"D14", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":15, "name":"D15", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":16, "name":"D16", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":17, "name":"D17", "capabilities":["DI", "DO"], "notes":"5V digital"},
+        {"port":18, "name":"A0",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":19, "name":"A1",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":20, "name":"A2",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":21, "name":"A3",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":22, "name":"A4",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
+        {"port":23, "name":"A5",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"}
+   ]
+}

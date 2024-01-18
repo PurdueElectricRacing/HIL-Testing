@@ -1,0 +1,13 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Abox", "harness_connections":[
+            {"dut":{"connector":"P12","pin":1}, "hil":{"device":"ABoxTester", "port":"D13"}},
+            {"dut":{"connector":"P12","pin":2}, "hil":{"device":"ABoxTester", "port":"D4"}},
+            {"dut":{"connector":"P12","pin":3}, "hil":{"device":"ABoxTester", "port":"D5"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"ABoxTester", "type":"arduino_uno", "id":5}
+    ]
+}

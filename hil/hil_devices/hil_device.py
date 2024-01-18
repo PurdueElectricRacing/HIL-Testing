@@ -39,8 +39,11 @@ class HilDevice():
                     if mode in p['capabilities']:
                         return p['port']
                     else:
-                        utils.log_error(f"Port {port_name} does not have capability {mode}")
-                    break
+                        utils.log_warning(f"Port {port_name} on {self.name} does not have capability {mode}")
+                        utils.log_warning(f"Ports with {mode} capability for {self.name} include:")
+                        utils.log_warning([p['name'] for p in self.config['ports'] if mode in p['capabilities']])
+                        utils.log_warning("Change connection and try again.")
+                        return -1
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
 
