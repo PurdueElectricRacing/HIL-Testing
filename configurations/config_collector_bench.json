@@ -1,0 +1,15 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Collector", "harness_connections":[
+            {"dut":{"connector":"J4","pin":1}, "hil":{"device":"CollTester", "port":"D0"}},
+            {"dut":{"connector":"J4","pin":2}, "hil":{"device":"CollTester", "port":"D1"}},
+            {"dut":{"connector":"J4","pin":4}, "hil":{"device":"CollTester", "port":"D2"}},
+            {"dut":{"connector":"J4","pin":5}, "hil":{"device":"CollTester", "port":"A0"}},
+            {"dut":{"connector":"J4","pin":7}, "hil":{"device":"CollTester", "port":"D3"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"CollTester", "type":"arduino_uno", "id":5}
+    ]
+}
