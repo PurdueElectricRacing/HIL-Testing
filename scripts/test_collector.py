@@ -17,10 +17,16 @@ def test_collector(hil):
     # Inputs
     to = hil.ain("Collector", "TEMP_OUT")
 
-    tolerance_v    = 0.1
-    test_voltage   = 2.5
-    pullup_voltage = 3.3
+    tolerance_v    = 0.1 # volts
+    current_res    = 9100.0 # ohms
+    pullup_res     = 4700.0 # ohms
+    test_voltage   = 3.3 # volts
+    pullup_voltage = 5 # volts
     num_therm      = 10
+
+    test_voltage = (pullup_voltage / (current_res + pullup_res)) * current_res
+
+    utils.log_warning(test_voltage)
 
     for thermistor in range(num_therm):
         print(f"Place test input on thermistor {thermistor}. Press Enter when ready")
