@@ -59,7 +59,7 @@ class Component():
         dev = hil.get_hil_device(hil_con[0])
         hil_port_num = dev.get_port_number(hil_con[1], mode)
         if (hil_port_num >= 0):
-            #print(f"Creating new component '{self.name}' of type {mode} on {hil_con}")
+            print(f"Creating new component '{self.name}' of type {mode} on {hil_con}")
             if (mode == "DI"):
                     if self.inv_meas:
                         self.read_func = lambda : not dev.read_gpio(hil_port_num)
