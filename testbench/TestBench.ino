@@ -1,12 +1,19 @@
+#define HAL_DAC_MODULE_ENABLED 1
 #include <Arduino.h>
 #include "DigiPot.h"
 
 // #define DEBUG
+// #define STM32
+#ifdef STM32
+#define SERIAL SerialUSB
+#else
+#define SERIAL Serial
+#endif
 
 const int DIGITAL_PIN_COUNT = 14;
 const int ANALOG_PIN_COUNT = 5;
 
-const int TESTER_ID = 0;
+const int TESTER_ID = 5;
 
 //#define DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;
@@ -55,7 +62,7 @@ enum GpioCommands
 
 void setup()
 {
-  Serial.begin(115200);
+  SERIAL.begin(115200);
 #ifdef DIGIPOT_EN
   digipot_init(DIGIPOT_CS1_PIN, DIGIPOT_UD_PIN, &dp1);
   digipot_init(DIGIPOT_CS2_PIN, DIGIPOT_UD_PIN, &dp2);
@@ -65,17 +72,17 @@ void setup()
 
 void error(String error_string)
 {
-  Serial.write(0xFF);
-  Serial.write(0xFF);
-  Serial.println(error_string);
+  SERIAL.write(0xFF);
+  SERIAL.write(0xFF);
+  SERIAL.println(error_string);
 }
 
 void loop()
 {
-  if (Serial.available() >= 2)
+  if (SERIAL.available() >= 2)
   {
-    data[0] = Serial.read();
-    data[1] = Serial.read();
+    data[0] = SERIAL.read();
+    data[1] = SERIAL.read();
     Command c;
     c.reinit(data);
     count++;
@@ -106,7 +113,7 @@ void loop()
         {
           pinMode(pin, INPUT);
           int val = digitalRead(pin);
-          Serial.write(val & 0xFF);
+          SERIAL.write(val & 0xFF);
         }
         else
         {
@@ -119,6 +126,7 @@ void loop()
         //if (pin < DAC_PIN_COUNT)
         //{
           //mcp.analogWrite(pin, value);
+          // 4 and 5 have DAC on f407
           pinMode(pin, OUTPUT);
           analogWrite(pin, value & 0xFF); // max val 255
           // TODO: check valid PWM pin
@@ -135,8 +143,8 @@ void loop()
         if (1)
         {
           int val = analogRead(pin);
-          Serial.write((val >> 8) & 0xFF);
-          Serial.write(val & 0xFF);
+          SERIAL.write((val >> 8) & 0xFF);
+          SERIAL.write(val & 0xFF);
         }
         else
         {
@@ -146,7 +154,7 @@ void loop()
       }
       case (READ_ID):
       {
-        Serial.write(TESTER_ID);
+        SERIAL.write(TESTER_ID);
         break;
       }
       case (WRITE_POT):
