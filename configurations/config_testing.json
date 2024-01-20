@@ -1,0 +1,10 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Test", "harness_connections":[
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"Test_HIL", "type":"disco_f4", "id":5}
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"MainSDC", "harness_connections":[
+            {"dut":{"connector":"J1","pin":1}, "hil":{"device":"Arduino", "port":"D5"}},
+            {"dut":{"connector":"J1","pin":2}, "hil":{"device":"Arduino", "port":"D4"}},
+            {"dut":{"connector":"J1","pin":3}, "hil":{"device":"STM32", "port":"PA4"}},
+            {"dut":{"connector":"J2","pin":2}, "hil":{"device":"Arduino", "port":"D3"}},
+            {"dut":{"connector":"J2","pin":5}, "hil":{"device":"Arduino", "port":"D6"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"Arduino", "type":"arduino_uno", "id":5},
+        {"name":"STM32", "type":"disco_f4", "id":6}
+    ]
+}

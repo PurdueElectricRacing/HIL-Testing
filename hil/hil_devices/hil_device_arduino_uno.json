@@ -22,5 +22,6 @@
         {"port":17, "name":"A3",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
         {"port":18, "name":"A4",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"},
         {"port":19, "name":"A5",  "capabilities":["DI", "AI", "DO"], "notes":"analog / digital input 5V"}
-   ]
+   ],
+   "adc_config":{"bit_resolution":10, "reference_v":5.0}
 }

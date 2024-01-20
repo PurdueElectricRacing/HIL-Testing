@@ -106,11 +106,19 @@ class HIL():
                     self.dut_connections[board_name][connector] = {}
                 self.dut_connections[board_name][connector][pin] = hil_port
 
-    def add_component(self, board, net, hil_con, mode):
+    def add_component(self, board, net, mode):
+        # If board is a HIL device, net is expected to be port name
+        # If board is a DUT device, net is expected to be a net name from the board
+        if board in self.hil_devices:
+            hil_con = (board, net)
+        else:
+            hil_con = self.get_hil_device_connection(board, net)
         comp_name = '.'.join([board, net])
         if not comp_name in self.components:
             comp = Component(comp_name, hil_con, mode, self)
             self.components[comp_name] = comp
+        else:
+            utils.log_warning(f"Component {comp_name} already exists")
         return self.components[comp_name]
 
     def load_hil_devices(self, hil_devices):
@@ -147,21 +155,17 @@ class HIL():
         self.handle_error(f"Connect dut to {net} on {board}.")
     
     def din(self, board, net):
-        hil_con = self.get_hil_device_connection(board, net)
-        return self.add_component(board, net, hil_con, 'DI')
+        return self.add_component(board, net, 'DI')
     
     def dout(self, board, net):
-        hil_con = self.get_hil_device_connection(board, net)
-        return self.add_component(board, net, hil_con, 'DO')
+        return self.add_component(board, net, 'DO')
 
     def ain(self, board, net):
-        hil_con = self.get_hil_device_connection(board, net)
-        return self.add_component(board, net, hil_con, 'AI')
+        return self.add_component(board, net, 'AI')
     
     def aout(self, board, net):
-        hil_con = self.get_hil_device_connection(board, net)
-        return self.add_component(board, net, hil_con, 'AO')
-    
+        return self.add_component(board, net, 'AO')
+
     def daq_var(self, board, var_name):
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board}"][var_name]
@@ -185,11 +189,12 @@ class HIL():
         self.curr_test = name
         self.curr_test_fail_count = 0
         self.curr_test_count = 0
+        self.term_width = os.get_terminal_size().columns
 
     def check(self, stat, check_name):
         stat_str = "PASS" if stat else "FAIL"
         stat_clr = utils.bcolors.OKGREEN if stat else utils.bcolors.FAIL
-        print(f"{self.curr_test} - {check_name}: {stat_clr}[{stat_str}]{utils.bcolors.ENDC}")
+        print(f"{self.curr_test + ' - ' + check_name:<50}: {stat_clr+'['+stat_str+']'+utils.bcolors.ENDC:>10}")
         if (not stat): self.curr_test_fail_count = self.curr_test_fail_count + 1
         self.curr_test_count = self.curr_test_count + 1
         return stat

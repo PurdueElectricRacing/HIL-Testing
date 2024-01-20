@@ -69,5 +69,7 @@
         {"port":61, "name":"PD13", "capabilities":["DI", "DO"], "notes":"3V3 digital"},
         {"port":62, "name":"PD14", "capabilities":["DI", "DO"], "notes":"3V3 digital"},
         {"port":63, "name":"PD15", "capabilities":["DI", "DO"], "notes":"3V3 digital"}
-   ]
+   ],
+   "adc_config":{"bit_resolution":10, "reference_v":3.0},
+   "dac_config":{"bit_resolution":8,  "reference_v":3.0}
 }

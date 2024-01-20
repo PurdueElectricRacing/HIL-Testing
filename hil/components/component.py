@@ -15,6 +15,7 @@ class Component():
         self.inv_emul = False
         self.read_func  = None
         self.write_func = None
+        self.hiZ_func = None
 
         # TODO: allow both measure and emulation source
 
@@ -73,8 +74,12 @@ class Component():
                 else:
                     self.write_func = lambda s: dev.write_gpio(hil_port_num, s)
                 self.state = self._state
+                self.hiZ_func = lambda : dev.read_gpio(hil_port_num)
+                # TODO: check if hil port also has DI capability (i.e. relay can't hiZ)
             elif(mode == "AO"):
                 self.write_func = lambda s: dev.write_dac(hil_port_num, s)
+                self.hiZ_func = lambda : dev.read_gpio(hil_port_num)
+                # TODO: check if hil port also has DI capability (i.e. OTS DAQ may be unable to hiZ)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:
@@ -98,7 +103,13 @@ class Component():
             self.write_func(s)
         else:
             utils.log_warning(f"Wrote to {self.name}, but no emulation source was found")
-
+    
+    def hiZ(self):
+        if (self.hiZ_func):
+            self.hiZ_func()
+        else:
+            utils.log_warning(f"hiZ is not supported for {self.name}")
+    
     def shutdown(self):
         if self.write_func:
             self.state = 0
