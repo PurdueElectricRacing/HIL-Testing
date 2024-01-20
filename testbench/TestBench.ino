@@ -3,7 +3,7 @@
 #include "DigiPot.h"
 
 // #define DEBUG
-// #define STM32
+ #define STM32
 #ifdef STM32
 #define SERIAL SerialUSB
 #else
@@ -13,7 +13,7 @@
 const int DIGITAL_PIN_COUNT = 14;
 const int ANALOG_PIN_COUNT = 5;
 
-const int TESTER_ID = 5;
+const int TESTER_ID = 6;
 
 //#define DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;

@@ -115,3 +115,35 @@ class VoltageDivider():
     def reverse(self, output):
         return output / self.ratio
 
+
+def measure_trip_time(trip_sig, timeout, is_falling=False):
+    t_start = time.time()
+    while(trip_sig.state == is_falling):
+        time.sleep(0.015)
+        if (t_start + timeout <= time.time()):
+            log_warning(f"Trip for {trip_sig.name} timed out")
+            return timeout
+    t_delt = time.time() - t_start
+    print(f"Trip time for {trip_sig.name} = {t_delt}s")
+    return t_delt
+
+
+def measure_trip_thresh(thresh_sig, start, stop, step, period_s, trip_sig, is_falling=False):
+    gain = 1000
+    thresh = start
+    _start = int(start * gain)
+    _stop = int(stop * gain)
+    _step = int(step * gain)
+    thresh_sig.state = start
+    for v in range(_start, _stop+_step, _step):
+        thresh_sig.state = v / gain
+        time.sleep(period_s)
+        if (trip_sig.state == (not is_falling)):
+            thresh = v / gain
+            break
+    if (trip_sig.state == is_falling):
+        log_warning(f"{trip_sig.name} did not trip at stop of {stop}.")
+        return stop
+    else:
+        return thresh
+    
