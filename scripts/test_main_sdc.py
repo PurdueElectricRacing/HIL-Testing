@@ -64,6 +64,7 @@ def test_bspd(hil):
     set_bspd_current(c_sense, 75)
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
     # time.sleep(100)
+
     hil.check(bspd_ctrl.state == 1, "Current no brake")
 
     # Current Sense Short to Ground
@@ -106,6 +107,7 @@ def test_bspd(hil):
     reset_bspd(brk_fail, brk_stat, c_sense)
     cycle_power(pow)
     brk_stat.state = 1
+
     hil.check(bspd_ctrl.state == 1, "Power On")
     start = ABOX_DHAB_CH1_DIV.div(dhab_ch1_a_to_v(0.0)) / DAC_GAIN
     stop  = ABOX_DHAB_CH1_DIV.div(dhab_ch1_a_to_v(DHAB_S124_CH1_MAX_A)) / DAC_GAIN
@@ -140,12 +142,14 @@ def test_bspd(hil):
     cycle_power(pow)
     hil.check(bspd_ctrl.state == 1, "Power On")
     time.sleep(2)
+
     set_bspd_current(c_sense, DHAB_S124_CH1_MAX_A)
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
     hil.check(bspd_ctrl.state == 1, "Max output current okay")
     start = ABOX_DHAB_CH1_DIV.div(DHAB_S124_MAX_OUT_V) / DAC_GAIN
     stop = ABOX_DHAB_CH1_DIV.div(5.0) / DAC_GAIN
     step = 0.01 / DAC_GAIN
+
     thresh = utils.measure_trip_thresh(c_sense, start, stop, step,
                                        R_BSPD_MAX_TRIP_TIME_S,
                                        bspd_ctrl, is_falling=True)
