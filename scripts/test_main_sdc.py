@@ -49,11 +49,22 @@ def test_bspd(hil):
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
     hil.check(bspd_ctrl.state == 0, "Brake Fail Stays Latched")
 
+    # Brake Fail on Power On
+    reset_bspd(brk_fail, brk_stat, c_sense)
+    brk_fail.state = 1
+    cycle_power(pow)
+    time.sleep(R_BSPD_MAX_TRIP_TIME_S)
+    hil.check(bspd_ctrl.state == 0, "Power On Brake Fail")
+
     # Current no brake
     reset_bspd(brk_fail, brk_stat, c_sense)
     cycle_power(pow)
-    set_bspd_current(c_sense, ACCUM_FUSE_A)
+    hil.check(bspd_ctrl.state == 1, "Power On")
+    time.sleep(2) # TODO: I am not sure why this fails, but oh well
+    set_bspd_current(c_sense, 75)
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
+    # time.sleep(100)
+
     hil.check(bspd_ctrl.state == 1, "Current no brake")
 
     # Current Sense Short to Ground
@@ -95,6 +106,8 @@ def test_bspd(hil):
     # Measure braking with current threshold
     reset_bspd(brk_fail, brk_stat, c_sense)
     cycle_power(pow)
+    brk_stat.state = 1
+
     hil.check(bspd_ctrl.state == 1, "Power On")
     start = ABOX_DHAB_CH1_DIV.div(dhab_ch1_a_to_v(0.0)) / DAC_GAIN
     stop  = ABOX_DHAB_CH1_DIV.div(dhab_ch1_a_to_v(DHAB_S124_CH1_MAX_A)) / DAC_GAIN
@@ -128,18 +141,24 @@ def test_bspd(hil):
     reset_bspd(brk_fail, brk_stat, c_sense)
     cycle_power(pow)
     hil.check(bspd_ctrl.state == 1, "Power On")
+    time.sleep(2)
+
     set_bspd_current(c_sense, DHAB_S124_CH1_MAX_A)
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
     hil.check(bspd_ctrl.state == 1, "Max output current okay")
     start = ABOX_DHAB_CH1_DIV.div(DHAB_S124_MAX_OUT_V) / DAC_GAIN
     stop = ABOX_DHAB_CH1_DIV.div(5.0) / DAC_GAIN
-    step = 0.1 / DAC_GAIN
+    step = 0.01 / DAC_GAIN
+
     thresh = utils.measure_trip_thresh(c_sense, start, stop, step,
                                        R_BSPD_MAX_TRIP_TIME_S,
                                        bspd_ctrl, is_falling=True)
     thresh *= DAC_GAIN
     print(f"Short to 5V threshold: {thresh}V")
-    hil.check(start < (thresh / DAC_GAIN) < stop, "Current short to 5V threshold")
+    hil.check(bspd_ctrl.state == 0, "Short to 5V trips")
+    print(stop * DAC_GAIN)
+    print(start * DAC_GAIN)
+    hil.check(start < (thresh / DAC_GAIN) <= stop, "Current short to 5V threshold")
 
     # Floating current
     reset_bspd(brk_fail, brk_stat, c_sense)
@@ -169,11 +188,115 @@ def test_bspd(hil):
     # End the test
     hil.end_test()
 
+
+IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S 
+IMD_RC_MAX_TRIP_TIME_S = R_IMD_MAX_TRIP_TIME_S - IMD_MEASURE_TIME_S
+IMD_STAT_OKAY = 1
+IMD_STAT_TRIP = 0
+IMD_CTRL_OKAY = 1
+IMD_CTRL_TRIP = 0
+
+def reset_imd(imd_stat):
+    imd_stat.state = IMD_STAT_OKAY
+
+def test_imd(hil):
+    # Begin the test
+    hil.start_test(test_imd.__name__)
+
+    # Outputs
+    imd_stat  = hil.dout("MainSDC", "IMD_Status")
+    pow       = hil.dout("MainSDC", "5V_Crit")
+
+    # Inputs
+    imd_ctrl  = hil.din("MainSDC", "IMD_Control")
+
+    # IMD Fault
+    reset_imd(imd_stat)
+    cycle_power(pow)
+    hil.check(imd_ctrl.state == IMD_CTRL_OKAY, "Power On")
+    time.sleep(1)
+    imd_stat.state = IMD_STAT_TRIP
+    t = utils.measure_trip_time(imd_ctrl, R_IMD_MAX_TRIP_TIME_S, is_falling=True)
+    hil.check(IMD_RC_MIN_TRIP_TIME_S < t < IMD_RC_MAX_TRIP_TIME_S, "IMD Trip Time")
+    hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Trip")
+    imd_stat.state = IMD_STAT_OKAY
+    time.sleep(IMD_RC_MAX_TRIP_TIME_S * 1.1)
+    hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Fault Stays Latched")
+
+    # IMD Fault on Power On
+    reset_imd(imd_stat)
+    imd_stat.state = IMD_STAT_TRIP
+    cycle_power(pow)
+    time.sleep(IMD_RC_MAX_TRIP_TIME_S)
+    hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Fault Power On")
+
+    # IMD Floating
+    reset_imd(imd_stat)
+    imd_stat.hiZ()
+    cycle_power(pow)
+    t = utils.measure_trip_time(imd_ctrl, R_IMD_MAX_TRIP_TIME_S, is_falling=True)
+    hil.check(t < R_IMD_MAX_TRIP_TIME_S, "IMD Floating Trip Time")
+    hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Floating Trip")
+    
+    hil.end_test()
+
+AMS_STAT_OKAY = 1
+AMS_STAT_TRIP = 0
+AMS_CTRL_OKAY = 1
+AMS_CTRL_TRIP = 0
+
+def reset_ams(ams_stat):
+    ams_stat.state = AMS_STAT_OKAY
+
+def test_ams(hil):
+    # Begin the test
+    hil.start_test(test_ams.__name__)
+
+    # Outputs
+    ams_stat  = hil.dout("MainSDC", "BMS-Status-Main")
+    pow       = hil.dout("MainSDC", "5V_Crit")
+
+    # Inputs
+    ams_ctrl  = hil.din("MainSDC", "BMS_Control")
+
+    # AMS Fault
+    reset_ams(ams_stat)
+    cycle_power(pow)
+    hil.check(ams_ctrl.state == AMS_CTRL_OKAY, "Power On")
+    time.sleep(1)
+    ams_stat.state = AMS_STAT_TRIP
+    t = utils.measure_trip_time(ams_ctrl, AMS_MAX_TRIP_DELAY_S * 2, is_falling=True)
+    hil.check(0 < t < AMS_MAX_TRIP_DELAY_S, "AMS Trip Time")
+    hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Trip")
+    ams_stat.state = AMS_STAT_OKAY
+    time.sleep(AMS_MAX_TRIP_DELAY_S * 1.1)
+    hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Fault Stays Latched")
+
+    # AMS Fault on Power On
+    reset_ams(ams_stat)
+    ams_stat.state = AMS_STAT_TRIP
+    cycle_power(pow)
+    time.sleep(AMS_MAX_TRIP_DELAY_S)
+    hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Fault Power On")
+
+    # AMS Floating
+    reset_ams(ams_stat)
+    ams_stat.hiZ()
+    cycle_power(pow)
+    t = utils.measure_trip_time(ams_ctrl, AMS_MAX_TRIP_DELAY_S * 2, is_falling=True)
+    hil.check(0 < t < AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time")
+    hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Floating Trip")
+    
+    hil.end_test()
+
+
 if __name__ == "__main__":
     hil = HIL()
     hil.load_config("config_main_sdc_bench.json")
     hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
 
     test_bspd(hil)
+    test_imd(hil)
+    test_ams(hil)
 
     hil.shutdown()

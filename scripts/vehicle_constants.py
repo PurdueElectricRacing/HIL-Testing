@@ -11,6 +11,13 @@ ACCUM_FUSE_A    = 140.0
 
 ABOX_DHAB_CH1_DIV = utils.VoltageDivider(1000, 2000)
 
+# IMD Constants
+IMD_MEASURE_TIME_S = 20.0
+IMD_STARTUP_TIME_S = 2.0
+
+# AMS Constants
+AMS_MAX_TRIP_DELAY_S = 3.0
+
 # DHAB S124 Current Sensor
 DHAB_S124_MAX_OUT_V = 4.8
 DHAB_S124_MIN_OUT_V = 0.2
