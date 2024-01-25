@@ -27,7 +27,7 @@ class SerialManager():
             # Uno takes a while startup, have to treat it nicely
             for _ in range(5):
                 # Get Tester id
-                ard.write(b'\x40\x00')
+                ard.write(b'\x04\x00\x00')
                 i = ard.read(1)
                 if (len(i) == 1):
                     break

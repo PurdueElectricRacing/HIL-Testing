@@ -3,17 +3,14 @@
 #include "DigiPot.h"
 
 // #define DEBUG
- #define STM32
+//#define STM32
 #ifdef STM32
 #define SERIAL SerialUSB
 #else
 #define SERIAL Serial
 #endif
 
-const int DIGITAL_PIN_COUNT = 14;
-const int ANALOG_PIN_COUNT = 5;
-
-const int TESTER_ID = 6;
+const int TESTER_ID = 1;
 
 //#define DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;
@@ -22,30 +19,31 @@ const uint8_t DIGIPOT_CS2_PIN = 23; // A5
 digipot_t dp1, dp2;
 
 int count = 0;
-char data[2];
+char data[3];
 
 struct Command
 {
   Command(uint8_t command=0, uint8_t pin=0, uint8_t value=0)
   {
-    data[0] = (command << 4) & 0xF0;
-    data[0] |= (pin & 0x0F);
-    data[1] = value;
+    data[0] = command;
+    data[1] = pin;
+    data[2] = value;
   };
 
   void reinit(char data[])
   {
     this->data[0] = data[0];
     this->data[1] = data[1];
+    this->data[2] = data[2];
   };
 
-  uint8_t command() { return (data[0] & 0xF0) >> 4; };
-  uint8_t pin() { return data[0] & 0x0F; };
+  uint8_t command() { return data[0];};
+  uint8_t pin() { return data[1]; };
   uint16_t value() { 
-    return data[1]; 
+    return data[2]; 
   };
-  int size() { return 2 * sizeof(char); };
-  char data[2];
+  int size() { return 3 * sizeof(char); };
+  char data[3];
 };
 
 
@@ -79,10 +77,11 @@ void error(String error_string)
 
 void loop()
 {
-  if (SERIAL.available() >= 2)
+  if (SERIAL.available() >= 3)
   {
     data[0] = SERIAL.read();
     data[1] = SERIAL.read();
+    data[2] = SERIAL.read();
     Command c;
     c.reinit(data);
     count++;
