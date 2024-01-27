@@ -111,6 +111,8 @@ class Component():
             utils.log_warning(f"hiZ is not supported for {self.name}")
     
     def shutdown(self):
-        if self.write_func:
+        if (self.hiZ_func):
+            self.hiZ_func()
+        elif self.write_func:
             self.state = 0
 

@@ -1,16 +1,32 @@
-#define HAL_DAC_MODULE_ENABLED 1
+
 #include <Arduino.h>
 #include "DigiPot.h"
 
-// #define DEBUG
 //#define STM32
 #ifdef STM32
 #define SERIAL SerialUSB
+#define HAL_DAC_MODULE_ENABLED 1
 #else
 #define SERIAL Serial
 #endif
 
 const int TESTER_ID = 1;
+
+#define DAC
+
+#ifdef STM32
+#ifdef DAC
+#warning "Can't have both DAC and STM32 enabled"
+#endif
+#endif
+
+#ifdef DAC
+#include <DFRobot_MCP4725.h>
+#define NUM_DACS 2
+DFRobot_MCP4725 dacs[NUM_DACS];
+uint8_t dac_power_down[NUM_DACS];
+const uint16_t dac_vref = 255;
+#endif
 
 //#define DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;
@@ -61,10 +77,19 @@ enum GpioCommands
 void setup()
 {
   SERIAL.begin(115200);
+
 #ifdef DIGIPOT_EN
   digipot_init(DIGIPOT_CS1_PIN, DIGIPOT_UD_PIN, &dp1);
   digipot_init(DIGIPOT_CS2_PIN, DIGIPOT_UD_PIN, &dp2);
   digipot_set(48, &dp1);
+#endif
+#ifdef DAC
+  dacs[0].init(0x63, dac_vref);
+  dacs[1].init(0x62, dac_vref);
+  dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
+  dacs[1].setMode(MCP4725_POWER_DOWN_500KRES);
+  dac_power_down[0] = 1;
+  dac_power_down[1] = 1;
 #endif
 }
 
@@ -107,33 +132,40 @@ void loop()
       }
       case (READ_GPIO):
       {
-        //if (pin < DIGITAL_PIN_COUNT)
-        if (1)
+#ifdef DAC
+        if (pin >= 200 && pin < 200 + NUM_DACS)
+        {
+          dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
+          dac_power_down[pin - 200] = 1;
+          SERIAL.write(0x01);
+        }
+        else
+#endif
         {
           pinMode(pin, INPUT);
           int val = digitalRead(pin);
           SERIAL.write(val & 0xFF);
         }
-        else
-        {
-          error("GPIO PIN COUNT EXCEEDED");
-        }
         break;
       }
       case (WRITE_DAC):
       {
-        //if (pin < DAC_PIN_COUNT)
-        //{
-          //mcp.analogWrite(pin, value);
+#ifdef DAC
+        if (pin >= 200 && pin < 200 + NUM_DACS)
+        {
+          if (dac_power_down[pin-200])
+          {
+            dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
+            dac_power_down[pin - 200] = 0;
+          }
+          dacs[pin - 200].outputVoltage(value & 0xFF);
+        }
+#endif
+#ifdef STM32
           // 4 and 5 have DAC on f407
           pinMode(pin, OUTPUT);
           analogWrite(pin, value & 0xFF); // max val 255
-          // TODO: check valid PWM pin
-        //}
-        //else
-        //{
-        //  error("DAC PIN COUNT EXCEEDED");
-        //}
+#endif
         break;
       }
       case (READ_ADC):
