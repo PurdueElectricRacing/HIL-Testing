@@ -5,9 +5,10 @@ import utils
 # NOTE: each value in this file should be a physical or electrical property of the vehicle
 
 # Accumulator Constants
-ACCUM_MAX_V     = 317.3
-ACCUM_NOMINAL_V = 273.6
-ACCUM_FUSE_A    = 140.0
+ACCUM_MAX_V  = 317.3
+ACCUM_MIN_V  = 190.0 
+ACCUM_NOM_V  = 273.6
+ACCUM_FUSE_A = 140.0
 
 ABOX_DHAB_CH1_DIV = utils.VoltageDivider(1000, 2000)
 
@@ -17,6 +18,18 @@ IMD_STARTUP_TIME_S = 2.0
 
 # AMS Constants
 AMS_MAX_TRIP_DELAY_S = 3.0
+
+# Precharge Constants   
+PCHG_COMPLETE_DELAY_S = 0.5
+
+# Tiffomy Constants
+TIFF_LV_MAX = 5.0
+TIFF_LV_MIN = -5.0
+TIFF_SCALE  = 100.0
+def tiff_hv_to_lv(hv_voltage):
+    return min(max(hv_voltage / TIFF_SCALE, TIFF_LV_MIN), TIFF_LV_MAX)
+def tiff_lv_to_hv(lv_voltage):
+    return lv_voltage * TIFF_SCALE
 
 # DHAB S124 Current Sensor
 DHAB_S124_MAX_OUT_V = 4.8
