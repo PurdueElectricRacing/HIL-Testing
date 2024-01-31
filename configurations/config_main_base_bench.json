@@ -1,0 +1,24 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Main", "harness_connections":[
+            {"dut":{"connector":"J3","pin":7}, "hil":{"device":"Arduino", "port":"DAC1"}},
+            {"dut":{"connector":"J3","pin":18}, "hil":{"device":"Arduino", "port":"DAC2"}},
+            {"dut":{"connector":"J3","pin":5}, "hil":{"device":"Arduino", "port":"AI1"}},
+            {"dut":{"connector":"J3","pin":6}, "hil":{"device":"Arduino", "port":"AI2"}},
+            {"dut":{"connector":"J3","pin":10}, "hil":{"device":"Arduino", "port":"AI3"}},
+            {"dut":{"connector":"J3","pin":9}, "hil":{"device":"Arduino", "port":"AI4"}},
+            {"dut":{"connector":"J3","pin":2}, "hil":{"device":"Arduino", "port":"DI7"}},
+            {"dut":{"connector":"J4","pin":15}, "hil":{"device":"Arduino2", "port":"DAC1"}},
+            {"dut":{"connector":"J4","pin":8}, "hil":{"device":"Arduino2", "port":"DI5"}},
+            {"dut":{"connector":"J4","pin":7}, "hil":{"device":"Arduino2", "port":"DI6"}},
+            {"dut":{"connector":"J4","pin":21}, "hil":{"device":"Arduino", "port":"DI5"}},
+            {"dut":{"connector":"J4","pin":22}, "hil":{"device":"Arduino", "port":"DI6"}},
+            {"dut":{"connector":"J3","pin":8}, "hil":{"device":"Arduino2", "port":"DI3"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"Arduino", "type":"test_pcb", "id":1},
+        {"name":"Arduino2", "type":"test_pcb", "id":2}
+    ]
+}
