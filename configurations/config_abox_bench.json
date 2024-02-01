@@ -1,13 +1,34 @@
 {
     "$schema": "./config_schema.json",
     "dut_connections":[
-        {"board":"Abox", "harness_connections":[
-            {"dut":{"connector":"P12","pin":1}, "hil":{"device":"ABoxTester", "port":"D13"}},
-            {"dut":{"connector":"P12","pin":2}, "hil":{"device":"ABoxTester", "port":"D4"}},
-            {"dut":{"connector":"P12","pin":3}, "hil":{"device":"ABoxTester", "port":"D5"}}
+        {"board":"a_box", "harness_connections":[
+            {"dut":{"connector":"P9","pin":2}, "hil":{"device":"ABoxTester", "port":"AI1"}},
+            {"dut":{"connector":"P9","pin":4}, "hil":{"device":"ABoxTester", "port":"AI2"}},
+            {"dut":{"connector":"P12","pin":3}, "hil":{"device":"ABoxTester", "port":"AI2"}},
+            {"dut":{"connector":"P12","pin":1}, "hil":{"device":"ABoxTester", "port":"AI3"}},
+            {"dut":{"connector":"P9","pin":6}, "hil":{"device":"ABoxTester", "port":"AI4"}},
+            {"dut":{"connector":"P9","pin":11}, "hil":{"device":"ABoxTester", "port":"RLY1"}},
+            {"dut":{"connector":"P9","pin":5}, "hil":{"device":"ABoxTester", "port":"RLY2"}},
+            {"dut":{"connector":"P7","pin":6}, "hil":{"device":"ABoxTester", "port":"RLY3"}},
+            {"dut":{"connector":"P9","pin":3}, "hil":{"device":"ABoxTester", "port":"DI3"}},
+            {"dut":{"connector":"P9","pin":7}, "hil":{"device":"ABoxTester", "port":"DI4"}},
+            {"dut":{"connector":"P13","pin":3}, "hil":{"device":"ABoxTester", "port":"DI5"}},
+            {"dut":{"connector":"P5","pin":3}, "hil":{"device":"ABoxTester", "port":"DI6"}},
+            {"dut":{"connector":"P12","pin":11}, "hil":{"device":"ABoxTester", "port":"DAC1"}},
+            {"dut":{"connector":"P4","pin":2}, "hil":{"device":"ArduinoUno", "port":"D2"}},
+            {"dut":{"connector":"P4","pin":3}, "hil":{"device":"ArduinoUno", "port":"D3"}},
+            {"dut":{"connector":"P4","pin":4}, "hil":{"device":"ArduinoUno", "port":"D4"}},
+            {"dut":{"connector":"P4","pin":5}, "hil":{"device":"ArduinoUno", "port":"D5"}},
+            {"dut":{"connector":"P4","pin":7}, "hil":{"device":"ArduinoUno", "port":"D6"}},
+            {"dut":{"connector":"P3","pin":7}, "hil":{"device":"ArduinoUno", "port":"D7"}},
+            {"dut":{"connector":"P2","pin":7}, "hil":{"device":"ArduinoUno", "port":"D8"}},
+            {"dut":{"connector":"P1","pin":7}, "hil":{"device":"ArduinoUno", "port":"D9"}},
+            {"dut":{"connector":"P10","pin":3}, "hil":{"device":"ABoxTester", "port":"RLY4"}},
+            {"dut":{"connector":"P9","pin":8}, "hil":{"device":"ABoxTester", "port":"DI7"}}
         ]}
     ],
     "hil_devices":[
-        {"name":"ABoxTester", "type":"arduino_uno", "id":5}
+        {"name":"ABoxTester", "type":"test_pcb", "id":2},
+        {"name":"ArduinoUno", "type":"arduino_uno", "id":3}
     ]
 }
