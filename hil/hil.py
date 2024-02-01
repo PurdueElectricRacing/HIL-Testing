@@ -35,6 +35,10 @@ class HIL():
         self.can_bus = None
         utils.hilProt = self
         signal.signal(signal.SIGINT, signal_int_handler)
+        self.global_failed_checks = []
+        self.global_test_names = []
+        self.global_check_count = 0 # multiple checks within a test
+        self.global_test_count = 0
 
     def init_can(self):
         config = self.hil_params
@@ -68,6 +72,24 @@ class HIL():
         self.clear_components()
         self.clear_hil_devices()
         self.stop_can()
+
+        print(f"{utils.bcolors.OKCYAN}{utils.bcolors.UNDERLINE}")
+        utils.log("TEST SUMMARY")
+        print(f"{utils.bcolors.ENDC}")
+        utils.log(f"{self.global_test_count} tests with {self.global_check_count} checks performed:")
+        utils.log(', '.join(self.global_test_names))
+        num_fail = len(self.global_failed_checks)
+        num_pass = self.global_check_count - num_fail
+        if (self.global_check_count == 0): 
+            return
+        utils.log(f"{num_pass}/{self.global_check_count} ({num_pass/self.global_check_count*100:.5}%) of checks passing")
+        if (num_fail > 0):
+            utils.log(f"{utils.bcolors.FAIL}{utils.bcolors.BOLD}Failing {num_fail} checks:{utils.bcolors.ENDC}")
+            for c in self.global_failed_checks:
+                utils.log(f"{c[0]} - {c[1]}")
+        else:
+            utils.log(f"{utils.bcolors.OKGREEN}{utils.bcolors.BOLD}ALL CHECKS PASSING{utils.bcolors.ENDC}")
+
 
     def stop_can(self):
         if not self.can_bus: return
@@ -168,8 +190,8 @@ class HIL():
 
     def daq_var(self, board, var_name):
         try:
-            return utils.signals[utils.b_str][board][f"daq_response_{board}"][var_name]
-        except KeyError:
+            return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
+        except KeyError as e:
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     def can_var(self, board, message_name, signal_name):
@@ -189,14 +211,18 @@ class HIL():
         self.curr_test = name
         self.curr_test_fail_count = 0
         self.curr_test_count = 0
-        self.term_width = os.get_terminal_size().columns
+        self.global_test_count = self.global_test_count + 1
+        self.global_test_names.append(name)
 
     def check(self, stat, check_name):
         stat_str = "PASS" if stat else "FAIL"
         stat_clr = utils.bcolors.OKGREEN if stat else utils.bcolors.FAIL
         print(f"{self.curr_test + ' - ' + check_name:<50}: {stat_clr+'['+stat_str+']'+utils.bcolors.ENDC:>10}")
-        if (not stat): self.curr_test_fail_count = self.curr_test_fail_count + 1
+        if (not stat): 
+            self.curr_test_fail_count = self.curr_test_fail_count + 1
+            self.global_failed_checks.append((self.curr_test,check_name))
         self.curr_test_count = self.curr_test_count + 1
+        self.global_check_count = self.global_check_count + 1
         return stat
 
     def check_within(self, val1, val2, thresh, check_name):

@@ -81,9 +81,9 @@ if __name__ == "__main__":
     pm.load_mcu_pin_map('../pin_maps/stm32f407_pin_map.csv')
 
     print(pm.get_mcu_pin('ur mom', 'idk'))
-    print(pm.get_mcu_pin('Abox', 'ur mom'))
-    print(pm.get_mcu_pin('Abox', 'Isense_Ch1_raw'))
-    print(pm.get_mcu_pin('Abox', 'GND'))
-    print(pm.get_mcu_pin('Abox', 'ISense Ch1'))
+    print(pm.get_mcu_pin('a_box', 'ur mom'))
+    print(pm.get_mcu_pin('a_box', 'Isense_Ch1_raw'))
+    print(pm.get_mcu_pin('a_box', 'GND'))
+    print(pm.get_mcu_pin('a_box', 'ISense Ch1'))
 
  
