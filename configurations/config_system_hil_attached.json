@@ -1,0 +1,27 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Main_Module", "harness_connections":[
+            {"dut":{"connector":"J3","pin":1},  "hil":{"device":"RearTester", "port":"DI3"}},
+            {"dut":{"connector":"J3","pin":2},  "hil":{"device":"RearTester", "port":"DI4"}},
+            {"dut":{"connector":"J3","pin":5},  "hil":{"device":"RearTester", "port":"AI1"}},
+            {"dut":{"connector":"J3","pin":6},  "hil":{"device":"RearTester", "port":"AI2"}},
+            {"dut":{"connector":"J3","pin":7},  "hil":{"device":"RearTester", "port":"DAC1"}},
+            {"dut":{"connector":"J3","pin":16}, "hil":{"device":"RearTester", "port":"DI5"}},
+            {"dut":{"connector":"J3","pin":18}, "hil":{"device":"RearTester", "port":"DAC2"}},
+            {"dut":{"connector":"J4","pin":1},  "hil":{"device":"RearTester", "port":"RLY3"}},
+            {"dut":{"connector":"J4","pin":15}, "hil":{"device":"RearTesterArd", "port":"DAC2"}}
+        ]},
+        {"board":"Dashboard", "harness_connections":[
+            {"dut":{"connector":"J1","pin":9},  "hil":{"device":"FrontTester", "port":"DAC1"}},
+            {"dut":{"connector":"J1","pin":10}, "hil":{"device":"FrontTester", "port":"DAC2"}},
+            {"dut":{"connector":"J1","pin":11}, "hil":{"device":"FrontTester", "port":"POT1"}},
+            {"dut":{"connector":"J1","pin":12}, "hil":{"device":"FrontTester", "port":"POT2"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"FrontTester", "type":"test_pcb", "id":1},
+        {"name":"RearTester",  "type":"test_pcb", "id":2},
+        {"name":"RearTesterArd", "type":"test_pcb", "id":4}
+    ]
+}

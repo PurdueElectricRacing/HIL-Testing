@@ -1,7 +1,7 @@
 {
     "$schema": "./config_schema.json",
     "dut_connections":[
-        {"board":"Main", "harness_connections":[
+        {"board":"Main_Module", "harness_connections":[
             {"dut":{"connector":"J3","pin":7}, "hil":{"device":"Arduino", "port":"DAC1"}},
             {"dut":{"connector":"J3","pin":18}, "hil":{"device":"Arduino", "port":"DAC2"}},
             {"dut":{"connector":"J3","pin":5}, "hil":{"device":"Arduino", "port":"AI1"}},

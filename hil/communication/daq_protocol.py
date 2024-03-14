@@ -158,7 +158,7 @@ class DAQVariable(BusSignal):
             if (time.time() >= start_t + DAQ_READ_TIMEOUT_S):
                 utils.log_warning(f"Timed out reading DAQ var {self.signal_name} of {self.node_name}")
                 return 0
-            time.sleep(0.001)
+            time.sleep(0.015)
         return self.curr_val
         
     @state.setter
@@ -204,10 +204,10 @@ class DaqProtocol():
         self.curr_pin  = pin  & DAQ_PIN_MASK
         val = ((((self.curr_pin) << DAQ_BANK_LENGTH) | (self.curr_bank)) << DAQ_CMD_LENGTH) | DAQ_CMD_READ_PIN
         data = [val & 0xFF, (val >> 8) & 0xFF]
+        self.pin_read_in_progress = True
         self.can_bus.sendMsg(can.Message(arbitration_id=dbc_msg.frame_id,
                                          is_extended_id=True,
                                          data=data))
-        self.pin_read_in_progress = True
 
     def readVar(self, var: DAQVariable):
         """ Requests to read a variable, expects a reply """
@@ -449,14 +449,19 @@ class DAQPin():
         self.board = board
         self.bank = bank
         self.pin = pin
+        self.t_last = time.time()
 
     @property
     def state(self):
-        utils.daqProt.readPin(self.board, self.bank, self.pin)
+        self.t_last = time.time()
         t_start = time.time()
+        utils.daqProt.readPin(self.board, self.bank, self.pin)
         while (utils.daqProt.pin_read_in_progress):
+            time.sleep(0.015) # This sleep allows rx thread to run
             if (time.time() > t_start + DAQ_READ_TIMEOUT_S):
+
                 utils.log_error(f"Pin read timed out for {self.board} net {self.name} on bank {self.bank} pin {self.pin}")
+                utils.daqProt.pin_read_in_progress = False
                 return 0
         return utils.daqProt.curr_pin_val
 

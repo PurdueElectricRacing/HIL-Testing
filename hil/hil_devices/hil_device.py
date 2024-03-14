@@ -10,6 +10,7 @@ HIL_CMD_READ_GPIO  = 1
 HIL_CMD_WRITE_DAC  = 2
 HIL_CMD_WRITE_GPIO = 3
 HIL_CMD_READ_ID    = 4
+HIL_CMD_WRITE_POT  = 5
 
 HIL_ID_MASK = 0xFF
 
@@ -25,17 +26,40 @@ class HilDevice():
 
         self.config = utils.load_json_config(os.path.join(HIL_DEVICES_PATH, f"hil_device_{self.type}.json"), None) # TODO: validate w/ schema
 
+        self.rail_5v = 0
+        if "calibrate_rail" in self.config and self.config['calibrate_rail']:
+            # Measure 3V3 rail and find dac reference
+            p = self.get_port_number('3v3ref', 'AI')
+            if p >= 0:
+                self.adc_to_volts = 1
+                self.adc_max = pow(2, self.config['adc_config']['bit_resolution']) - 1
+                meas_3v3 = self.read_analog(p)
+                # 3.3V = meas_3v3 / adc_max * 5V
+                # 5V = 3.3V * adc_max / meas_3v3
+                self.rail_5v = 3.3 * self.adc_max / meas_3v3
+                utils.log(f"5V rail measured to be {self.rail_5v:.3}V")
+
         self.adc_to_volts = 0.0
         self.adc_max = 0
         if "adc_config" in self.config:
             self.adc_max = pow(2, self.config['adc_config']['bit_resolution']) - 1
-            self.adc_to_volts = float(self.config['adc_config']['reference_v']) / self.adc_max
-        
+            if self.rail_5v == 0:
+                self.adc_to_volts = float(self.config['adc_config']['reference_v']) / self.adc_max
+            else:
+                self.adc_to_volts = self.rail_5v / self.adc_max
+
         self.volts_to_dac = 0.0
         self.dac_max = 0
         if "dac_config" in self.config:
             self.dac_max = pow(2, self.config['dac_config']['bit_resolution']) - 1
-            self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v']) 
+            if self.rail_5v == 0:
+                self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v']) 
+            else:
+                self.volts_to_dac = self.dac_max / self.rail_5v
+        
+        self.pot_max = 0
+        if "pot_config" in self.config:
+            self.pot_max = pow(2, self.config['pot_config']['bit_resolution']) - 1
 
     def get_port_number(self, port_name, mode):
         for p in self.config['ports']:
@@ -58,6 +82,7 @@ class HilDevice():
     def write_dac(self, pin, value):
         value = min(self.dac_max, max(0, int(value * self.volts_to_dac)))
         data = [(HIL_CMD_WRITE_DAC & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
+        # print(f"write pin {pin} to {value}")
         self.sm.send_data(self.id, data)
 
     def read_gpio(self, pin): 
@@ -78,3 +103,9 @@ class HilDevice():
             if (d <= self.adc_max): return (d * self.adc_to_volts)
         utils.log_error(f"Failed to read adc pin {pin} on {self.name}")
         return 0
+
+    def write_pot(self, pin, value):
+        value = min(self.pot_max, max(0, int(value * self.pot_max)))
+        data = [(HIL_CMD_WRITE_POT & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
+        #print(f"sending {value} to pin {pin}")
+        self.sm.send_data(self.id, data)

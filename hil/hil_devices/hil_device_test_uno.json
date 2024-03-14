@@ -17,12 +17,9 @@
         {"port":13, "name":"RLY4", "capabilities":["DO"], "notes":"relay"},
         {"port":200, "name":"DAC1", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
         {"port":201, "name":"DAC2", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
-        {"port":1, "name":"POT1", "capabilities":["POT"], "notes":"6-bit Digipot"},
-        {"port":2, "name":"POT2", "capabilities":["POT"], "notes":"6-bit Digipot"},
-        {"port":9, "name":"3v3ref", "capabilities":["AI"], "notes":"3V3 input reference"}
+        {"port":17, "name":"3v3ref", "capabilities":["AI"], "notes":"3V3 input reference"}
     ],
    "adc_config":{"bit_resolution":10, "reference_v":5.0},
    "dac_config":{"bit_resolution":8, "reference_v":5.0},
-   "pot_config":{"bit_resolution":6},
    "calibrate_rail":true
 }

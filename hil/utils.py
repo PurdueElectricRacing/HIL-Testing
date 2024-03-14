@@ -135,13 +135,16 @@ def measure_trip_thresh(thresh_sig, start, stop, step, period_s, trip_sig, is_fa
     _stop = int(stop * gain)
     _step = int(step * gain)
     thresh_sig.state = start
+    tripped = False
+    print(f"Start: {_start} Stop: {_stop} Step: {_step} Gain: {gain}")
     for v in range(_start, _stop+_step, _step):
         thresh_sig.state = v / gain
         time.sleep(period_s)
         if (trip_sig.state == (not is_falling)):
             thresh = v / gain
+            tripped = True
             break
-    if (trip_sig.state == is_falling):
+    if (not tripped):
         log_warning(f"{trip_sig.name} did not trip at stop of {stop}.")
         return stop
     else:

@@ -1,6 +1,6 @@
 
 #include <Arduino.h>
-#include "DigiPot.h"
+#include "MCP4021.h"
 
 //#define STM32
 #ifdef STM32
@@ -10,7 +10,7 @@
 #define SERIAL Serial
 #endif
 
-const int TESTER_ID = 1;
+const int TESTER_ID = 2;
 
 #define DAC
 
@@ -28,11 +28,14 @@ uint8_t dac_power_down[NUM_DACS];
 const uint16_t dac_vref = 255;
 #endif
 
-//#define DIGIPOT_EN
+#define DIGIPOT_EN
+#ifdef DIGIPOT_EN
 const uint8_t DIGIPOT_UD_PIN  = 7;
 const uint8_t DIGIPOT_CS1_PIN = 22; // A4
 const uint8_t DIGIPOT_CS2_PIN = 23; // A5
-digipot_t dp1, dp2;
+MCP4021 digipot1(DIGIPOT_CS1_PIN, DIGIPOT_UD_PIN, false);  // initialize Digipot 1
+MCP4021 digipot2(DIGIPOT_CS2_PIN, DIGIPOT_UD_PIN, false);  // initialize Digipot 2
+#endif
 
 int count = 0;
 char data[3];
@@ -40,7 +43,7 @@ char data[3];
 struct Command
 {
   Command(uint8_t command=0, uint8_t pin=0, uint8_t value=0)
-  {
+  { 
     data[0] = command;
     data[1] = pin;
     data[2] = value;
@@ -79,9 +82,13 @@ void setup()
   SERIAL.begin(115200);
 
 #ifdef DIGIPOT_EN
-  digipot_init(DIGIPOT_CS1_PIN, DIGIPOT_UD_PIN, &dp1);
-  digipot_init(DIGIPOT_CS2_PIN, DIGIPOT_UD_PIN, &dp2);
-  digipot_set(48, &dp1);
+  // Setting up Digipot 1
+  digipot1.setup();
+  digipot1.begin();
+
+  // Setting up Digipot 2
+  digipot2.setup();
+  digipot2.begin();
 #endif
 #ifdef DAC
   dacs[0].init(0x63, dac_vref);
@@ -192,9 +199,9 @@ void loop()
       {
 #ifdef DIGIPOT_EN
         if (pin == 1)
-          digipot_set((uint8_t) value, &dp1);
+          digipot1.setTap((uint8_t) value);
         else if (pin == 2)
-          digipot_set((uint8_t) value, &dp2);
+          digipot2.setTap((uint8_t) value); 
         else
 #endif
         {
