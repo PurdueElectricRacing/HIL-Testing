@@ -79,7 +79,8 @@ class Component():
             elif(mode == "AO"):
                 self.write_func = lambda s: dev.write_dac(hil_port_num, s)
                 self.hiZ_func = lambda : dev.read_gpio(hil_port_num)
-                # TODO: check if hil port also has DI capability (i.e. OTS DAQ may be unable to hiZ)
+            elif(mode == "POT"):
+                self.write_func = lambda s: dev.write_pot(hil_port_num, s)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:

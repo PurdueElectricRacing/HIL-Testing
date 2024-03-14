@@ -187,6 +187,9 @@ class HIL():
     
     def aout(self, board, net):
         return self.add_component(board, net, 'AO')
+    
+    def pot(self, board, net):
+        return self.add_component(board, net, 'POT')
 
     def daq_var(self, board, var_name):
         try:
@@ -202,7 +205,7 @@ class HIL():
 
     def mcu_pin(self, board, net):
         bank, pin = self.pin_map.get_mcu_pin(board, net)
-        if not bank:
+        if bank == None:
             self.handle_error(f"Failed to get mcu pin for {board} net {net}")
         return DAQPin(net, board, bank, pin)
 

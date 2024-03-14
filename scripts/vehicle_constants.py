@@ -58,3 +58,18 @@ def dhab_ch2_a_to_v(amps):
 
 def dhab_v_valid(signal_v):
     return (DHAB_S124_MIN_OUT_V <= signal_v <= DHAB_S124_MAX_OUT_V)
+
+# Brake Pressure Transducer
+BRK_MAX_OUT_V  = 4.8
+BRK_MIN_OUT_V  = 0.2
+BRK_1_REST_V   = 0.5 # Resting line voltage of brake 1
+BRK_2_REST_V   = 0.5 # Resting line voltage of brake 2
+BRK_1_DIV = utils.VoltageDivider(5600, 10000)
+BRK_2_DIV = utils.VoltageDivider(5600, 10000)
+BRK_1_THRESH_V = BRK_1_DIV.reverse(1.0) # Threshold that is considered braking for brake 1
+BRK_2_THRESH_V = BRK_2_DIV.reverse(1.0) # Threshold that is considered braking for brake 2
+
+# Throttle
+THTL_MAX_P = 0.9 # Maximum pedal press percent
+THTL_MIN_P = 0.1 # Minimum pedal press percent
+THTL_THRESH = 0.2 # Throttle pressed percent

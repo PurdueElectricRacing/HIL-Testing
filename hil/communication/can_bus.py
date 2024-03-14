@@ -236,7 +236,11 @@ class CanBus(threading.Thread):
         """ Sends a can message over the bus """
         if self.connected:
             if not self.is_wireless:
-                self.bus.send(msg)
+                # print(f"sending {msg}")
+                try:
+                    self.bus.send(msg, timeout=2)
+                except can.CanOperationError:
+                    utils.log_error(f"Failed to send {msg}")
             elif self.tcp:
                 self.tcpbus.send(msg)
         else:
@@ -271,8 +275,9 @@ class CanBus(threading.Thread):
                 #     if utils.debug_mode: utils.log_warning(f"unrecognized: {msg.arbitration_id}")
             except ValueError as e:
                 if "daq" not in dbc_msg.name:
-                    if utils.debug_mode: utils.log_warning(f"Failed to convert msg: {msg}")
-                    print(e)
+                    pass
+                    #if utils.debug_mode: utils.log_warning(f"Failed to convert msg: {msg}")
+                    #print(e)
         # if (msg.is_error_frame):
         #     utils.log(msg)
 
@@ -352,6 +357,7 @@ class BusSignal():
         self.node_name = node_name
         self.message_name = msg_name
         self.signal_name = sig_name
+        self.name = '.'.join([self.bus_name, self.node_name, self.message_name, self.signal_name])
 
         self.unit = unit
         self.msg_desc = msg_desc

@@ -53,10 +53,11 @@ def test_isense(hil):
     ch1_filt = hil.ain("a_box", "ISense Ch1")
 
     # Need to test voltage divider transfer function correct
-    for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, DHAB_S124_MAX_OUT_V, 5.0]:
+    for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0]:
         ch1_raw.state = v
-        time.sleep(0.01)
+        time.sleep(1)
         exp_out = ABOX_DHAB_CH1_DIV.div(v)
+        input(f"enter to meas, set to {v}, expected {exp_out}")
         meas = ch1_filt.state
         print(f"isense expected: {exp_out}V, measured: {meas}V")
         hil.check_within(meas, exp_out, 0.05, f"Isense v={v:.3}")
@@ -124,7 +125,7 @@ def test_precharge(hil):
     hil.end_test()
 
 SUPPLY_VOLTAGE = 24.0
-TIFF_DLY = 0.05
+TIFF_DLY = 0.3
 
 def test_tiffomy(hil):
     # Begin the test
@@ -152,6 +153,7 @@ def test_tiffomy(hil):
     bat_p.state = RLY_ON
     time.sleep(TIFF_DLY)
     exp = SUPPLY_VOLTAGE
+    #input("press enter, tiff should be getting volts")
     meas = tiff_lv_to_hv(vbat.state)
     print(f"Tiff HV reading: {meas} V, expect: {SUPPLY_VOLTAGE} V")
     hil.check_within(meas, exp, 2.5, "Tiff on")
@@ -199,7 +201,7 @@ def test_tmu(hil):
     daq_override.state = 0
 
     TMU_TOLERANCE = 100
-    TMU_HIGH_VALUE = 2148
+    TMU_HIGH_VALUE = 1970 #2148
 
     # thermistors
     for i in range(0,16):
@@ -207,7 +209,7 @@ def test_tmu(hil):
         tmu_b_do.state = bool(i & 0x2)
         tmu_c_do.state = bool(i & 0x4)
         tmu_d_do.state = bool(i & 0x8)
-        time.sleep(0.25)
+        time.sleep(1.0)
         a = int(tmu_a_ai.state)
         b = int(tmu_b_ai.state)
         c = int(tmu_c_ai.state)

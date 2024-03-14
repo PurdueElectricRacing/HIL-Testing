@@ -5,6 +5,6 @@
         ]}
     ],
     "hil_devices":[
-        {"name":"Test_HIL", "type":"test_pcb", "id":1}
+        {"name":"Test_HIL", "type":"test_pcb", "id":2}
     ]
 }

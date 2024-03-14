@@ -3,6 +3,7 @@ sys.path.append(path.join(path.dirname(path.dirname(path.abspath(__file__))), 'h
 from hil import HIL
 import utils
 import time
+import can
 from rules_constants import *
 from vehicle_constants import *
 
@@ -60,24 +61,109 @@ def test_dac(hil):
     dac1 = hil.aout("Test_HIL", "DAC1")
     dac2 = hil.aout("Test_HIL", "DAC2")
 
-    dac1.state = 5.0
-    dac2.state = 2.5
-    input("")
+    dac1.state = 2.5
+    dac2.state = 5.0
+    input("5, 2")
     dac1.hiZ()
     dac2.hiZ()
-    input("")
+    input("hi-z")
     dac1.state = 0.25
     dac2.state = 0.25
-    input("")
+    input(".25")
 
     hil.end_test()
+
+def test_pot(hil):
+
+    pot1 = hil.pot("Test_HIL", "POT1")
+    pot2 = hil.pot("Test_HIL", "POT2")
+    
+    print("initial")
+    input(" - ")
+    print("0.5, 1")
+    pot1.state = 0.5
+    pot2.state = 0.5
+    input(" - ")
+
+    print("1, 0.5")
+    pot1.state = 1.0
+    pot2.state = 1.0
+    input(" - ")
+
+    print("0, 0")
+    pot1.state = 0.0
+    pot2.state = 0.0
+    input(" - ")
+
+    for i in range(1000):
+        pot1.state = 0.25
+        pot2.state = 0.25
+        time.sleep(0.01)
+        pot1.state = 0.75
+        pot2.state = 0.75
+        time.sleep(0.01)
+
+    pot1.state = 0.5
+    pot2.state = 0.5
+    input("-------")
+
+def test_mcu_pin(hil):
+    hil.start_test(test_mcu_pin.__name__)
+
+    brk_stat_tap = hil.mcu_pin("Dashboard", "BRK_STAT_TAP")
+
+    delta_avg = 0
+    delta_cnt = 0
+    for i in range(100):
+        t_start = time.time()
+        #time.sleep(0.01)
+        print(brk_stat_tap.state)
+        t_start = time.time() - t_start
+        delta_avg += t_start
+        delta_cnt = delta_cnt + 1
+    
+    print(f"Average: {delta_avg/delta_cnt}")
+    
+    hil.end_test()
+
+
+def test_daq(hil):
+    hil.start_test(test_daq.__name__)
+
+    counter = 0
+    start_time = time.time()
+
+    LOOP_TIME_S = 0.015
+
+    # while(1):
+    #     time.sleep(3)
+
+    print("Sending")
+
+    while (time.time() - start_time < 15*60):
+        last_tx = time.perf_counter()
+        #msg = can.Message(arbitration_id=0x14000072, data=counter.to_bytes(4, 'little'))
+        msg = can.Message(arbitration_id=0x80080c4, data=counter.to_bytes(4, 'little'))
+        hil.can_bus.sendMsg(msg)
+        counter = counter + 1
+        delta = LOOP_TIME_S - (time.perf_counter() - last_tx)
+        if (delta < 0): delta = 0
+        time.sleep(delta)
+
+    print("Done")
+    print(f"Last count sent: {counter - 1}")
+
 
 if __name__ == "__main__":
     hil = HIL()
     hil.load_config("config_testing.json")
     hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
 
+    # hil.init_can()
     #test_bspd(hil)
     test_dac(hil)
+    # test_pot(hil)
+    # test_mcu_pin(hil)
+    # test_daq(hil)
 
     hil.shutdown()
