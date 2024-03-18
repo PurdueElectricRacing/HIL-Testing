@@ -22,6 +22,6 @@
     "hil_devices":[
         {"name":"FrontTester", "type":"test_pcb", "id":1},
         {"name":"RearTester",  "type":"test_pcb", "id":2},
-        {"name":"RearTesterArd", "type":"test_pcb", "id":4}
+        {"name":"RearTesterArd", "type":"test_uno", "id":4}
     ]
 }

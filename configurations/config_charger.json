@@ -1,0 +1,14 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Charger", "harness_connections":[
+            {"dut":{"connector":"P301","pin":8},  "hil":{"device":"RearTester", "port":"AI2"}},
+            {"dut":{"connector":"P301","pin":6},  "hil":{"device":"RearTester", "port":"AI1"}},
+            {"dut":{"connector":"P301","pin":9},  "hil":{"device":"RearTester", "port":"DI3"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"RearTester",  "type":"test_pcb", "id":2},
+        {"name":"RearTesterArd", "type":"test_pcb", "id":4}
+    ]
+}

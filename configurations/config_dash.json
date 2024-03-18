@@ -1,0 +1,14 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Dashboard", "harness_connections":[
+            {"dut":{"connector":"J1","pin":9},  "hil":{"device":"FrontTester", "port":"DAC1"}},
+            {"dut":{"connector":"J1","pin":10}, "hil":{"device":"FrontTester", "port":"DAC2"}},
+            {"dut":{"connector":"J1","pin":11}, "hil":{"device":"FrontTester", "port":"POT1"}},
+            {"dut":{"connector":"J1","pin":12}, "hil":{"device":"FrontTester", "port":"POT2"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"FrontTester", "type":"test_pcb", "id":1}
+    ]
+}

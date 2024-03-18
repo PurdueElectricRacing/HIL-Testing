@@ -66,8 +66,8 @@ BRK_1_REST_V   = 0.5 # Resting line voltage of brake 1
 BRK_2_REST_V   = 0.5 # Resting line voltage of brake 2
 BRK_1_DIV = utils.VoltageDivider(5600, 10000)
 BRK_2_DIV = utils.VoltageDivider(5600, 10000)
-BRK_1_THRESH_V = BRK_1_DIV.reverse(1.0) # Threshold that is considered braking for brake 1
-BRK_2_THRESH_V = BRK_2_DIV.reverse(1.0) # Threshold that is considered braking for brake 2
+BRK_1_THRESH_V = 0.68 # Threshold that is considered braking for brake 1
+BRK_2_THRESH_V = 0.68 # Threshold that is considered braking for brake 2
 
 # Throttle
 THTL_MAX_P = 0.9 # Maximum pedal press percent

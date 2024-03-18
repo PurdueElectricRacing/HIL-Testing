@@ -699,10 +699,10 @@ if __name__ == "__main__":
     power = hil.dout("RearTester", "RLY1")
 
     # Drive Critical Tests
-    test_precharge(hil)
-    # test_bspd(hil)
-    #test_imd(hil) # note: tsal needs to be tripped
-    #test_ams(hil)
+    # test_precharge(hil)
+    test_bspd(hil)
+    # test_imd(hil) # note: tsal needs to be tripped
+    # test_ams(hil)
     # test_tsal(hil)
     # test_sdc(hil)
     # test_buzzer(hil)

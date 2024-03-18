@@ -37,7 +37,7 @@ class HilDevice():
                 # 3.3V = meas_3v3 / adc_max * 5V
                 # 5V = 3.3V * adc_max / meas_3v3
                 self.rail_5v = 3.3 * self.adc_max / meas_3v3
-                utils.log(f"5V rail measured to be {self.rail_5v:.3}V")
+                utils.log(f"5V rail measured to be {self.rail_5v:.3}V on {self.name}")
 
         self.adc_to_volts = 0.0
         self.adc_max = 0
