@@ -47,7 +47,8 @@ class CanBus(threading.Thread):
 
         self.is_importing = False
 
-        self.port = 8080
+        #self.port = 8080
+        self.port = 5005
         self.ip = default_ip
         #self.ip = "10.42.0.1"
         self.password = None
@@ -87,11 +88,12 @@ class CanBus(threading.Thread):
             utils.log(f"cleared {i} from buffer")
             utils.log_warning("This does not gurantee a connection. Please make sure Raspberry Pi is broadcasting.")
             # self.connect_sig.emit(self.connected)
+            self.connect_tcp()
             return
         except OSError as e:
             utils.log(f"UDP connect error {e}")
 
-        # Usb failed, trying tcp
+        # # Usb failed, trying tcp
         # utils.log("Trying tcp")
         # try:
         #     self.bus = TCPBus(self.ip, self.port)
@@ -124,34 +126,33 @@ class CanBus(threading.Thread):
             self.tcpbus = TCPBus(self.ip, self.port)
             self.connected_tcp = True
             # Empty buffer of old messages
-            time.sleep(3)
+            # time.sleep(3)
             i=0
             while(self.tcpbus.recv(0)):
                 i+=1
             utils.log(f"cleared {i} from buffer")
             utils.log("Tcp successful")
             # self.password = PasswordDialog.promptPassword(self.password)
-            self.password = "TODO: I DONT REMEMBER THE PASSWORD"
-            print(self.password)
-            result = True
-            if self.password == "":
-                result = False
-            elif self.password == None:
-                self.tcpbus.shutdown(0)
-                result = True
-            else:
-                result = self.tcpbus.handshake(self.password)
-            while not result:
-                self.password = None
-                # self.password = PasswordDialog.setText(self.password)
-                if self.password == "":
-                    result = False
-                elif self.password == None:
-                    self.tcpbus.shutdown(0)
-                    result = True
-                else:
-                    result = self.tcpbus.handshake(self.password)
-            # self.connect_sig.emit(self.connected)
+            # print(self.password)
+            # result = True
+            # if self.password == "":
+            #     result = False
+            # elif self.password == None:
+            #     self.tcpbus.shutdown(0)
+            #     result = True
+            # else:
+            #     result = self.tcpbus.handshake(self.password)
+            # while not result:
+            #     self.password = None
+            #     self.password = PasswordDialog.setText(self.password)
+            #     if self.password == "":
+            #         result = False
+            #     elif self.password == None:
+            #         self.tcpbus.shutdown(0)
+            #         result = True
+            #     else:
+            #         result = self.tcpbus.handshake(self.password)
+            # # self.connect_sig.emit(self.connected)
             self.connected_disp = 2
             # self.write_sig.emit(self.connected_disp)
             self.tcp = True
@@ -160,7 +161,7 @@ class CanBus(threading.Thread):
             self.connected_disp = 0
             # self.write_sig.emit(self.connected_disp)
             utils.log_error(e)
-            # BindError.bindError()
+            BindError.bindError()
             self.tcpbus.close()
             return
         except Exception as e:

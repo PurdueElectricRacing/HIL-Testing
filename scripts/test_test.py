@@ -133,17 +133,20 @@ def test_daq(hil):
     counter = 0
     start_time = time.time()
 
-    LOOP_TIME_S = 0.015
+    LOOP_TIME_S = 0.001
 
     # while(1):
     #     time.sleep(3)
 
     print("Sending")
 
-    while (time.time() - start_time < 15*60):
+    #while (time.time() - start_time < 15*60):
+    while (counter < 4000):
         last_tx = time.perf_counter()
         #msg = can.Message(arbitration_id=0x14000072, data=counter.to_bytes(4, 'little'))
-        msg = can.Message(arbitration_id=0x80080c4, data=counter.to_bytes(4, 'little'))
+        #msg = can.Message(arbitration_id=0x80080c4, data=counter.to_bytes(4, 'little'))
+        msg = can.Message(arbitration_id=0x400193e, data=counter.to_bytes(8, 'little'))
+        #print(msg)
         hil.can_bus.sendMsg(msg)
         counter = counter + 1
         delta = LOOP_TIME_S - (time.perf_counter() - last_tx)
@@ -156,14 +159,14 @@ def test_daq(hil):
 
 if __name__ == "__main__":
     hil = HIL()
-    hil.load_config("config_testing.json")
+    #hil.load_config("config_testing.json")
     hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
 
-    # hil.init_can()
+    hil.init_can()
     #test_bspd(hil)
-    test_dac(hil)
+    #test_dac(hil)
     # test_pot(hil)
     # test_mcu_pin(hil)
-    # test_daq(hil)
+    test_daq(hil)
 
     hil.shutdown()
