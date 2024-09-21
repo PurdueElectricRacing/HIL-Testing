@@ -20,7 +20,7 @@ CONFIG_PATH = "..\\configurations"
 NET_MAP_PATH = "..\\net_maps"
 PIN_MAP_PATH = "..\\pin_maps"
 
-PARAMS_PATH = "..\hil_params.json"
+PARAMS_PATH = "..\\hil_params.json"
 
 
 class HIL():

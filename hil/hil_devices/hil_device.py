@@ -14,7 +14,7 @@ HIL_CMD_WRITE_POT  = 5
 
 HIL_ID_MASK = 0xFF
 
-HIL_DEVICES_PATH = "..\hil\hil_devices"
+HIL_DEVICES_PATH = "../hil/hil_devices"
 
 class HilDevice():
 
