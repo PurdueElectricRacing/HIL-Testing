@@ -62,12 +62,12 @@ class Component():
         if (hil_port_num >= 0):
             print(f"Creating new component '{self.name}' of type {mode} on {hil_con}")
             if (mode == "DI"):
-                    if self.inv_meas:
-                        self.read_func = lambda : not dev.read_gpio(hil_port_num)
-                    else:
-                        self.read_func = lambda : dev.read_gpio(hil_port_num)
+                if self.inv_meas:
+                    self.read_func = lambda : not dev.read_gpio(hil_port_num)
+                else:
+                    self.read_func = lambda : dev.read_gpio(hil_port_num)
             elif (mode == "AI"):
-                    self.read_func = lambda : dev.read_analog(hil_port_num)
+                self.read_func = lambda : dev.read_analog(hil_port_num)
             elif (mode == "DO"):
                 if self.inv_emul:
                     self.write_func = lambda s: dev.write_gpio(hil_port_num, not s)
