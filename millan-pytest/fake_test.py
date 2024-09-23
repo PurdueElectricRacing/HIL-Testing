@@ -1,6 +1,5 @@
 # import pytest
 
-# @pytest.mark.section("FAKE 1")
 # def test_fake():
 # 	assert 1 == 1, "Power"
 # 	assert 2 == 3, "Fire"
@@ -9,14 +8,12 @@
 # 	assert 5 == 5, "Steering"
 # 	assert 6 == 6, "Suspension"
 
-# @pytest.mark.section("FAKE 2")
 # def test_fake2():
 # 	assert False
 # 	assert True
 # 	assert False
 # 	assert True
 
-# @pytest.mark.section("FAKE 3")
 # def test_fake3():
 # 	assert True
 # 	assert True
