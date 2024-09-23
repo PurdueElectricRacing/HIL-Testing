@@ -317,22 +317,3 @@ def test_imd(hil):
 
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
-if __name__ == "__main__":
-    # hil = HIL()
-    # hil.load_config("config_abox_bench.json")
-    # hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-
-    # hil.init_can()
-
-    test_abox_ams()
-    test_isense()
-    test_precharge()
-    test_tiffomy()
-    test_tmu()
-    test_imd()
-
-    # hil.shutdown()
-# ---------------------------------------------------------------------------- #

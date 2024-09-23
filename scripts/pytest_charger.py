@@ -184,21 +184,3 @@ def test_ams(hil):
     
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
-if __name__ == "__main__":
-    # hil = HIL()
-
-    # hil.load_config("config_charger.json")
-    # hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-
-    #hil.init_can()
-
-    # power = hil.dout("RearTester", "RLY1")
-
-    test_imd()
-    test_ams()
-
-    # hil.shutdown()
-# ---------------------------------------------------------------------------- #
