@@ -52,3 +52,6 @@ def test_fake3(param):
     check.is_true(True, "True 3")
     check.is_true(True, "True 4")
 
+def test_fake4(param):
+    check.almost_equal(0.2, 0.23, abs=0.1, rel=0.0,  msg="Almost 1")
+
