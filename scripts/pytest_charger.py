@@ -12,6 +12,7 @@ import pytest_check as check
 import pytest
 
 
+# ---------------------------------------------------------------------------- #
 AMS_STAT_OKAY = 1
 AMS_STAT_TRIP = 0
 AMS_CTRL_OKAY = 1
@@ -41,8 +42,10 @@ IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S
 IMD_RC_MAX_TRIP_TIME_S = R_IMD_MAX_TRIP_TIME_S - IMD_MEASURE_TIME_S
 IMD_CTRL_OKAY = 1
 IMD_CTRL_TRIP = 0
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 @pytest.fixture(scope="session")
 def hil():
     global power
@@ -59,8 +62,10 @@ def hil():
     yield hil_instance
     
     hil_instance.shutdown() 
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 def test_imd(hil):
     # Begin the test
     # hil.start_test(test_imd.__name__)
@@ -118,7 +123,9 @@ def test_imd(hil):
     check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Floating Trip") 
     
     # hil.end_test()
+# ---------------------------------------------------------------------------- #
 
+# ---------------------------------------------------------------------------- #
 def test_ams(hil):
     # Begin the test
     hil.start_test(test_ams.__name__)
@@ -176,8 +183,10 @@ def test_ams(hil):
     check.equal(ams_ctrl.state, AMS_CTRL_TRIP, "AMS Floating Trip")
     
     # hil.end_test()
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 if __name__ == "__main__":
     # hil = HIL()
 
@@ -192,3 +201,4 @@ if __name__ == "__main__":
     test_ams()
 
     # hil.shutdown()
+# ---------------------------------------------------------------------------- #
