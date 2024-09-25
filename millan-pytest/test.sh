@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Check if a Python file was passed as an argument
+# If no file passed, run on all files
 if [ "$#" -ne 1 ]; then
-    echo "Usage: ./test <file.py>"
-    exit 1
+    echo "Running tests on all files..."
+    pytest --cache-clear --no-header -v
+else
+    echo "Running tests on $1..."
+    pytest --cache-clear --no-header -v "$1"
 fi
-
-pytest --cache-clear --no-header -v "$1"
