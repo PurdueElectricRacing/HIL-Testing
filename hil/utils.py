@@ -8,32 +8,48 @@ import numpy as np
 def initGlobals():
     global signals
     signals = {}
+    
     global plot_x_range_sec
     plot_x_range_sec = 10
+    
     global events
     events = []
+    
     global b_str
     b_str = "Main"
+    
     global data_types
     data_types = {
-        'uint8_t':np.dtype('<u1'),
-        'uint16_t':np.dtype('<u2'),
-        'uint32_t':np.dtype('<u4'),
-        'uint64_t':np.dtype('<u8'),
-        'int8_t':np.dtype('<i1'),
-        'int16_t':np.dtype('<i2'),
-        'int32_t':np.dtype('<i4'),
-        'int64_t':np.dtype('<i8'),
-        'float':np.dtype('<f4') # 32 bit
+        'uint8_t':  np.dtype('<u1'),
+        'uint16_t': np.dtype('<u2'),
+        'uint32_t': np.dtype('<u4'),
+        'uint64_t': np.dtype('<u8'),
+        'int8_t':   np.dtype('<i1'),
+        'int16_t':  np.dtype('<i2'),
+        'int32_t':  np.dtype('<i4'),
+        'int64_t':  np.dtype('<i8'),
+        'float':    np.dtype('<f4') # 32 bit
     }
+    
     global data_type_length
-    data_type_length = {'uint8_t':8, 'uint16_t':16, 'uint32_t':32, 'uint64_t':64,
-                    'int8_t':8, 'int16_t':16, 'int32_t':32, 'int64_t':64,
-                    'float':32}
+    data_type_length = {
+        'uint8_t':  8,
+        'uint16_t': 16,
+        'uint32_t': 32,
+        'uint64_t': 64,
+        'int8_t':   8,
+        'int16_t':  16,
+        'int32_t':  32,
+        'int64_t':  64,
+        'float':    32
+    }
+    
     global debug_mode
     debug_mode = True
+    
     global daqProt
     daqProt = None
+    
     global hilProt
     hilProt = None
 
@@ -79,7 +95,7 @@ def load_json_config(config_path, schema_path=None):
     return config
 
 def clearDictItems(dictionary:dict):
-    """ recursively calls clear on items in multidimensional dict"""
+    """Recursively calls clear on items in multidimensional dict"""
     for key, value in dictionary.items():
         if type(value) is dict:
             clearDictItems(value)
@@ -102,8 +118,9 @@ def high_precision_sleep(duration):
             time.sleep(max(remaining_time/2, 0.0001))  # Sleep for the remaining time or minimum sleep interval
         else:
             pass
-class VoltageDivider():
 
+
+class VoltageDivider():
     def __init__(self, r1, r2):
         self.r1 = float(r1)
         self.r2 = float(r2)
