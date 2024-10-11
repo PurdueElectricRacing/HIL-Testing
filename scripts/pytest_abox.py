@@ -17,7 +17,7 @@ import pytest
 def hil():
     hil_instance = HIL()
 
-    hil_instance.load_config("config_charger.json")
+    hil_instance.load_config("config_abox_bench.json")
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
 
     hil_instance.init_can()
