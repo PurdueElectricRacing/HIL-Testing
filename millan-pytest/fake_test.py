@@ -30,11 +30,25 @@ def param():
     yield param_instance
     
 
+def log_function_start_end(func):
+    def wrapper_function(*args, **kwargs): 
+        print(f"START: {func.__name__}")
+        func(*args,  **kwargs) 
+        print(f"END:   {func.__name__}")
+    return wrapper_function 
+
+
+@log_function_start_end
+def do_something():
+    pass
+
 def test_fake(param):
     check.equal(1, 1, "Power")
+    do_something()
     check.equal(2, 3, "Fire")
     check.equal(3, 3, "Cooling")
     check.equal(4, 5, "Brakes")
+    do_something()
     check.equal(5, 5, "Steering")
     check.equal(6, 6, "Suspension")
     check.between_equal(5, 1, 10, "Speed")
