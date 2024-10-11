@@ -179,7 +179,7 @@ def test_ams(hil):
     t = utils.measure_trip_time(ams_ctrl, AMS_MAX_TRIP_DELAY_S * 2, is_falling=True)
     # hil.check(0 <= t < AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time")
     # hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Floating Trip")
-    check.between(t, 0, AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time")
+    check.between(t, 0, AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time", ge=True)
     check.equal(ams_ctrl.state, AMS_CTRL_TRIP, "AMS Floating Trip")
     
     # hil.end_test()
