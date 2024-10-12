@@ -4,9 +4,30 @@ from hil import HIL
 import utils
 import time
 
+import pytest_check as check
+import pytest
+
+
+# ---------------------------------------------------------------------------- #
+@pytest.fixture(scope="session")
+def hil():
+    hil_instance = HIL()
+
+    hil_instance.load_config("config_collector_bench.json")
+    hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
+    
+    # hil_instance.init_can()
+    
+    yield hil_instance
+    
+    hil_instance.shutdown() 
+# ---------------------------------------------------------------------------- #
+
+
+# ---------------------------------------------------------------------------- #
 def test_collector(hil):
     # Begin the test
-    hil.start_test(test_collector.__name__)
+    # hil.start_test(test_collector.__name__)
 
     # Outputs
     m1 = hil.dout("Collector", "MUX_A")
@@ -40,15 +61,19 @@ def test_collector(hil):
             time.sleep(0.01)
 
             if (i == thermistor):
-                hil.check_within(to.state, test_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+                # hil.check_within(to.state, test_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+                check.almost_equal(to.state, test_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
             else:
-                hil.check_within(to.state, pullup_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+                # hil.check_within(to.state, pullup_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+                check.almost_equal(to.state, pullup_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
             print(to.state)
 
     # End the test
-    hil.end_test()
+    # hil.end_test()
+# ---------------------------------------------------------------------------- #
 
-if __name__ == "__main__":
+# ---------------------------------------------------------------------------- #
+# if __name__ == "__main__":
     hil = HIL()
     hil.load_config("config_collector_bench.json")
     hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
