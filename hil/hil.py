@@ -2,7 +2,7 @@ import utils
 import os
 import signal
 import sys
-import time
+# import time
 from pin_mapper import PinMapper
 from hil_devices.hil_device import HilDevice
 from hil_devices.serial_manager import SerialManager

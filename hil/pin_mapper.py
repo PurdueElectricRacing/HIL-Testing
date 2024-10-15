@@ -10,18 +10,22 @@ import utils
 
 class PinMapper():
 
-    def __init__(self, net_map):
+    def __init__(self, net_map: str):
         #utils.initGlobals()
-        self.load_net_map(net_map)
-        self.mcu_pin_map = {}
-    
-    def load_net_map(self, fname):
-        self.net_map_fname = fname
-        self.net_map = {}
-        # CSV format:
-        # Board,Net,Component,Designator,Connector Name,,
-        # Create dictionary as follows
+
         # [board name][net name] = [(component, designator, connector name), ...]
+        self.net_map: dict[str, dict[str, list[tuple[str, str, str]]]] = {}
+        self.net_map_fname: str = ""
+
+        # [designator] = (bank, pin)
+        self.mcu_pin_map: dict[int, tuple[int, int]] = {}
+        self.mcu_pin_name_fname: str = ""
+
+        self.load_net_map(net_map)
+    
+    def load_net_map(self, fname: str) -> None:
+        self.net_map_fname = fname
+        # CSV format: Board,Net,Component,Designator,Connector Name,,
         with open(self.net_map_fname, mode='r') as f:
             csv_file = csv.DictReader(f)
             for row in csv_file:
@@ -35,7 +39,7 @@ class PinMapper():
                     net_map_board[net] = []
                 self.net_map[board][net].append(items)
         
-    def load_mcu_pin_map(self, fname):
+    def load_mcu_pin_map(self, fname: str) -> None:
         self.mcu_pin_name_fname = fname
         self.mcu_pin_map = {}
         # CSV format:
@@ -52,7 +56,7 @@ class PinMapper():
                 pin  = int(row['Pin Name'][2:])
                 self.mcu_pin_map[designator] = (bank, pin)
         
-    def get_mcu_pin(self, board, net):
+    def get_mcu_pin(self, board: str, net: str) -> tuple[int, int]:
         """ Returns first MCU pin found that is connected """
         connections = self.get_net_connections(board, net)
         for connection in connections:
@@ -65,7 +69,7 @@ class PinMapper():
         utils.log_error(f"Net {net} on board {board} is not connected to MCU.")
         return (None, None)
 
-    def get_net_connections(self, board, net):
+    def get_net_connections(self, board: str, net: str) -> list[tuple[str, str, str]]:
         """ [(component, designator, connector name), ...] """
         if not board in self.net_map:
             utils.log_error(f"Unrecogniazed board {board}.")
