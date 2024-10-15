@@ -60,7 +60,7 @@ class HIL():
         self.can_bus.start()
 
     @utils.log_function_start_end
-    def load_pin_map(self, net_map, pin_map) -> None:
+    def load_pin_map(self, net_map: str, pin_map: str) -> None:
         net_map_f = os.path.join(NET_MAP_PATH, net_map)
         pin_map_f = os.path.join(PIN_MAP_PATH, pin_map)
 
@@ -101,7 +101,7 @@ class HIL():
         print(f"{utils.bcolors.OKGREEN}HIL stop_can END{utils.bcolors.ENDC}")
 
     @utils.log_function_start_end
-    def load_config(self, config_name) -> None:
+    def load_config(self, config_name: str) -> None:
         config = utils.load_json_config(os.path.join(CONFIG_PATH, config_name), None) # TODO: validate w/ schema
 
         # TODO: support joining configs
@@ -113,7 +113,7 @@ class HIL():
         self.load_connections(config['dut_connections'])
     
     @utils.log_function_start_end
-    def load_connections(self, dut_connections) -> None:
+    def load_connections(self, dut_connections: dict) -> None:
         self.dut_connections = {}
         # Dictionary format:
         # [board][connector][pin] = (hil_device, port)
@@ -130,7 +130,7 @@ class HIL():
                 self.dut_connections[board_name][connector][pin] = hil_port
 
     @utils.log_function_start_end
-    def add_component(self, board, net, mode) -> Component:
+    def add_component(self, board: str, net: str, mode: str) -> Component:
         # If board is a HIL device, net is expected to be port name
         # If board is a DUT device, net is expected to be a net name from the board
         if board in self.hil_devices:
@@ -146,7 +146,7 @@ class HIL():
         return self.components[comp_name]
 
     @utils.log_function_start_end
-    def load_hil_devices(self, hil_devices) -> None:
+    def load_hil_devices(self, hil_devices: dict) -> None:
         self.clear_hil_devices()
         self.serial_manager.discover_devices()
         for hil_device in hil_devices:
@@ -156,14 +156,14 @@ class HIL():
                 self.handle_error(f"Failed to discover HIL device {hil_device['name']} with id {hil_device['id']}")
 
     @utils.log_function_start_end
-    def get_hil_device(self, name) -> HilDevice:
+    def get_hil_device(self, name: str) -> HilDevice:
         if name in self.hil_devices:
             return self.hil_devices[name]
         else:
             self.handle_error(f"HIL device {name} not recognized")
 
     @utils.log_function_start_end
-    def get_hil_device_connection(self, board, net) -> tuple[str, str]:
+    def get_hil_device_connection(self, board: str, net: str) -> tuple[str, str]:
         """ Converts dut net to hil port name """
         if not board in self.dut_connections:
             self.handle_error(f"No connections to {board} found in configuration.")
@@ -182,41 +182,41 @@ class HIL():
         self.handle_error(f"Connect dut to {net} on {board}.")
     
     @utils.log_function_start_end
-    def din(self, board, net) -> Component:
+    def din(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DI')
     @utils.log_function_start_end
-    def dout(self, board, net) -> Component:
+    def dout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DO')
     
     @utils.log_function_start_end
-    def ain(self, board, net) -> Component:
+    def ain(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AI')
     
     @utils.log_function_start_end
-    def aout(self, board, net) -> Component:
+    def aout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AO')
     
     @utils.log_function_start_end
-    def pot(self, board, net) -> Component:
+    def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
 
     @utils.log_function_start_end
-    def daq_var(self, board, var_name) -> DAQVariable:
+    def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
         except KeyError as e:
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     @utils.log_function_start_end
-    def can_var(self, board, message_name, signal_name) -> str:
-        # TODO: not sure if the return type is correct
+    def can_var(self, board: str, message_name: str, signal_name: str) -> str:
+        # TODO: not sure if any of the type hints are correct
         try:
             return utils.signals[utils.b_str][board][message_name][signal_name]
         except KeyError:
             self.handle_error(f"Unable to locate CAN signal {signal_name} of message {message_name} of board {board}")
 
     @utils.log_function_start_end
-    def mcu_pin(self, board, net) -> DAQPin:
+    def mcu_pin(self, board: str, net: str) -> DAQPin:
         bank, pin = self.pin_map.get_mcu_pin(board, net)
         if bank == None:
             self.handle_error(f"Failed to get mcu pin for {board} net {net}")
@@ -248,7 +248,7 @@ class HIL():
     #     print(f"{utils.bcolors.OKCYAN}{self.curr_test} failed {self.curr_test_fail_count} out of {self.curr_test_count} checks{utils.bcolors.ENDC}")
 
     @utils.log_function_start_end
-    def handle_error(self, msg) -> None:
+    def handle_error(self, msg: str) -> None:
         utils.log_error(msg)
         self.shutdown()
         exit(0)
