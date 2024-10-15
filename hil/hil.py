@@ -36,10 +36,10 @@ class HIL():
         self.can_bus = None
         utils.hilProt = self
         signal.signal(signal.SIGINT, signal_int_handler)
-        self.global_failed_checks = []
-        self.global_test_names = []
-        self.global_check_count = 0 # multiple checks within a test
-        self.global_test_count = 0
+        # self.global_failed_checks = []
+        # self.global_test_names = []
+        # self.global_check_count = 0 # multiple checks within a test
+        # self.global_test_count = 0
 
     @utils.log_function_start_end
     def init_can(self):
