@@ -1,4 +1,6 @@
+from collections.abc import Callable
 import utils
+from hil.hil import HIL
 
 class Component():
     """ 
@@ -7,15 +9,15 @@ class Component():
     When in measurement or emulation, a source must be specified.
     """
 
-    def __init__(self, name, hil_con, mode, hil):
-        self.name = name
+    def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil: HIL):
+        self.name: str = name
 
         self._state = 0
-        self.inv_meas = False
-        self.inv_emul = False
-        self.read_func  = None
-        self.write_func = None
-        self.hiZ_func = None
+        self.inv_meas: bool = False
+        self.inv_emul: bool = False
+        self.read_func: Callable[[], int] = None
+        self.write_func: Callable[[int], None] = None
+        self.hiZ_func: Callable[[], None] = None
 
         # TODO: allow both measure and emulation source
 
@@ -89,7 +91,7 @@ class Component():
         self.hil = hil
 
     @property
-    def state(self):
+    def state(self) -> int:
         if self.read_func:
             self._state = self.read_func()
         elif self.write_func == None:
@@ -97,7 +99,7 @@ class Component():
         return self._state
 
     @state.setter
-    def state(self, s):
+    def state(self, s: int) -> None:
         if self.read_func == None:
             self._state = s
         if self.write_func:
@@ -105,13 +107,13 @@ class Component():
         else:
             utils.log_warning(f"Wrote to {self.name}, but no emulation source was found")
     
-    def hiZ(self):
+    def hiZ(self) -> None:
         if (self.hiZ_func):
             self.hiZ_func()
         else:
             utils.log_warning(f"hiZ is not supported for {self.name}")
     
-    def shutdown(self):
+    def shutdown(self) -> None:
         if (self.hiZ_func):
             self.hiZ_func()
         elif self.write_func:
