@@ -1,9 +1,15 @@
-import json
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 import sys
 import time
 import numpy as np
+
+import json
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
+
+from components.component import Component
+from hil.hil import HIL
+from communication.daq_protocol import DaqProtocol
+
 
 def initGlobals():
     global signals
@@ -13,13 +19,13 @@ def initGlobals():
     plot_x_range_sec = 10
     
     global events
-    events = []
+    events: list = []
     
     global b_str
-    b_str = "Main"
+    b_str: str = "Main"
     
     global data_types
-    data_types = {
+    data_types: dict[str, np.dtype] = {
         'uint8_t':  np.dtype('<u1'),
         'uint16_t': np.dtype('<u2'),
         'uint32_t': np.dtype('<u4'),
@@ -32,7 +38,7 @@ def initGlobals():
     }
     
     global data_type_length
-    data_type_length = {
+    data_type_length: dict[str, int] = {
         'uint8_t':  8,
         'uint16_t': 16,
         'uint32_t': 32,
@@ -45,13 +51,13 @@ def initGlobals():
     }
     
     global debug_mode
-    debug_mode = True
+    debug_mode: bool = True
     
     global daqProt
-    daqProt = None
+    daqProt: DaqProtocol = None
     
     global hilProt
-    hilProt = None
+    hilProt: HIL = None
 
 # display current function start/end
 def log_function_start_end(func):
@@ -74,16 +80,16 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def log_error(phrase):
+def log_error(phrase: str) -> None:
     print(f"{bcolors.FAIL}ERROR: {phrase}{bcolors.ENDC}")
 
-def log_warning(phrase):
+def log_warning(phrase: str) -> None:
     log(f"{bcolors.WARNING}WARNING: {phrase}{bcolors.ENDC}")
 
-def log_success(phrase):
+def log_success(phrase: str) -> None:
     log(f"{bcolors.OKGREEN}{phrase}{bcolors.ENDC}")
 
-def log(phrase):
+def log(phrase: str) -> None:
     global debug_mode
     if debug_mode: print(phrase)
 
@@ -103,20 +109,20 @@ def load_json_config(config_path: str, schema_path=None) -> dict:
 
     return config
 
-def clearDictItems(dictionary:dict):
+def clearDictItems(dictionary: dict) -> None:
     """Recursively calls clear on items in multidimensional dict"""
-    for key, value in dictionary.items():
+    for value in dictionary.values():
         if type(value) is dict:
             clearDictItems(value)
         else:
             value.clear()
 
-def clear_term_line():
+def clear_term_line() -> None:
     sys.stdout.write('\033[F\033[K')
     #sys.stdout.flush()
 
 # Credit: https://stackoverflow.com/questions/1133857/how-accurate-is-pythons-time-sleep/76554895#76554895
-def high_precision_sleep(duration):
+def high_precision_sleep(duration: float) -> None:
     start_time = time.perf_counter()
     while True:
         elapsed_time = time.perf_counter() - start_time
@@ -130,19 +136,19 @@ def high_precision_sleep(duration):
 
 
 class VoltageDivider():
-    def __init__(self, r1, r2):
+    def __init__(self, r1: float, r2: float):
         self.r1 = float(r1)
         self.r2 = float(r2)
         self.ratio = (self.r2 / (self.r1 + self.r2))
 
-    def div(self, input):
+    def div(self, input: float) -> float:
         return input * self.ratio
     
-    def reverse(self, output):
+    def reverse(self, output: float) -> float:
         return output / self.ratio
 
 
-def measure_trip_time(trip_sig, timeout, is_falling=False):
+def measure_trip_time(trip_sig: Component, timeout: float, is_falling: bool = False) -> float:
     t_start = time.time()
     while(trip_sig.state == is_falling):
         time.sleep(0.015)
@@ -154,7 +160,15 @@ def measure_trip_time(trip_sig, timeout, is_falling=False):
     return t_delt
 
 
-def measure_trip_thresh(thresh_sig, start, stop, step, period_s, trip_sig, is_falling=False):
+def measure_trip_thresh(
+        thresh_sig: Component,
+        start: float,
+        stop: float,
+        step: float,
+        period_s: float,
+        trip_sig: Component,
+        is_falling: bool = False
+) -> float:
     gain = 1000
     thresh = start
     _start = int(start * gain)
