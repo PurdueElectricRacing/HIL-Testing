@@ -1,7 +1,9 @@
 import os
-import time
-import serial
+# import time
+# import serial
 import serial.tools.list_ports
+from hil_devices.serial_manager import SerialManager
+
 import utils
 
 HIL_CMD_MASK       = 0xFF
@@ -17,12 +19,11 @@ HIL_ID_MASK = 0xFF
 HIL_DEVICES_PATH = "../hil/hil_devices"
 
 class HilDevice():
-
-    def __init__(self, name, type, id, serial_manager):
-        self.name = name
-        self.type = type
-        self.id = id
-        self.sm = serial_manager
+    def __init__(self, name: str, type: str, id: int, serial_manager: SerialManager):
+        self.name: str = name
+        self.type: str = type
+        self.id: int = id
+        self.sm: SerialManager = serial_manager
 
         self.config = utils.load_json_config(os.path.join(HIL_DEVICES_PATH, f"hil_device_{self.type}.json"), None) # TODO: validate w/ schema
 
@@ -61,7 +62,7 @@ class HilDevice():
         if "pot_config" in self.config:
             self.pot_max = pow(2, self.config['pot_config']['bit_resolution']) - 1
 
-    def get_port_number(self, port_name, mode):
+    def get_port_number(self, port_name: str, mode: str) -> int:
         for p in self.config['ports']:
             if port_name == p['name']:
                     if mode in p['capabilities']:
@@ -75,17 +76,17 @@ class HilDevice():
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
 
-    def write_gpio(self, pin, value): 
+    def write_gpio(self, pin: int, value: int) -> None: 
         data = [(HIL_CMD_WRITE_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
         self.sm.send_data(self.id, data)
 
-    def write_dac(self, pin, value):
+    def write_dac(self, pin: int, value: int) -> None: 
         value = min(self.dac_max, max(0, int(value * self.volts_to_dac)))
         data = [(HIL_CMD_WRITE_DAC & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
         # print(f"write pin {pin} to {value}")
         self.sm.send_data(self.id, data)
 
-    def read_gpio(self, pin): 
+    def read_gpio(self, pin: int) -> int:
         data = [(HIL_CMD_READ_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK), 0]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 1)
@@ -94,7 +95,7 @@ class HilDevice():
             if (d <= 1): return d
         utils.log_error(f"Failed to read gpio pin {pin} on {self.name}")
 
-    def read_analog(self, pin):
+    def read_analog(self, pin: int) -> float:
         data = [(HIL_CMD_READ_ADC & HIL_CMD_MASK), (pin & HIL_ID_MASK), 0]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 2)
@@ -104,7 +105,7 @@ class HilDevice():
         utils.log_error(f"Failed to read adc pin {pin} on {self.name}")
         return 0
 
-    def write_pot(self, pin, value):
+    def write_pot(self, pin: int, value: float) -> None:
         value = min(self.pot_max, max(0, int(value * self.pot_max)))
         data = [(HIL_CMD_WRITE_POT & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
         #print(f"sending {value} to pin {pin}")
