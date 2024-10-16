@@ -1,6 +1,6 @@
 from os import sys, path 
 sys.path.append(path.join(path.dirname(path.dirname(path.abspath(__file__))), 'hil'))
-import utils
+import hil.utils as utils
 
 # NOTE: each value in this file should be a physical or electrical property of the vehicle
 
