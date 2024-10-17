@@ -9,8 +9,8 @@ from communication.client import TCPBus, UDPBus
 import utils
 import time
 import threading
-import numpy as np
-import math
+# import numpy as np
+# import math
 
 CAN_READ_TIMEOUT_S = 1.0
 
