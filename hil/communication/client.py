@@ -12,6 +12,8 @@ import datetime
 # https://github.com/teebr/socketsocketcan
 # switched raspi to be the server instead of a client
 
+
+# ---------------------------------------------------------------------------- #
 class TCPBus(can.BusABC):
 
     RECV_FRAME_SZ = 29
@@ -19,30 +21,30 @@ class TCPBus(can.BusABC):
     CAN_RTR_FLAG = 0x40000000
     CAN_ERR_FLAG = 0x20000000
 
-    def __init__(self, ip, port,can_filters=None,**kwargs):
-        super().__init__("whatever",can_filters)
-        self.port = port
-        self._is_connected = False
-        self.recv_buffer = Queue()
-        self.send_buffer = Queue()
-        self._shutdown_flag = False#Queue()
+    def __init__(self, ip: str, port: int, can_filters: can.typechecking.CanFilters | None = None,**kwargs):
+        super().__init__("whatever", can_filters)
+        self.port: int = port
+        self._is_connected: bool = False
+        self.recv_buffer: Queue = Queue()
+        self.send_buffer: Queue = Queue()
+        self._shutdown_flag: bool = False#Queue()
 
         print(f"IP: {ip}, port: {port}")
 
         #open socket and wait for connection to establish.
         socket.setdefaulttimeout(3) # seconds
         utils.log("attempting to connect to tcp")
-        self._conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+        self._conn: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
         utils.log("Connecting...")
         self._conn.connect((ip, port))
         utils.log("connected")
-        self._is_connected = True
+        self._is_connected: bool = True
         self._conn.settimeout(0.5) #blocking makes exiting an infinite loop hard
 
         self.start_threads()
 
 
-    def start_threads(self):
+    def start_threads(self) -> bool:
         # self._conn.sendall(password.encode())
         # data_raw = self._conn.recv(1)
         # data = int.from_bytes(data_raw,"little")
@@ -61,7 +63,7 @@ class TCPBus(can.BusABC):
         self.send_time_sync()
         return True
     
-    def send_time_sync(self):
+    def send_time_sync(self) -> None:
         # Sends the current time to update RTC
         self.send_buffer.put(4)
         t = datetime.datetime.now() 
@@ -69,14 +71,15 @@ class TCPBus(can.BusABC):
                    t.day, t.month, (t.year-2000), 0, 0])
         self.send_buffer.put(v)
 
-    def _recv_internal(self,timeout=None):
+    def _recv_internal(self,timeout: float | None = None) -> tuple[can.Message | None, bool]:
         #TODO: filtering
         try:
             return (self.recv_buffer.get(timeout=timeout), True)
         except queue.Empty:
             return None, True
 
-    def send(self,msg):
+    def send(self, msg):
+        # TODO: type hint!
         if msg.is_extended_id:
             msg.arbitration_id |= self.CAN_EFF_FLAG
         if msg.is_remote_frame:
@@ -86,21 +89,21 @@ class TCPBus(can.BusABC):
         self.send_buffer.put(0)
         self.send_buffer.put(msg)
 
-    def start_logging(self):
+    def start_logging(self) -> None:
         self.send_buffer.put(1)
         self.send_buffer.put(0xFFFFFFFF)
 
-    def stop_logging(self):
+    def stop_logging(self) -> None:
         self.send_buffer.put(3)
         self.send_buffer.put(0xFFFFFFFF)
 
-    def _stop_threads(self):
+    def _stop_threads(self) -> None:
         #self._shutdown_flag.put(True)
         self._shutdown_flag = True
         self._is_connected = False
         utils.log_warning("Bus Client Shutdown (TCP)")
 
-    def shutdown(self, handshake):
+    def shutdown(self, handshake: int) -> None:
         """gracefully close TCP connection and exit threads"""
         #handshake: 0: Currently in handshake mode, 1: In regular send mode
         if handshake == 0:
@@ -116,15 +119,16 @@ class TCPBus(can.BusABC):
             sleep(0.005)
         self._conn.close() #shutdown might be faster but can be ugly and raise an exception
 
-    def close(self):
+    def close(self) -> None:
         self._conn.close()
 
     @property
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """check that a TCP connection is active"""
         return self._is_connected
 
-    def _msg_to_bytes(self,msg):
+    def _msg_to_bytes(self, msg):
+        # TODO: type hint!
         """convert Message object to bytes to be put on TCP socket"""
         # print(msg)
         arb_id = msg.arbitration_id.to_bytes(4,"little") #TODO: masks
@@ -133,7 +137,7 @@ class TCPBus(can.BusABC):
         # print(arb_id + dlc + data)
         return arb_id+dlc+data
 
-    def _bytes_to_message(self,b):
+    def _bytes_to_message(self, b: bytes) -> can.Message:
         """convert raw TCP bytes to can.Message object"""
         #ts = int.from_bytes(b[:4],"little") + int.from_bytes(b[4:8],"little")/1e6
         ts = int.from_bytes(b[:8],"little") + int.from_bytes(b[8:16],"little")/1e6
@@ -160,7 +164,7 @@ class TCPBus(can.BusABC):
             data=b[21:21+dlc]
         )
 
-    def _poll_socket(self):
+    def _poll_socket(self) -> None:
         """background thread to check for new CAN messages on the TCP socket"""
         part_formed_message = bytearray() # TCP transfer might off part way through sending a message
         #with self._conn as conn:
@@ -204,7 +208,7 @@ class TCPBus(can.BusABC):
                 break
         # utils.log("Exited poll socket")
 
-    def _poll_send(self):
+    def _poll_send(self) -> None:
         """background thread to send messages when they are put in the queue"""
         #with self._conn as s:
         s = self._conn
@@ -234,6 +238,10 @@ class TCPBus(can.BusABC):
             except QueueEmpty:
                 pass #NBD, just means nothing to send.
         # utils.log("Exited poll send")
+# ---------------------------------------------------------------------------- #
+
+
+# ---------------------------------------------------------------------------- #
 class UDPBus(can.BusABC):
     #RECV_FRAME_SZ = 29
     RECV_FRAME_SZ = 18
@@ -241,28 +249,28 @@ class UDPBus(can.BusABC):
     CAN_RTR_FLAG = 0x40000000
     CAN_ERR_FLAG = 0x20000000
 
-    def __init__(self, ip, port,can_filters=None,**kwargs):
+    def __init__(self, ip: str, port: int, can_filters: can.typechecking.CanFilters | None = None, **kwargs):
         super().__init__("whatever",can_filters)
-        self.port = port
-        self._is_connected = False
-        self.recv_buffer = Queue()
-        self._shutdown_flag = False#Queue()
+        self.port: int = port
+        self._is_connected: bool = False
+        self.recv_buffer: Queue = Queue()
+        self._shutdown_flag: bool = False#Queue()
 
         #open socket and wait for connection to establish.
         socket.setdefaulttimeout(3) # seconds
         utils.log("attempting to connect to udp")
-        self._conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self._conn: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
         self._conn.bind(("", 5005))
         utils.log("Listening to UDP Port")
-        self._is_connected = True
+        self._is_connected: bool = True
         self._conn.settimeout(0.5) #blocking makes exiting an infinite loop hard
 
         #now we're connected, kick off other threads.
-        self._udp_listener = Thread(target=self._poll_udp_socket)
+        self._udp_listener: Thread = Thread(target=self._poll_udp_socket)
         self._udp_listener.start()
 
-    def _bytes_to_message(self,b):
+    def _bytes_to_message(self, b: bytes) -> can.Message:
         """convert raw TCP bytes to can.Message object"""
         #ts = int.from_bytes(b[:4],"little") + int.from_bytes(b[4:8],"little")/ e6
         # ts = int.from_bytes(b[:8],"little") + int.from_bytes(b[8:16],"little")/1e6
@@ -294,7 +302,9 @@ class UDPBus(can.BusABC):
             #data=b[21:21+dlc]
             data=b[10:10+dlc]
         )
-    def send(self,msg):
+
+    def send(self, msg):
+        # TODO: type hint!
         if msg.is_extended_id:
             msg.arbitration_id |= self.CAN_EFF_FLAG
         if msg.is_remote_frame:
@@ -303,14 +313,14 @@ class UDPBus(can.BusABC):
             msg.arbitration_id |= self.CAN_ERR_FLAG
         self.send_buffer.put(msg)
 
-    def _recv_internal(self,timeout=None):
+    def _recv_internal(self, timeout: float | None = None) -> tuple[can.Message | None, bool]:
         #TODO: filtering
         try:
             return (self.recv_buffer.get(timeout=timeout), True)
         except queue.Empty:
             return None, True
 
-    def _poll_udp_socket(self):
+    def _poll_udp_socket(self) -> None:
         """background thread to check for new CAN messages on the UDP socket"""
         part_formed_message = bytearray() # UDP transfer might off part way through sending a message
         conn = self._conn
@@ -352,13 +362,13 @@ class UDPBus(can.BusABC):
                 self._stop_threads()
                 break
 
-    def _stop_threads(self):
+    def _stop_threads(self) -> None:
         #self._shutdown_flag.put(True)
         self._shutdown_flag = True
         self._is_connected = False
         utils.log_warning("Bus Client Shutdown (UDP)")
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         """gracefully close UDP connection and exit threads"""
         if self._is_connected:
             self._stop_threads()
@@ -366,3 +376,4 @@ class UDPBus(can.BusABC):
         while self._udp_listener.is_alive():
             sleep(0.005)
         self._conn.close() #shutdown might be faster but can be ugly and raise an exception
+# ---------------------------------------------------------------------------- #
