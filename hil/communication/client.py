@@ -25,8 +25,8 @@ class TCPBus(can.BusABC):
         super().__init__("whatever", can_filters)
         self.port: int = port
         self._is_connected: bool = False
-        self.recv_buffer: Queue = Queue()
-        self.send_buffer: Queue = Queue()
+        self.recv_buffer: Queue = Queue() # Queue[can.Message]
+        self.send_buffer: Queue = Queue() # Queue[can.Message]
         self._shutdown_flag: bool = False#Queue()
 
         print(f"IP: {ip}, port: {port}")
@@ -78,8 +78,7 @@ class TCPBus(can.BusABC):
         except queue.Empty:
             return None, True
 
-    def send(self, msg):
-        # TODO: type hint!
+    def send(self, msg: can.Message) -> None:
         if msg.is_extended_id:
             msg.arbitration_id |= self.CAN_EFF_FLAG
         if msg.is_remote_frame:
@@ -127,8 +126,7 @@ class TCPBus(can.BusABC):
         """check that a TCP connection is active"""
         return self._is_connected
 
-    def _msg_to_bytes(self, msg):
-        # TODO: type hint!
+    def _msg_to_bytes(self, msg: can.Message) -> bytes:
         """convert Message object to bytes to be put on TCP socket"""
         # print(msg)
         arb_id = msg.arbitration_id.to_bytes(4,"little") #TODO: masks
@@ -303,8 +301,7 @@ class UDPBus(can.BusABC):
             data=b[10:10+dlc]
         )
 
-    def send(self, msg):
-        # TODO: type hint!
+    def send(self, msg: can.Message) -> None:
         if msg.is_extended_id:
             msg.arbitration_id |= self.CAN_EFF_FLAG
         if msg.is_remote_frame:
