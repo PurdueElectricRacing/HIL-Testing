@@ -26,7 +26,7 @@ class CanBus(threading.Thread):
 
     def __init__(self, dbc_path: str, default_ip: str, can_config: dict):
         super(CanBus, self).__init__()
-        self.db = cantools.db.load_file(dbc_path) # TODO: type hint
+        self.db: cantools.database.can.database.Database = cantools.db.load_file(dbc_path)
 
         utils.log(f"CAN version: {can.__version__}")
         utils.log(f"gs_usb version: {gs_usb.__version__}")
@@ -182,8 +182,6 @@ class CanBus(threading.Thread):
         self.connected_disp = 0
         # self.write_sig.emit(self.connected_disp)
 
-
-
     def disconnect_bus(self) -> None:
         self.connected = False
         # self.connect_sig.emit(self.connected)
@@ -227,8 +225,8 @@ class CanBus(threading.Thread):
         else:
             self.tcpbus.stop_logging()
 
-    def sendFormatMsg(self, msg_name, msg_data: dict) -> None:
-        # TODO: type hint
+    def sendFormatMsg(self, msg_name: str, msg_data: dict) -> None:
+        # TODO: not sure if the type hints are correct
         """ Sends a message using a dictionary of its data """
         dbc_msg = self.db.get_message_by_name(msg_name)
         data = dbc_msg.encode(msg_data)
@@ -390,7 +388,7 @@ class BusSignal():
         else:
             self.store_dtype: np.dtype = store_dtype
         
-        self.data = 0 # TODO: type hint
+        self.data: int = 0 # TODO: n
         self.time: float = 0
         self.stale_timestamp: float = time.time()
 
@@ -409,8 +407,8 @@ class BusSignal():
                          sig_desc=(sig['sig_desc'] if 'sig_desc' in sig else ""),
                          msg_period=msg['msg_period'])
 
-    def update(self, val, timestamp: float) -> None:
-        # TODO: type hint
+    def update(self, val: int, timestamp: float) -> None:
+        # TODO: not sure if the type hints are correct
         """ update the value of the signal """
         self.data = val
         self.time = timestamp
@@ -422,8 +420,8 @@ class BusSignal():
         self.time = 0
 
     @property
-    def curr_val(self):
-        # TODO: type hint
+    def curr_val(self) -> int:
+        # TODO: not sure if the type hints are correct
         """ last value recorded """
         return self.data
 
@@ -440,8 +438,8 @@ class BusSignal():
             return ((time.time() - self.stale_timestamp) * 1000) > self.msg_period * 1.5
 
     @property
-    def state(self):
-        # TODO: type hint
+    def state(self) -> int:
+        # TODO: not sure if the type hints are correct
         start_t = time.time()
         while (self.is_stale):
             if (time.time() >= start_t + CAN_READ_TIMEOUT_S):
