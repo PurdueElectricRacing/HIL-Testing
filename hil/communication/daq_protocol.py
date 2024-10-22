@@ -46,6 +46,7 @@ TODO: parsing, import file vars as signals
 """
 
 
+# ---------------------------------------------------------------------------- #
 class DAQVariable(BusSignal):
     """ DAQ variable that can be subscribed (connected) to for receiving updates"""
 
@@ -172,8 +173,10 @@ class DAQVariable(BusSignal):
         a = self.state
         if (abs(s - a) > 0.0001):
             utils.log_warning(f"Write failed for DAQ var {self.signal_name} of {self.node_name}")
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 class DaqProtocol():
     """ Implements CAN daq protocol for modifying and live tracking of variables """
 
@@ -440,19 +443,20 @@ class DaqProtocol():
                             utils.signals[bus['bus_name']][node['node_name']][f"daq_response_{node['node_name'].upper()}"][var['var_name']] = DAQVariable.fromDAQFileVar(
                                 id_counter, var, file['name'], file['eeprom_lbl'], node, bus)
                             id_counter += 1
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 class DAQPin():
-
-    def __init__(self, pin_name, board, bank, pin):
-        self.name = pin_name
-        self.board = board
-        self.bank = bank
-        self.pin = pin
-        self.t_last = time.time()
+    def __init__(self, pin_name: str, board: str, bank: int, pin: int):
+        self.name: str = pin_name
+        self.board: str = board
+        self.bank: int = bank
+        self.pin: int = pin
+        self.t_last: float = time.time()
 
     @property
-    def state(self):
+    def state(self) -> int:
         self.t_last = time.time()
         t_start = time.time()
         utils.daqProt.readPin(self.board, self.bank, self.pin)
