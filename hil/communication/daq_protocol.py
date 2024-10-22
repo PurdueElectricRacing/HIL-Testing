@@ -184,23 +184,24 @@ class DaqProtocol():
 
     def __init__(self, bus: CanBus, daq_config: dict):
         super(DaqProtocol, self).__init__()
-        self.can_bus = bus
-        # self.can_bus.new_msg_sig.connect(self.handleDaqMsg)
+        self.can_bus: CanBus = bus
         self.can_bus.handle_daq_msg = self.handleDaqMsg
+
+        # self.can_bus.new_msg_sig.connect(self.handleDaqMsg)
 
         self.updateVarDict(daq_config)
 
         # eeprom saving (prevent a load while save taking place)
-        self.last_save_request_id = 0
-        self.save_in_progress = False
+        self.last_save_request_id: int = 0
+        self.save_in_progress: bool = False
         utils.daqProt = self
 
-        self.curr_pin = 0
-        self.curr_bank = 0
-        self.curr_pin_val = 0
-        self.pin_read_in_progress = False
+        self.curr_pin: int = 0
+        self.curr_bank: int = 0
+        self.curr_pin_val: int = 0
+        self.pin_read_in_progress: bool = False
 
-    def readPin(self, node, bank, pin):
+    def readPin(self, node: str, bank: int, pin: int) -> None:
         """ Requests to read a GPIO pin, expects a reply """
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{node.upper()}")
         self.curr_bank = bank & DAQ_BANK_MASK
@@ -212,7 +213,7 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
 
-    def readVar(self, var: DAQVariable):
+    def readVar(self, var: DAQVariable) -> None:
         """ Requests to read a variable, expects a reply """
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
         data = [((var.id & DAQ_ID_MASK) << DAQ_CMD_LENGTH) | DAQ_CMD_READ]
@@ -220,7 +221,8 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
 
-    def writeVar(self, var: DAQVariable, new_val):
+    def writeVar(self, var: DAQVariable, new_val) -> None:
+        # TODO: type hint
         """ Writes to a variable """
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
         data = [((var.id & DAQ_ID_MASK) << DAQ_CMD_LENGTH) | DAQ_CMD_WRITE]
@@ -234,7 +236,7 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
         
-    def saveFile(self, var: DAQVariable):
+    def saveFile(self, var: DAQVariable) -> None:
         """ Saves variable state in eeprom, expects save complete reply """
         if var.file_lbl == None:
             utils.log_error(f"Invalid save var operation for {var.signal_name}")
@@ -254,7 +256,7 @@ class DaqProtocol():
         # self.last_save_request_id = var.id
         # self.save_in_progress_sig.emit(True)
 
-    def loadFile(self, var: DAQVariable):
+    def loadFile(self, var: DAQVariable) -> None:
         """ Loads a variable from eeprom, cannot be performed during save operation """
         if var.file_lbl == None:
             utils.log_error(f"Invalid load var operation for {var.signal_name}")
@@ -274,7 +276,7 @@ class DaqProtocol():
                                          data=data))
         self.setFileClean(var)
 
-    def pubVar(self, var: DAQVariable, period_ms):
+    def pubVar(self, var: DAQVariable, period_ms: int) -> None:
         """ Requests to start publishing a variable at a specified period """
         var.pub_period_ms = period_ms
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
@@ -284,7 +286,8 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
 
-    def forceFault(self, id, state):
+    def forceFault(self, id: int, state) -> None:
+        # TODO: type hint
         print(f"Id: {id}, State: {state}")
         fault_msg = self.can_bus.db.get_message_by_name(f"set_fault")
         data = fault_msg.encode({"id": id, "value": state})
@@ -292,7 +295,7 @@ class DaqProtocol():
                                         is_extended_id=True,
                                         data=data))
 
-    def create_ids(self, fault_config):
+    def create_ids(self, fault_config: dict) -> dict:
        num = 0
        idx = 0
        for node in fault_config['modules']:
@@ -316,7 +319,7 @@ class DaqProtocol():
                print("An error occured configuring a node.")
        return fault_config
 
-    def unforceFault(self, id):
+    def unforceFault(self, id: int) -> None:
         print(f"Id: {id}. Returning control!")
         fault_msg = self.can_bus.db.get_message_by_name(f"return_fault_control")
         data = fault_msg.encode({"id": id})
@@ -324,7 +327,7 @@ class DaqProtocol():
                                         is_extended_id=True,
                                         data=data))
 
-    def pubVarStop(self, var: DAQVariable):
+    def pubVarStop(self, var: DAQVariable) -> None:
         """ Requests to stop publishing a variable """
         var.pub_period_ms = 0
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
@@ -333,7 +336,7 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
     
-    def setFileClean(self, var_in_file: DAQVariable):
+    def setFileClean(self, var_in_file: DAQVariable) -> None:
         """ Sets all variables in a file to clean (usually after flushing) """
         if (var_in_file.file_lbl == None): return
         node_d = utils.signals[var_in_file.bus_name][var_in_file.node_name]
@@ -343,7 +346,7 @@ class DaqProtocol():
             vars[file_var].updateDirty(False)
 
 
-    def setFileClean(self, var_in_file: DAQVariable):
+    def setFileClean(self, var_in_file: DAQVariable) -> None:
         """ Sets all variables in a file to clean (usually after flushing) """
         if (var_in_file.file_lbl == None): return
         node_d = utils.signals[var_in_file.bus_name][var_in_file.node_name]
@@ -353,7 +356,7 @@ class DaqProtocol():
             vars[file_var].updateDirty(False)
 
 
-    def handleDaqMsg(self, msg: can.Message):
+    def handleDaqMsg(self, msg: can.Message) -> None:
         """ Interprets and runs commands from DAQ message """
         # Return if not a DAQ message
         if (msg.arbitration_id >> 6) & 0xFFFFF != 0xFFFFF: return
@@ -415,7 +418,7 @@ class DaqProtocol():
                     else:
                         utils.log_warning(f"Got unexpected pin read response {node_name} bank {bank} pin {pin}")
 
-    def updateVarDict(self, daq_config: dict):
+    def updateVarDict(self, daq_config: dict) -> None:
         """ Creates dictionary of variable objects from daq configuration"""
         for bus in daq_config['busses']:
             # create bus keys
