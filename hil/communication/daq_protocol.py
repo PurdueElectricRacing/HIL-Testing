@@ -1,3 +1,4 @@
+from __future__ import annotations
 from communication.can_bus import BusSignal, CanBus
 # from PyQt5 import QtCore
 import utils
@@ -49,25 +50,53 @@ TODO: parsing, import file vars as signals
 # ---------------------------------------------------------------------------- #
 class DAQVariable(BusSignal):
     """ DAQ variable that can be subscribed (connected) to for receiving updates"""
+    def __init__(self,
+        bus_name: str,
+        node_name: str,
+        msg_name: str,
+        sig_name: str,
+        id: int,
+        read_only: bool,
+        bit_length: int,
+        dtype: np.dtype,
+        store_dtype: np.dtype | None = None,
+        unit: str = "",
+        msg_desc: str = "",
+        sig_desc: str = "",
+        msg_period: int = 0,
+        file_name: str | None = None,
+        file_lbl: str | None = None,
+        scale: int = 1,
+        offset: int = 0
+    ):
+        super(DAQVariable, self).__init__(
+            bus_name,
+            node_name,
+            msg_name,
+            sig_name,
+            dtype,
+            store_dtype=store_dtype,
+            unit=unit,
+            msg_desc=msg_desc,
+            sig_desc=sig_desc,
+            msg_period=msg_period
+        )
+        self.id: int = id
+        self.read_only: bool = read_only
+        self.bit_length: int = bit_length
+        self.file: str = file_name
+        self.file_lbl: str = file_lbl
 
+        self.pub_period_ms: int = 0
 
-    def __init__(self, bus_name, node_name, msg_name, sig_name, id, read_only, bit_length, 
-                 dtype, store_dtype=None, unit="", msg_desc="", sig_desc="", msg_period=0, file_name=None, file_lbl=None, scale=1, offset=0):
-        super(DAQVariable, self).__init__(bus_name, node_name, msg_name, sig_name, dtype, store_dtype=store_dtype, 
-                                          unit=unit, msg_desc=msg_desc, sig_desc=sig_desc, msg_period=msg_period)
-        self.id = id
-        self.read_only = read_only
-        self.bit_length = bit_length
-        self.file = file_name
-        self.file_lbl = file_lbl
-        self.pub_period_ms = 0
+        # TODO: not sure if the type hints are correct
+        self.scale: int = scale
+        self.offset: int = offset
 
-        self.scale = scale
-        self.offset = offset
+        self.is_dirty: bool = False
 
-        self.is_dirty = False
-
-    def fromDAQVar(id, var, node, bus):
+    @classmethod
+    def fromDAQVar(cls, id: int, var: dict, node: dict, bus: dict) -> DAQVariable:
         send_dtype = utils.data_types[var['type']]
         # If there is scaling going on, don't store as an integer on accident
         if ('scale' in var and var['scale'] != 1) or ('offset' in var and var['offset'] != 0):
@@ -81,7 +110,7 @@ class DAQVariable(BusSignal):
                 utils.log_error(f"Invalid bit length defined for DAQ variable {var['var_name']}")
             bit_length = var['length']
 
-        return DAQVariable(bus['bus_name'], node['node_name'], f"daq_response_{node['node_name'].upper()}", var['var_name'],
+        return cls(bus['bus_name'], node['node_name'], f"daq_response_{node['node_name'].upper()}", var['var_name'],
                          id, var['read_only'], bit_length,
                          send_dtype, store_dtype=parse_dtype,
                          unit=(var['unit'] if 'unit' in var else ""),
@@ -90,7 +119,9 @@ class DAQVariable(BusSignal):
                          scale=(var['scale'] if 'scale' in var else 1),
                          offset=(var['offset'] if 'offset' in var else 0))
     
-    def fromDAQFileVar(id, var, file_name, file_lbl, node, bus):
+    @classmethod
+    def fromDAQFileVar(cls, id: int, var: dict, file_name: str, file_lbl: str, node: dict, bus: dict) -> DAQVariable:
+        # TODO: not sure if the type hints are correct
         send_dtype = utils.data_types[var['type']]
         # If there is scaling going on, don't store as an integer on accident
         if ('scale' in var and var['scale'] != 1) or ('offset' in var and var['offset'] != 0):
@@ -100,7 +131,7 @@ class DAQVariable(BusSignal):
         # Calculate bit length
         bit_length = utils.data_type_length[var['type']]
 
-        return DAQVariable(bus['bus_name'], node['node_name'], f"daq_response_{node['node_name'].upper()}", var['var_name'],
+        return cls(bus['bus_name'], node['node_name'], f"daq_response_{node['node_name'].upper()}", var['var_name'],
                          id, False, bit_length,
                          send_dtype, store_dtype=parse_dtype,
                          unit=(var['unit'] if 'unit' in var else ""),
@@ -109,15 +140,17 @@ class DAQVariable(BusSignal):
                          scale=(var['scale'] if 'scale' in var else 1),
                          offset=(var['offset'] if 'offset' in var else 0))
 
-    def update(self, bytes, timestamp):
+    def update(self, bytes: int, timestamp: float) -> None:
         val = np.frombuffer(bytes.to_bytes((self.bit_length + 7)//8, 'little'), dtype=self.send_dtype, count=1)
         val = val * self.scale + self.offset
-        return super().update(val, timestamp)
+        super().update(val, timestamp)
 
-    def reverseScale(self, val):
+    def reverseScale(self, val: float) -> float:
+        # TODO: not sure if the type hint is correct
         return (val - self.offset) / self.scale
 
-    def valueSendable(self, val):
+    def valueSendable(self, val: float) -> bool:
+        # TODO: not sure if the type hint is correct
         # TODO: check max and min from json config
         val = self.reverseScale(val)
         if 'uint' in str(self.send_dtype):
@@ -130,27 +163,29 @@ class DAQVariable(BusSignal):
                 return False
         return True
 
-    def reverseToBytes(self, val):
+    def reverseToBytes(self, val: float) -> bytes | bool:
         if not self.valueSendable(val): return False # Value will not fit in the given dtype
         return (np.array([self.reverseScale(val)], dtype=self.send_dtype).tobytes())
 
-    def getSendValue(self, val):
+    def getSendValue(self, val: float) -> float | bool:
+        # TODO: not sure if the type hint is correct
         if not self.valueSendable(val): return False # Value will not fit in the given dtype
         # Convert to send
         a = np.array([self.reverseScale(val)], dtype=self.send_dtype)[0]
         # Convert back
         return a * self.scale + self.offset
 
-    def isDirty(self):
+    def isDirty(self) -> bool:
         if self.file_lbl == None: return False
         return self.is_dirty
 
-    def updateDirty(self, dirty):
+    def updateDirty(self, dirty: bool) -> None:
         if self.file_lbl == None: return
         self.is_dirty = dirty
 
     @property
-    def state(self):
+    def state(self) -> int:
+        # TODO: not sure if the type hints are correct
         """ Read the value in blocking manner """
         old_t = self.last_update_time
         utils.daqProt.readVar(self) 
@@ -163,7 +198,8 @@ class DAQVariable(BusSignal):
         return self.curr_val
         
     @state.setter
-    def state(self, s):
+    def state(self, s: int) -> None:
+        # TODO: not sure if the type hint is correct
         """ Writes the value in blocking manner """
         if (self.read_only):
             utils.log_error(f"Can't write to read-only DAQ variable {self.signal_name} of {self.node_name}")
