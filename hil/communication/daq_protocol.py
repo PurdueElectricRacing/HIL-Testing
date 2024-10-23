@@ -257,8 +257,8 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
 
-    def writeVar(self, var: DAQVariable, new_val) -> None:
-        # TODO: type hint
+    def writeVar(self, var: DAQVariable, new_val: float) -> None:
+        # TODO: not sure if the type hint is correct
         """ Writes to a variable """
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
         data = [((var.id & DAQ_ID_MASK) << DAQ_CMD_LENGTH) | DAQ_CMD_WRITE]
@@ -322,8 +322,8 @@ class DaqProtocol():
                                          is_extended_id=True,
                                          data=data))
 
-    def forceFault(self, id: int, state) -> None:
-        # TODO: type hint
+    def forceFault(self, id: int, state: int) -> None:
+        # TODO: not sure if the type hint is correct
         print(f"Id: {id}, State: {state}")
         fault_msg = self.can_bus.db.get_message_by_name(f"set_fault")
         data = fault_msg.encode({"id": id, "value": state})
