@@ -8,7 +8,7 @@ from hil_devices.hil_device import HilDevice
 from hil_devices.serial_manager import SerialManager
 from components.component import Component
 
-from communication.can_bus import CanBus
+from communication.can_bus import CanBus, BusSignal
 from communication.daq_protocol import DaqProtocol
 from communication.daq_protocol import DAQPin
 from communication.daq_protocol import DAQVariable
@@ -208,7 +208,7 @@ class HIL():
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     @utils.log_function_start_end
-    def can_var(self, board: str, message_name: str, signal_name: str) -> str:
+    def can_var(self, board: str, message_name: str, signal_name: str) -> BusSignal:
         # TODO: not sure if any of the type hints are correct
         try:
             return utils.signals[utils.b_str][board][message_name][signal_name]
