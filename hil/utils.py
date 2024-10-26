@@ -36,11 +36,11 @@ def initGlobals():
     # }
 
     
-    global plot_x_range_sec
-    plot_x_range_sec = 10
+    # global plot_x_range_sec
+    # plot_x_range_sec: int = 10
     
-    global events
-    events: list = []
+    # global events
+    # events: list = []
     
     global b_str
     b_str: str = "Main"
