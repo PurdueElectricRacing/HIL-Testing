@@ -14,28 +14,25 @@ from communication.daq_protocol import DaqProtocol
 def initGlobals():
     global signals
     signals = {}
+    # Structure of signals based on daq_config and can_config
     # signals = {
-    #     "bus_name": {                               # Top level, keyed by bus name (e.g., "Main", "Test")
-    #         "node_name": {                          # Second level, keyed by node name (e.g., "Main_Module", "TEST_NODE")
-    #             "daq_response_NODE_NAME": {         # DAQ-specific dictionary; exists if DAQ variables are defined
-    #                 "var_name": DAQVariable         # Each variable from `daq_config`, stored as DAQVariable instances
-    #                 # e.g., "cal_steer_angle": DAQVariable instance
-    #             },
-    #             "files": {                          # Optional DAQ-specific dictionary; exists if file data is present in DAQ config
-    #                 "file_name": {                  # Keyed by file name (e.g., "config")
-    #                     "contents": [               # List of variable names in the file
-    #                         "var_name"              # e.g., "blue_on"
-    #                     ]
-    #                 }
-    #             },
-    #             "messages": {                       # CAN-specific dictionary; exists if CAN messages are defined
-    #                 "msg_name": {                   # Keyed by message name from `can_config` (e.g., "main_hb", "gearbox")
-    #                     "sig_name": BusSignal       # Each signal from CAN message, stored as BusSignal instances
-    #                     # e.g., "car_state": BusSignal instance
-    #                 }
-    #             }
+    #   'bus_name': { # busses; ex: "Main", "Test"
+    #     'node_name': { # busses->nodes; ex: "Main_Module", "Dashboard"
+    #       'msg_name': { # busses->nodes->tx; ex: "main_hb", "coolant_temps"
+    #         'sig_name': BusSignal # # busses->nodes->tx->signals; ex: "car_state", "battery_in_temp"
+    #       },
+    #       "daq_response_{node['node_name'].upper()}": { # busses->nodes; ex: "daq_response_MAIN_MODULE", "daq_response_DASHBOARD"
+    #         'var_name': DAQVariable # busses->nodes->variables | busses->nodes->files->contents; ex: "cal_steer_angle", "sdc_main_status", "blue_on", "odometer"
+    #       },
+    #       "files": {
+    #         'name': { # busses->nodes->files; ex: "config"
+    #           "contents": [
+    #             'var_name' # busses->nodes->files->contents; ex: "blue_on", "odometer"
+    #           ]
     #         }
+    #       }
     #     }
+    #   }
     # }
 
     
