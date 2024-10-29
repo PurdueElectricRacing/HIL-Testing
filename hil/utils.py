@@ -19,7 +19,7 @@ def initGlobals():
     #   'bus_name': { # busses; ex: "Main", "Test"
     #     'node_name': { # busses->nodes; ex: "Main_Module", "Dashboard"
     #       'msg_name': { # busses->nodes->tx; ex: "main_hb", "coolant_temps"
-    #         'sig_name': BusSignal # # busses->nodes->tx->signals; ex: "car_state", "battery_in_temp"
+    #         'sig_name': BusSignal # busses->nodes->tx->signals; ex: "car_state", "battery_in_temp"
     #       },
     #       "daq_response_{node['node_name'].upper()}": { # busses->nodes; ex: "daq_response_MAIN_MODULE", "daq_response_DASHBOARD"
     #         'var_name': DAQVariable # busses->nodes->variables | busses->nodes->files->contents; ex: "cal_steer_angle", "sdc_main_status", "blue_on", "odometer"
