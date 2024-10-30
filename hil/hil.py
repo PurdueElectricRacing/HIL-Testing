@@ -27,7 +27,6 @@ PARAMS_PATH = "../hil_params.json"
 class HIL():
 
     @utils.log_function_start_end
-    @utils.log_function_start_end
     def __init__(self):
         utils.initGlobals()
         self.components: dict[str, Component] = {}
