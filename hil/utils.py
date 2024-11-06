@@ -93,14 +93,6 @@ def initGlobals():
     global hilProt
     hilProt = None
 
-# display current function start/end
-def log_function_start_end(func):
-    def wrapper_function(*args, **kwargs): 
-        global debug_mode
-        if debug_mode: print(f"{bcolors.OKCYAN}START: {func.__name__}{bcolors.ENDC}")
-        func(*args,  **kwargs) 
-        if debug_mode: print(f"{bcolors.OKCYAN}END:   {func.__name__}{bcolors.ENDC}")
-    return wrapper_function 
 
 # Logging helper functions
 class bcolors:

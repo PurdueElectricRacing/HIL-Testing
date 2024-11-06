@@ -25,8 +25,6 @@ PARAMS_PATH = "../hil_params.json"
 
 
 class HIL():
-
-    @utils.log_function_start_end
     def __init__(self):
         utils.initGlobals()
         self.components: dict[str, Component] = {}
@@ -46,7 +44,6 @@ class HIL():
         # self.global_check_count = 0 # multiple checks within a test
         # self.global_test_count = 0
 
-    @utils.log_function_start_end
     def init_can(self) -> None:
         config = self.hil_params
         self.daq_config = utils.load_json_config(os.path.join(config['firmware_path'], config['daq_config_path']), os.path.join(config['firmware_path'], config['daq_schema_path']))
@@ -58,7 +55,6 @@ class HIL():
         self.can_bus.connect()
         self.can_bus.start()
 
-    @utils.log_function_start_end
     def load_pin_map(self, net_map: str, pin_map: str) -> None:
         net_map_f = os.path.join(NET_MAP_PATH, net_map)
         pin_map_f = os.path.join(PIN_MAP_PATH, pin_map)
@@ -66,19 +62,16 @@ class HIL():
         self.pin_map = PinMapper(net_map_f)
         self.pin_map.load_mcu_pin_map(pin_map_f)
 
-    @utils.log_function_start_end
     def clear_components(self) -> None:
         """ Reset HIL"""
         for c in self.components.values():
             c.shutdown()
         self.components = {}
 
-    @utils.log_function_start_end
     def clear_hil_devices(self) -> None:
         self.hil_devices = {}
         self.serial_manager.close_devices()
 
-    @utils.log_function_start_end
     def shutdown(self) -> None:
         print(f"{utils.bcolors.OKCYAN}HIL shutdown START{utils.bcolors.ENDC}")
         self.clear_components()
@@ -86,7 +79,6 @@ class HIL():
         self.stop_can()
         print(f"{utils.bcolors.OKGREEN}HIL shutdown START{utils.bcolors.OKGREEN}")
 
-    @utils.log_function_start_end
     def stop_can(self) -> None:
         print(f"{utils.bcolors.OKCYAN}HIL stop_can START{utils.bcolors.ENDC}")
         if not self.can_bus: return
@@ -99,7 +91,6 @@ class HIL():
         self.can_bus.disconnect_bus()
         print(f"{utils.bcolors.OKGREEN}HIL stop_can END{utils.bcolors.ENDC}")
 
-    @utils.log_function_start_end
     def load_config(self, config_name: str) -> None:
         config = utils.load_json_config(os.path.join(CONFIG_PATH, config_name), None) # TODO: validate w/ schema
 
@@ -111,7 +102,6 @@ class HIL():
         # Setup corresponding components
         self.load_connections(config['dut_connections'])
     
-    @utils.log_function_start_end
     def load_connections(self, dut_connections: dict) -> None:
         self.dut_connections = {}
         # Dictionary format:
@@ -128,7 +118,6 @@ class HIL():
                     self.dut_connections[board_name][connector] = {}
                 self.dut_connections[board_name][connector][pin] = hil_port
 
-    @utils.log_function_start_end
     def add_component(self, board: str, net: str, mode: str) -> Component:
         # If board is a HIL device, net is expected to be port name
         # If board is a DUT device, net is expected to be a net name from the board
@@ -144,7 +133,6 @@ class HIL():
             utils.log_warning(f"Component {comp_name} already exists")
         return self.components[comp_name]
 
-    @utils.log_function_start_end
     def load_hil_devices(self, hil_devices: dict) -> None:
         self.clear_hil_devices()
         self.serial_manager.discover_devices()
@@ -154,14 +142,12 @@ class HIL():
             else:
                 self.handle_error(f"Failed to discover HIL device {hil_device['name']} with id {hil_device['id']}")
 
-    @utils.log_function_start_end
     def get_hil_device(self, name: str) -> HilDevice:
         if name in self.hil_devices:
             return self.hil_devices[name]
         else:
             self.handle_error(f"HIL device {name} not recognized")
 
-    @utils.log_function_start_end
     def get_hil_device_connection(self, board: str, net: str) -> tuple[str, str]:
         """ Converts dut net to hil port name """
         if not board in self.dut_connections:
@@ -180,33 +166,27 @@ class HIL():
         utils.log_warning(net_cons)
         self.handle_error(f"Connect dut to {net} on {board}.")
     
-    @utils.log_function_start_end
     def din(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DI')
-    @utils.log_function_start_end
+
     def dout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DO')
     
-    @utils.log_function_start_end
     def ain(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AI')
     
-    @utils.log_function_start_end
     def aout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AO')
     
-    @utils.log_function_start_end
     def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
 
-    @utils.log_function_start_end
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
         except KeyError as e:
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
-    @utils.log_function_start_end
     def can_var(self, board: str, message_name: str, signal_name: str) -> BusSignal:
         # TODO: not sure if any of the type hints are correct
         try:
@@ -214,7 +194,6 @@ class HIL():
         except KeyError:
             self.handle_error(f"Unable to locate CAN signal {signal_name} of message {message_name} of board {board}")
 
-    @utils.log_function_start_end
     def mcu_pin(self, board: str, net: str) -> DAQPin:
         bank, pin = self.pin_map.get_mcu_pin(board, net)
         if bank == None:
@@ -246,14 +225,12 @@ class HIL():
     # def end_test(self):
     #     print(f"{utils.bcolors.OKCYAN}{self.curr_test} failed {self.curr_test_fail_count} out of {self.curr_test_count} checks{utils.bcolors.ENDC}")
 
-    @utils.log_function_start_end
     def handle_error(self, msg: str) -> None:
         utils.log_error(msg)
         self.shutdown()
         exit(0)
 
 
-@utils.log_function_start_end
 def signal_int_handler(signum, frame) -> None:
     utils.log("Received signal interrupt, shutting down")
     if (utils.hilProt):

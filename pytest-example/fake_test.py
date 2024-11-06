@@ -30,19 +30,9 @@ def param():
     yield param_instance
     
 
-def log_function_start_end(func):
-    def wrapper_function(*args, **kwargs): 
-        print(f"START: {func.__name__}")
-        func(*args,  **kwargs) 
-        print(f"END:   {func.__name__}")
-    return wrapper_function 
-
-
-@log_function_start_end
 def do_something():
     print("Doing something")
 
-@log_function_start_end
 def do_something_with_args(arg1, arg2):
     print(f"Arg1: {arg1}, Arg2: {arg2}")
 
