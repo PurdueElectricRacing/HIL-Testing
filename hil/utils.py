@@ -11,6 +11,15 @@ from hil.hil import HIL
 from communication.daq_protocol import DaqProtocol
 
 
+signals: dict = {}
+b_str: str = ""
+data_types: dict[str, np.dtype] = {}
+data_type_length: dict[str, int] = {}
+debug_mode: bool = True
+daqProt: DaqProtocol = None
+hilProt: HIL = None
+
+
 def initGlobals():
     global signals
     signals = {}
@@ -37,16 +46,16 @@ def initGlobals():
 
     
     # global plot_x_range_sec
-    # plot_x_range_sec: int = 10
+    # plot_x_range_sec = 10
     
     # global events
-    # events: list = []
+    # events = []
     
     global b_str
-    b_str: str = "Main"
+    b_str = "Main"
     
     global data_types
-    data_types: dict[str, np.dtype] = {
+    data_types = {
         'uint8_t':  np.dtype('<u1'),
         'uint16_t': np.dtype('<u2'),
         'uint32_t': np.dtype('<u4'),
@@ -59,7 +68,7 @@ def initGlobals():
     }
     
     global data_type_length
-    data_type_length: dict[str, int] = {
+    data_type_length = {
         'uint8_t':  8,
         'uint16_t': 16,
         'uint32_t': 32,
@@ -72,13 +81,13 @@ def initGlobals():
     }
     
     global debug_mode
-    debug_mode: bool = True
+    debug_mode = True
     
     global daqProt
-    daqProt: DaqProtocol = None
+    daqProt = None
     
     global hilProt
-    hilProt: HIL = None
+    hilProt = None
 
 # display current function start/end
 def log_function_start_end(func):
