@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import sys
 import time
 import numpy as np
@@ -7,8 +9,10 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 from hil.components.component import Component
-# from hil.hil import HIL
 from hil.communication.daq_protocol import DaqProtocol
+
+if TYPE_CHECKING:
+    from hil.hil import HIL
 
 
 signals: dict = {}
@@ -17,8 +21,7 @@ data_types: dict[str, np.dtype] = {}
 data_type_length: dict[str, int] = {}
 debug_mode: bool = True
 daqProt: DaqProtocol = None
-# hilProt: HIL = None
-hilProt = None
+hilProt: 'HIL' = None
 
 
 def initGlobals():

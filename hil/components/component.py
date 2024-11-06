@@ -1,6 +1,9 @@
 from collections.abc import Callable
+from typing import TYPE_CHECKING
+
 import hil.utils as utils
-# from hil.hil import HIL
+if TYPE_CHECKING:
+    from hil.hil import HIL
 
 class Component():
     """ 
@@ -9,8 +12,7 @@ class Component():
     When in measurement or emulation, a source must be specified.
     """
 
-    def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil):
-    # def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil: HIL):
+    def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil: 'HIL'):
         self.name: str = name
 
         self._state = 0
