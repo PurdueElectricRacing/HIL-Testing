@@ -20,8 +20,7 @@ def hil():
 
     # hil.load_config("config_testing.json")
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-    
-    # hil_instance.init_can()
+    hil_instance.init_can()
     
     yield hil_instance
     
