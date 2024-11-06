@@ -21,7 +21,7 @@ const int TESTER_ID = 2;
 #endif
 
 #ifdef DAC
-	#include "DFRobot_MCP4725.h
+	#include "DFRobot_MCP4725.h"
 	#define NUM_DACS 2
 
 	DFRobot_MCP4725 dacs[NUM_DACS];
