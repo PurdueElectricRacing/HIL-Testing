@@ -1,5 +1,5 @@
 {
-    "firmware_path": "C:/users/lukeo/Documents/firmware",
+    "firmware_path": "/home/millankumar/Documents/PER/firmware",
     "daq_config_path": "common/daq/daq_config.json",
     "daq_schema_path": "common/daq/daq_schema.json",
     "dbc_path": "common/daq/per_dbc.dbc",
