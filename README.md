@@ -8,4 +8,4 @@
 - Code in `./Scripts` runs on your laptop
 	- It uses all the Python files
 	- Each file in `./Scripts` can run a Pytest script to test some board on the car
-	- Do `./run.sh [filename]` to run the script, or no filename to run all of them. 
+	- Do `./test.sh [filename]` to run the script, or no filename to run all of them. 
