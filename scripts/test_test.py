@@ -1,5 +1,7 @@
-from os import sys, path 
-sys.path.append(path.join(path.dirname(path.dirname(path.abspath(__file__))), 'hil'))
+from os import sys, path
+# adds "./HIL-Testing" to the path, basically making it so these scripts were run one folder level higher
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
 from hil.hil import HIL
 # import hil.utils as utils
 import time

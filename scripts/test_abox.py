@@ -1,4 +1,5 @@
-from os import sys, path 
+from os import sys, path
+# adds "./HIL-Testing" to the path, basically making it so these scripts were run one folder level higher
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from hil.hil import HIL
