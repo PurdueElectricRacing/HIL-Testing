@@ -8,11 +8,32 @@ import time
 from rules_constants import *
 from vehicle_constants import *
 
+import pytest_check as check
+import pytest
 
+
+# ---------------------------------------------------------------------------- #
+@pytest.fixture(scope="session")
+def hil():
+    hil_instance = HIL()
+
+    hil_instance.load_config("config_system_hil_attached.json")
+    hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
+
+    hil_instance.init_can()
+    
+    yield hil_instance
+    
+    hil_instance.shutdown() 
+# ---------------------------------------------------------------------------- #
+
+
+# ---------------------------------------------------------------------------- #
 BRK_SWEEP_DELAY = 0.1
+
 def test_bspd(hil):
     # Begin the test
-    hil.start_test(test_bspd.__name__)
+    # hil.start_test(test_bspd.__name__)
 
     # Outputs
     brk1    = hil.aout("Dashboard",   "BRK1_RAW")
@@ -25,23 +46,34 @@ def test_bspd(hil):
     # Brake threshold check
     brk1.state = BRK_1_REST_V
     brk2.state = BRK_2_REST_V
-    hil.check(brk_stat_tap.state == 0, "Brake stat starts low")
+    # hil.check(brk_stat_tap.state == 0, "Brake stat starts low")
+    check.equal(brk_stat_tap.state, 0, "Brake stat starts low")
+
     brk1.state = BRK_1_THRESH_V
     time.sleep(0.1)
-    hil.check(brk_stat_tap.state == 1, "Brake stat goes high at brk 1 thresh")
+    # hil.check(brk_stat_tap.state == 1, "Brake stat goes high at brk 1 thresh")
+    check.equal(brk_stat_tap.state, 1, "Brake stat goes high at brk 1 thresh")
+
     brk1.state = BRK_1_REST_V
-    hil.check(brk_stat_tap.state == 0, "Brake stat starts low")
+    # hil.check(brk_stat_tap.state == 0, "Brake stat starts low")
+    check.equal(brk_stat_tap.state, 0, "Brake stat starts low")
+
     brk2.state = BRK_2_THRESH_V
     time.sleep(0.1)
-    hil.check(brk_stat_tap.state == 1, "Brake stat goes high at brk 2 thresh")
+    # hil.check(brk_stat_tap.state == 1, "Brake stat goes high at brk 2 thresh")
+    check.equal(brk_stat_tap.state, 1, "Brake stat goes high at brk 2 thresh")
+
     brk1.state = BRK_1_THRESH_V
-    hil.check(brk_stat_tap.state == 1, "Brake stat stays high for both brakes")
+    # hil.check(brk_stat_tap.state == 1, "Brake stat stays high for both brakes")
+    check.equal(brk_stat_tap.state, 1, "Brake stat stays high for both brakes")
+
 
     # Brake threshold scan
     brk1.state = BRK_MIN_OUT_V
     brk2.state = BRK_MIN_OUT_V
     time.sleep(0.1)
-    hil.check(brk_stat_tap.state == 0, "Brake Stat Starts Low Brk 1")
+    # hil.check(brk_stat_tap.state == 0, "Brake Stat Starts Low Brk 1")
+    check.equal(brk_stat_tap.state, 0, "Brake Stat Starts Low Brk 1")
 
     start = BRK_MIN_OUT_V
     stop  = BRK_MAX_OUT_V
@@ -51,8 +83,14 @@ def test_bspd(hil):
                                        BRK_SWEEP_DELAY,
                                        brk_stat_tap, is_falling=False)
     print(f"Brake 1 braking threshold: {thresh}")
-    hil.check_within(thresh, BRK_1_THRESH_V, 0.2, "Brake 1 trip voltage")
-    hil.check(brk_stat_tap.state == 1, "Brake Stat Tripped for Brk 1")
+    # hil.check_within(thresh, BRK_1_THRESH_V, 0.2, "Brake 1 trip voltage")
+    # hil.check(brk_stat_tap.state == 1, "Brake Stat Tripped for Brk 1")
+    check.almost_equal(
+        thresh, BRK_1_THRESH_V,
+        abs=0.2, rel=0.0,
+        msg="Brake 1 trip voltage"
+    )
+    check.equal(brk_stat_tap.state, 1, "Brake Stat Tripped for Brk 1")
 
     brk1.state = BRK_MIN_OUT_V
     brk2.state = BRK_MIN_OUT_V
@@ -61,66 +99,83 @@ def test_bspd(hil):
                                        BRK_SWEEP_DELAY,
                                        brk_stat_tap, is_falling=False)
     print(f"Brake 2 braking threshold: {thresh}")
-    hil.check_within(thresh, BRK_2_THRESH_V, 0.2, "Brake 2 trip voltage")
-    hil.check(brk_stat_tap.state == 1, "Brake Stat Tripped for Brk 2")
+    # hil.check_within(thresh, BRK_2_THRESH_V, 0.2, "Brake 2 trip voltage")
+    # hil.check(brk_stat_tap.state == 1, "Brake Stat Tripped for Brk 2")
+    check.almost_equal(
+        thresh, BRK_2_THRESH_V,
+        abs=0.2, rel=0.0,
+        msg="Brake 2 trip voltage"
+    )
+    check.equal(brk_stat_tap.state, 1, "Brake Stat Tripped for Brk 2")
 
     # Brake Fail scan
     brk1.state = BRK_1_REST_V
     brk2.state = BRK_2_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 1 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 1 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 1 Starts 0")
+
     brk1.state = 0.0 # Force 0
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Short GND")
+    # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Short GND")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 1 Short GND")
+
     brk1.state = BRK_1_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 2 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 2 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 2 Starts 0")
+
     brk2.state = 0.0 # Force 0
     time.sleep(0.1)
     hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Short GND")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Short GND")
+
     brk2.state = BRK_2_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 3 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 3 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 3 Starts 0")
+
     brk1.state = 5.0 # Short VCC
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Short VCC")
+    # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Short VCC")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 1 Short VCC")
+
     brk1.state = BRK_1_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 4 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 4 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 4 Starts 0")
+
     brk2.state = 5.0 # Short VCC
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Short VCC")
+    # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Short VCC")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Short VCC")
+
     brk2.state = BRK_2_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 5 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 5 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 5 Starts 0")
+
     brk1.hiZ()
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Hi-Z")
+    # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Hi-Z")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 1 Hi-Z")
+
     brk1.state = BRK_1_REST_V
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 0, "Brake Fail Check 6 Starts 0")
+    # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 6 Starts 0")
+    check.equal(brk_fail_tap.state, 0, "Brake Fail Check 6 Starts 0")
+
     brk2.hiZ()
     time.sleep(0.1)
-    hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Hi-Z")
+    # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Hi-Z")
+    check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Hi-Z")
+
     brk2.state = BRK_2_REST_V
 
     # End the test
-    hil.end_test()
+    # hil.end_test()
+# ---------------------------------------------------------------------------- #
+
 
 # TODO: add throttle checks
 
-
-if __name__ == "__main__":
-    hil = HIL()
-
-    hil.load_config("config_system_hil_attached.json")
-    hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-
-    hil.init_can()
-
-    # Drive Critical Tests
-    test_bspd(hil)
-
-    # Peripheral Sensor Tests
-
-    hil.shutdown()
