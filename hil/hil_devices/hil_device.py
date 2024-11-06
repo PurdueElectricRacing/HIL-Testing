@@ -2,9 +2,9 @@ import os
 # import time
 # import serial
 # import serial.tools.list_ports
-from hil_devices.serial_manager import SerialManager
+from hil.hil_devices.serial_manager import SerialManager
 
-import utils
+import hil.utils as utils
 
 HIL_CMD_MASK       = 0xFF
 HIL_CMD_READ_ADC   = 0

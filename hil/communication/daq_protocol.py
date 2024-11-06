@@ -1,7 +1,7 @@
 from __future__ import annotations
-from communication.can_bus import BusSignal, CanBus
+from hil.communication.can_bus import BusSignal, CanBus
 # from PyQt5 import QtCore
-import utils
+import hil.utils as utils
 import can
 import math
 import numpy as np

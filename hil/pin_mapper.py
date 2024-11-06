@@ -2,7 +2,7 @@
 import os
 #from hil_devices.hil_device import HilDevice
 import csv
-import utils
+import hil.utils as utils
 
 """ PIN MAPPER """
 

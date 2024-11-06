@@ -1,17 +1,17 @@
-import utils
+import hil.utils as utils
 import os
 import signal
 import sys
 # import time
-from pin_mapper import PinMapper
-from hil_devices.hil_device import HilDevice
-from hil_devices.serial_manager import SerialManager
-from components.component import Component
+from hil.pin_mapper import PinMapper
+from hil.hil_devices.hil_device import HilDevice
+from hil.hil_devices.serial_manager import SerialManager
+from hil.components.component import Component
 
-from communication.can_bus import CanBus, BusSignal
-from communication.daq_protocol import DaqProtocol
-from communication.daq_protocol import DAQPin
-from communication.daq_protocol import DAQVariable
+from hil.communication.can_bus import CanBus, BusSignal
+from hil.communication.daq_protocol import DaqProtocol
+from hil.communication.daq_protocol import DAQPin
+from hil.communication.daq_protocol import DAQVariable
 
 """ HIL TESTER """
 

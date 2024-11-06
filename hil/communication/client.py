@@ -5,7 +5,7 @@ from queue import Empty as QueueEmpty
 from threading import Thread
 import can
 from time import sleep
-import utils
+import hil.utils as utils
 import datetime
 
 # modification of:

@@ -1,5 +1,6 @@
-from collections.abc import Callable
 from __future__ import annotations
+from collections.abc import Callable
+
 from datetime import datetime
 import can
 import can.interfaces.gs_usb
@@ -7,8 +8,8 @@ import gs_usb
 import socket
 import usb
 import cantools
-from communication.client import TCPBus, UDPBus
-import utils
+from hil.communication.client import TCPBus, UDPBus
+import hil.utils as utils
 import time
 import threading
 import numpy as np

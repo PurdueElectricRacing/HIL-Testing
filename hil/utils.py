@@ -6,9 +6,9 @@ import json
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from components.component import Component
-from hil.hil import HIL
-from communication.daq_protocol import DaqProtocol
+from hil.components.component import Component
+# from hil.hil import HIL
+from hil.communication.daq_protocol import DaqProtocol
 
 
 signals: dict = {}
@@ -17,7 +17,8 @@ data_types: dict[str, np.dtype] = {}
 data_type_length: dict[str, int] = {}
 debug_mode: bool = True
 daqProt: DaqProtocol = None
-hilProt: HIL = None
+# hilProt: HIL = None
+hilProt = None
 
 
 def initGlobals():
