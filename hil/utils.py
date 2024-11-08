@@ -119,7 +119,7 @@ def log(phrase: str) -> None:
     global debug_mode
     if debug_mode: print(phrase)
 
-def load_json_config(config_path: str, schema_path=None) -> dict:
+def load_json_config(config_path: str, schema_path: str = None) -> dict:
     """ loads config from json and validates with schema """
     config = json.load(open(config_path))
     if (schema_path == None): return config # Bypass schema check
