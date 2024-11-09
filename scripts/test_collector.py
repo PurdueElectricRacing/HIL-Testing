@@ -53,7 +53,9 @@ def test_collector(hil):
 
     for thermistor in range(num_therm):
         print(f"Place test input on thermistor {thermistor}. Press Enter when ready")
-        input("")
+
+        # TODO: find some way to wait for user input
+        # input("")
 
         for i in range(num_therm):
             # MUX (multiplexer) = choose which output to return from the thermistor based on the input
