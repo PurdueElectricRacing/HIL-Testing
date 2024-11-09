@@ -62,13 +62,22 @@ def test_collector(hil):
             m4.state = i & 0x8
             time.sleep(0.01)
 
-            if (i == thermistor):
-                # hil.check_within(to.state, test_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
-                check.almost_equal(to.state, test_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
+            to_state = to.state
+            if i == thermistor:
+                expected_voltage = test_voltage
             else:
-                # hil.check_within(to.state, pullup_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
-                check.almost_equal(to.state, pullup_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
-            print(to.state)
+                expected_voltage = pullup_voltage
+            within = abs(to_state - expected_voltage) < tolerance_v
+
+            print(f"({thermistor=}, {i=}) {to_state=} ?= {expected_voltage=} -> {within=}")
+            check.almost_equal(to_state, expected_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
+
+            # if i == thermistor:
+            #     # hil.check_within(to.state, test_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+            #     # check.almost_equal(to.state, test_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
+            # else:
+            #     # hil.check_within(to.state, pullup_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
+            #     # check.almost_equal(to.state, pullup_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
 
     # End the test
     # hil.end_test()
