@@ -52,10 +52,10 @@ def test_collector(hil):
     utils.log_warning(test_voltage)
 
     for thermistor in range(num_therm):
-        print(f"Place test input on thermistor {thermistor}. Press Enter when ready")
+        print(f"\nPlace test input on thermistor {thermistor}.")
 
         # TODO: find some way to wait for user input
-        # input("")
+        # input("Press Enter when ready...")
 
         for i in range(num_therm):
             # MUX (multiplexer) = choose which output to return from the thermistor based on the input
