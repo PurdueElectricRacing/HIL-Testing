@@ -10,6 +10,6 @@
         ]}
     ],
     "hil_devices":[
-        {"name":"CollTester", "type":"arduino_uno", "id":1}
+        {"name":"CollTester", "type":"arduino_uno", "id":2}
     ]
 }
