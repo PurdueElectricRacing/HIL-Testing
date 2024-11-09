@@ -9,7 +9,7 @@ class SerialManager():
         self.devices: dict[int, serial.Serial] = {}
 
     def discover_devices(self) -> None:
-        #print([a[1] for  a in serial.tools.list_ports.comports()])
+        # print([a[0] for  a in serial.tools.list_ports.comports()])
         ports = [a[0] for a in serial.tools.list_ports.comports() if ("Arduino" in a[1] or "USB Serial Device" in a[1])]
         self.devices = {}
         print('Arduinos found on ports ' + str(ports))
