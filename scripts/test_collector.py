@@ -85,13 +85,3 @@ def test_collector(hil):
     # End the test
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
-
-# ---------------------------------------------------------------------------- #
-# if __name__ == "__main__":
-    hil = HIL()
-    hil.load_config("config_collector_bench.json")
-    hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-
-    test_collector(hil)
-
-    hil.shutdown()
