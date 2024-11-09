@@ -134,6 +134,7 @@ void loop()
 				{
 					pinMode(pin, OUTPUT);
 					digitalWrite(pin, value);
+					digitalWrite(LED_BUILTIN, value);
 				}
 				else
 				{
