@@ -12,15 +12,14 @@ def do_on_off(hil: HIL):
 	# Outputs
 	mux_a = hil.dout("Collector", "MUX_A")
 
-	input("Turning on MUX_A. Press Enter when ready...")
-	mux_a.state = 1
-	input("MUX_A is on. Press Enter when ready...")
+	while True:
+		mux_a.state = 1
+		print("ON")
+		time.sleep(5)
 
-	input("Turning off MUX_A. Press Enter when ready...")
-	mux_a.state = 0
-	input("MUX_A is off. Press Enter when ready...")
-
-	print("Test complete.")
+		mux_a.state = 0
+		print("OFF")
+		time.sleep(5)
 
 	# # Inputs
 	# temp_out = hil.ain("Collector", "TEMP_OUT")
