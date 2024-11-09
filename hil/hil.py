@@ -78,11 +78,12 @@ class HIL():
         self.clear_components()
         self.clear_hil_devices()
         self.stop_can()
-        print(f"{utils.bcolors.OKGREEN}HIL shutdown START{utils.bcolors.OKGREEN}")
+        print(f"{utils.bcolors.OKGREEN}HIL shutdown END{utils.bcolors.OKGREEN}")
 
     def stop_can(self) -> None:
-        print(f"{utils.bcolors.OKCYAN}HIL stop_can START{utils.bcolors.ENDC}")
         if not self.can_bus: return
+        print(f"{utils.bcolors.OKCYAN}HIL stop_can START{utils.bcolors.ENDC}")
+        
         if self.can_bus.connected:
             self.can_bus.connected = False
             self.can_bus.join()
