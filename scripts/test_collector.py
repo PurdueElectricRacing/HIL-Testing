@@ -56,6 +56,9 @@ def test_collector(hil):
         input("")
 
         for i in range(num_therm):
+            # MUX (multiplexer) = choose which output to return from the thermistor based on the input
+            # Like a giant switch statement (0 -> return thermistor 0, 1 -> return thermistor 1, etc.)
+            # Encode the current thermistor into binary where each bit corresponds to each pin being high or low
             m1.state = i & 0x1
             m2.state = i & 0x2
             m3.state = i & 0x4
