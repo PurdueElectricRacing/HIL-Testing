@@ -8,7 +8,7 @@ import time
 
 
 # ---------------------------------------------------------------------------- #
-def test_collector(hil):
+def test_collector(hil: HIL):
     # Begin the test
     # hil.start_test(test_collector.__name__)
 
