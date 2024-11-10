@@ -3,7 +3,7 @@
     "dut_connections":[
         {"board":"Millan", "harness_connections":[
             {"dut":{"connector":"breadboard","pin":1}, "hil":{"device":"MillanTester", "port":"D3"}},
-            {"dut":{"connector":"breadboard","pin":2}, "hil":{"device":"MillanTester", "port":"D5"}}
+            {"dut":{"connector":"breadboard","pin":2}, "hil":{"device":"MillanTester", "port":"D4"}}
         ]}
     ],
     "hil_devices":[
