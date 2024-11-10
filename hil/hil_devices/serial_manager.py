@@ -26,7 +26,7 @@ class SerialManager():
             ard.setDTR(True)
             # Uno takes a while startup, have to treat it nicely
             for _ in range(5):
-                # Get Tester id
+                # Get Tester id - [command, pin, value], but we only care about the pin
                 ard.write(b'\x04\x00\x00')
                 i = ard.read(1)
                 if (len(i) == 1):
