@@ -8,6 +8,6 @@
         ]}
     ],
     "hil_devices":[
-        {"name":"MillanTester", "type":"arduino_micro", "id":2}
+        {"name":"MillanTester", "type":"arduino_micro", "id":1}
     ]
 }

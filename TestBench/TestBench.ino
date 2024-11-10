@@ -10,7 +10,7 @@
 	#define SERIAL Serial
 #endif
 
-const int TESTER_ID = 2;
+const int TESTER_ID = 1;
 
 // #define DAC
 
