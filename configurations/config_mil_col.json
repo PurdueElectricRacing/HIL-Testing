@@ -2,12 +2,14 @@
     "$schema": "./config_schema.json",
     "dut_connections":[
         {"board":"Millan", "harness_connections":[
-            {"dut":{"connector":"breadboard","pin":1}, "hil":{"device":"MillanTester", "port":"D3"}},
-            {"dut":{"connector":"breadboard","pin":2}, "hil":{"device":"MillanTester", "port":"D4"}},
-            {"dut":{"connector":"breadboard","pin":3}, "hil":{"device":"MillanTester", "port":"D5"}}
+            {"dut":{"connector":"J4","pin":2,"_":"MUX_A"},    "hil":{"device":"MilColTester", "port":"D0", "_":"DO"}},
+            {"dut":{"connector":"J4","pin":1,"_":"MUX_B"},    "hil":{"device":"MilColTester", "port":"D1", "_":"DO"}},
+            {"dut":{"connector":"J4","pin":4,"_":"MUX_C"},    "hil":{"device":"MilColTester", "port":"D2", "_":"DO"}},
+            {"dut":{"connector":"J4","pin":7,"_":"MUX_D"},    "hil":{"device":"MilColTester", "port":"D3", "_":"DO"}},
+            {"dut":{"connector":"J4","pin":5,"_":"TEMP_OUT"}, "hil":{"device":"MilColTester", "port":"D8", "_":"AI"}}
         ]}
     ],
     "hil_devices":[
-        {"name":"MillanTester", "type":"arduino_micro", "id":1}
+        {"name":"MilColTester", "type":"arduino_micro", "id":1}
     ]
 }
