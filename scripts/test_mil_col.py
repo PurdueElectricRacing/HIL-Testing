@@ -27,7 +27,7 @@ def test_collector(hil: HIL):
 
 	test_voltage = (pullup_voltage / (current_res + pullup_res)) * current_res
 	utils.log_warning(f"Test voltage: {test_voltage}")
-	
+
 
 	for thermistor in range(num_therm):
 		print(f"\nPlace test input on thermistor {thermistor}.")
@@ -49,7 +49,7 @@ def test_collector(hil: HIL):
 			within = abs(temp_out_state - expected_voltage) < tolerance_v
 			
 			if within: within_text = utils.bcolors.OKGREEN + "PASS" + utils.bcolors.ENDC
-			else:      within_text = utils.bcolors.FAIL + "FAIL" + utils.bcolors.ENDC
+			else:      within_text = utils.bcolors.FAIL    + "FAIL" + utils.bcolors.ENDC
 
 			print(f"({thermistor=}, {i=})  temp_out_state={temp_out_state:.1f} ?= expected_voltage={expected_voltage:.1f}  ->  {within_text}")
 # ---------------------------------------------------------------------------- #
