@@ -1,7 +1,7 @@
 {
     "$schema": "./config_schema.json",
     "dut_connections":[
-        {"board":"Millan", "harness_connections":[
+        {"board":"Collector", "harness_connections":[
             {"dut":{"connector":"J4","pin":2,"_":"MUX_A"},    "hil":{"device":"MilColTester", "port":"D0", "_":"DO"}},
             {"dut":{"connector":"J4","pin":1,"_":"MUX_B"},    "hil":{"device":"MilColTester", "port":"D1", "_":"DO"}},
             {"dut":{"connector":"J4","pin":4,"_":"MUX_C"},    "hil":{"device":"MilColTester", "port":"D2", "_":"DO"}},
