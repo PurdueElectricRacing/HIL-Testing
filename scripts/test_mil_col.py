@@ -21,7 +21,7 @@ def test_collector(hil: HIL):
 	tolerance_v    = 0.1 # volts
 	current_res    = 9100.0 # ohms
 	pullup_res     = 4700.0 # ohms
-	test_voltage   = 3.3 # volts
+	# test_voltage   = 3.3 # volts
 	pullup_voltage = 5 # volts
 	num_therm      = 10
 
