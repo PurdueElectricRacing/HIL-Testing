@@ -51,6 +51,8 @@ def test_collector(hil: HIL):
 			if within: within_text = utils.bcolors.OKGREEN + "PASS" + utils.bcolors.ENDC
 			else:      within_text = utils.bcolors.FAIL    + "FAIL" + utils.bcolors.ENDC
 
+			if i == thermistor: print("- ", end="")
+
 			print(f"({thermistor=}, {i=})  temp_out_state={temp_out_state:.1f} ?= expected_voltage={expected_voltage:.1f}  ->  {within_text}")
 # ---------------------------------------------------------------------------- #
 

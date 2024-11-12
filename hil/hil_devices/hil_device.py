@@ -78,7 +78,7 @@ class HilDevice():
 
     def write_gpio(self, pin: int, value: int) -> None: 
         data = [(HIL_CMD_WRITE_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
-        print(f"write pin {pin} to {value}")
+        # print(f"write pin {pin} to {value}")
         self.sm.send_data(self.id, data)
 
     def write_dac(self, pin: int, value: int) -> None: 
