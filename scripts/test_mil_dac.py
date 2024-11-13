@@ -16,8 +16,8 @@ def same_to_color_str(same: bool) -> str:
 
 
 def test(hil: HIL):
-	hil_ao = hil.ao("Millan", "HIL_AO")
-	hil_ai = hil.ai("Millan", "HIL_AI")
+	hil_ao = hil.ao("Millan", "HIL_AO") # HIL writes
+	hil_ai = hil.ai("Millan", "HIL_AI") # HIL reads
 
 	for _i in range(3):
 		for voltage in [0.0, 1.0, 2.5, 3.3, 5.0]:
