@@ -12,7 +12,7 @@
 
 const int TESTER_ID = 1;
 
-// #define DAC
+#define DAC
 
 #ifdef STM32
 	#ifdef DAC
