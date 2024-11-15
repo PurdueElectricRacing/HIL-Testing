@@ -92,8 +92,8 @@ void setup()
 	digipot2.begin();
 #endif
 #ifdef DAC
-	dacs[0].init(0x63, dac_vref);
-	dacs[1].init(0x62, dac_vref);
+	dacs[0].init(0x62, dac_vref);
+	dacs[1].init(0x63, dac_vref);
 	dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
 	dacs[1].setMode(MCP4725_POWER_DOWN_500KRES);
 	dac_power_down[0] = 1;
