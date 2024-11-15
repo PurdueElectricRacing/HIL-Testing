@@ -1,0 +1,7 @@
+Board,Net,Component,Designator,Connector Name,,
+
+Millan,HIL_DO,breadboard,1,FRED,,
+Millan,HIL_DI,breadboard,2,FRED,,
+
+Millan,HIL_AO,breadboard,3,FRED,,
+Millan,HIL_AI,breadboard,4,FRED,,

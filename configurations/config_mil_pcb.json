@@ -1,0 +1,14 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Millan", "harness_connections":[
+            {"dut":{"connector":"breadboard","pin":1, "_":"HIL_DO"}, "hil":{"device":"MilPcbTester", "port":"A1",   "_":"DO"}},
+            {"dut":{"connector":"breadboard","pin":2, "_":"HIL_DI"}, "hil":{"device":"MilPcbTester", "port":"D2",   "_":"DI"}},
+            {"dut":{"connector":"breadboard","pin":3, "_":"HIL_AO"}, "hil":{"device":"MilPcbTester", "port":"DAC1", "_":"AO"}},
+            {"dut":{"connector":"breadboard","pin":4, "_":"HIL_AI"}, "hil":{"device":"MilPcbTester", "port":"A2",   "_":"AI"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"MilPcbTester", "type":"arduino_micro_mil_pcb", "id":1}
+    ]
+}
