@@ -17,11 +17,11 @@ def bool_to_color_str(same: bool) -> str:
 
 
 def test_do_di(hil: HIL):
-	hil_do = hil.ao("Millan", "HIL_DO") # HIL writes
-	hil_di = hil.ai("Millan", "HIL_DI") # HIL reads
+	hil_do = hil.dout("Millan", "HIL_DO") # HIL writes
+	hil_di = hil.din("Millan", "HIL_DI") # HIL reads
 
 	for _i in range(3):
-		for state in [True, False]:
+		for state in [0, 1]:
 			hil_do.state = state
 
 			time.sleep(0.2)
@@ -29,15 +29,17 @@ def test_do_di(hil: HIL):
 			hil_di_state = hil_di.state
 			same = hil_di_state == state
 
-			print(f"HIL_DI: {hil_di_state} == {state} -> {bool_to_color_str(same)}")
+			print(f"{hil_di_state} == {state} -> {bool_to_color_str(same)}")
+
+			input("Press Enter to continue...")
 
 			time.sleep(0.5)
 
 		print()
 
 def test_ao_ai(hil: HIL):
-	hil_ao = hil.ao("Millan", "HIL_AO") # HIL writes
-	hil_ai = hil.ai("Millan", "HIL_AI") # HIL reads
+	hil_ao = hil.aout("Millan", "HIL_AO") # HIL writes
+	hil_ai = hil.ain("Millan", "HIL_AI") # HIL reads
 
 	for _i in range(3):
 		random_voltage = random.uniform(0.0, 5.0)
@@ -68,6 +70,6 @@ if __name__ == "__main__":
 	hil.load_pin_map("mil_pcb_net_map.csv", "stm32f407_pin_map.csv")
 	
 	test_do_di(hil)
-	test_ao_ai(hil)
+	# test_ao_ai(hil)
 
 	hil.shutdown()
