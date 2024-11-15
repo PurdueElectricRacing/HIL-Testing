@@ -17,8 +17,8 @@ def bool_to_color_str(same: bool) -> str:
 
 
 def test_do_di(hil: HIL):
-	hil_do = hil.dout("Millan", "HIL_DO") # HIL writes
-	hil_di = hil.din("Millan", "HIL_DI") # HIL reads
+	hil_do = hil.dout("Millan", "HIL_DO") # A1
+	hil_di = hil.din("Millan", "HIL_DI")  # A2
 
 	for _i in range(3):
 		for state in [0, 1]:
@@ -38,8 +38,8 @@ def test_do_di(hil: HIL):
 		print()
 
 def test_ao_ai(hil: HIL):
-	hil_ao = hil.aout("Millan", "HIL_AO") # HIL writes
-	hil_ai = hil.ain("Millan", "HIL_AI") # HIL reads
+	hil_ao = hil.aout("Millan", "HIL_AO") # DAC1
+	hil_ai = hil.ain("Millan", "HIL_AI")  # A4
 
 	for _i in range(3):
 		# random_voltage = random.uniform(0.0, 5.0)
@@ -58,7 +58,28 @@ def test_ao_ai(hil: HIL):
 
 		print()
 
-# TODO: test RLY
+def test_rly(hil: HIL):
+	hil_rly = hil.dout("Millan", "HIL_RLY") # RLY1
+	hil_di  = hil.din("Millan", "HIL_DI")   # A2
+
+	# 5V -> RLY1+
+	# RLY1- -> A2
+
+	for _i in range(3):
+		for state in [0, 1]:
+			hil_rly.state = state
+
+			time.sleep(0.2)
+
+			hil_di_state = hil_di.state
+			same = hil_di_state == state
+
+			print(f"{hil_di_state} == {state} -> {bool_to_color_str(same)}")
+
+			time.sleep(0.5)
+
+		print()
+
 # TODO: test POT
 # TODO: test PWM?
 # ---------------------------------------------------------------------------- #
