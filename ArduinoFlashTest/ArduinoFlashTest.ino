@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 int value = 0;
-int PIN = 3;
+int PIN = 4;
 
 void setup() {
   Serial.begin(115200);
@@ -17,5 +17,5 @@ void loop() {
   pinMode(PIN, OUTPUT);
   digitalWrite(PIN, value);
 
-  delay(3000);
+  delay(10000);
 }
