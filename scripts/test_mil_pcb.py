@@ -44,10 +44,10 @@ def test_ao_ai(hil: HIL):
 	for _i in range(3):
 		random_voltage = random.uniform(0.0, 5.0)
 		for voltage in [0.0, 1.0, 2.5, 3.3, 5.0, random_voltage]:
-			hil_ao.voltage = voltage
+			hil_ao.state = voltage
 			time.sleep(0.2)
 
-			hil_ai_voltage = hil_ai.voltage
+			hil_ai_voltage = hil_ai.state
 			within = abs(hil_ai_voltage - voltage) < 0.1
 
 			print(f"HIL_AI: {hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 	hil.load_config("config_mil_pcb.json")
 	hil.load_pin_map("mil_pcb_net_map.csv", "stm32f407_pin_map.csv")
 	
-	test_do_di(hil)
-	# test_ao_ai(hil)
+	# test_do_di(hil)
+	test_ao_ai(hil)
 
 	hil.shutdown()
