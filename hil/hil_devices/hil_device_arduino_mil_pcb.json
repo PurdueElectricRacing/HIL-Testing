@@ -1,5 +1,4 @@
 {
-    "$schema": "./emulator_schema.json",
     "communication_mode":"serial",
     "ports":[
         {"port":18, "name":"A1",   "capabilities":["DI", "DO", "AI"], "notes":"5V dig / analog in"},

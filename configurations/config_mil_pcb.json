@@ -9,6 +9,6 @@
         ]}
     ],
     "hil_devices":[
-        {"name":"MilPcbTester", "type":"arduino_micro_mil_pcb", "id":1}
+        {"name":"MilPcbTester", "type":"arduino_mil_pcb", "id":1}
     ]
 }
