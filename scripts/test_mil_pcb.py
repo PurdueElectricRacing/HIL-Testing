@@ -50,7 +50,7 @@ def test_ao_ai(hil: HIL):
 			hil_ai_voltage = hil_ai.state
 			within = abs(hil_ai_voltage - voltage) < 0.1
 
-			print(f"HIL_AI: {hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
+			print(f"{hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
 
 			time.sleep(0.5)
 
