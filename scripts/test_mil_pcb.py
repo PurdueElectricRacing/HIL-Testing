@@ -5,7 +5,7 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-import random
+# import random
 
 
 # ---------------------------------------------------------------------------- #
@@ -42,8 +42,10 @@ def test_ao_ai(hil: HIL):
 	hil_ai = hil.ain("Millan", "HIL_AI") # HIL reads
 
 	for _i in range(3):
-		random_voltage = random.uniform(0.0, 5.0)
-		for voltage in [0.0, 1.0, 2.5, 3.3, 5.0, random_voltage]:
+		# random_voltage = random.uniform(0.0, 5.0)
+		for voltage in [0.34]:
+			# 5 * 255 / (2^12 - 1) = 0.31135531135
+			# 5 * 0.1 / 0.31135531135 = 1.60588235297
 			hil_ao.state = voltage
 			time.sleep(0.2)
 
