@@ -37,7 +37,7 @@ def test_do_di(hil: HIL):
 
 		print()
 
-def test_ao_ai(hil: HIL):
+def test_dac_ai(hil: HIL):
 	hil_ao = hil.aout("Millan", "HIL_AO") # DAC1
 	hil_ai = hil.ain("Millan", "HIL_AI")  # A4
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 	hil.load_pin_map("mil_pcb_net_map.csv", "stm32f407_pin_map.csv")
 	
 	# test_do_di(hil)
-	# test_ao_ai(hil)
+	# test_dac_ai(hil)
 	test_rly(hil)
 
 	hil.shutdown()
