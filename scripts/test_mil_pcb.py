@@ -59,26 +59,31 @@ def test_ao_ai(hil: HIL):
 		print()
 
 def test_rly(hil: HIL):
+	hil_do = hil.dout("Millan", "HIL_DO")   # A1
 	hil_rly = hil.dout("Millan", "HIL_RLY") # RLY1
 	hil_di  = hil.din("Millan", "HIL_DI")   # A2
 
-	# 5V -> RLY1+
+	# A1 -> RLY1+
 	# RLY1- -> A2
 
 	for _i in range(3):
-		for state in [0, 1]:
-			hil_rly.state = state
+		for do_state in [0, 1]:
+			for rly_state in [0, 1]:
+				hil_do.state = do_state
+				hil_rly.state = rly_state
 
-			time.sleep(0.2)
+				expected_state = do_state and rly_state
 
-			hil_di_state = hil_di.state
-			same = hil_di_state == state
+				time.sleep(0.2)
 
-			print(f"{hil_di_state} == {state} -> {bool_to_color_str(same)}")
+				hil_di_state = hil_di.state
+				same = hil_di_state == expected_state
 
-			time.sleep(0.5)
+				print(f"{hil_di_state} == {expected_state} -> {bool_to_color_str(same)}")
 
-		print()
+				# input("Press Enter to continue...")
+
+				time.sleep(0.5)
 
 # TODO: test POT
 # TODO: test PWM?
@@ -86,6 +91,7 @@ def test_rly(hil: HIL):
 
 
 # ---------------------------------------------------------------------------- #
+# ONLY RUN ONE TEST AT A TIME AS THEY REFERENCE OVERLAPPING PINS
 if __name__ == "__main__":
 	hil = HIL()
 
@@ -93,6 +99,7 @@ if __name__ == "__main__":
 	hil.load_pin_map("mil_pcb_net_map.csv", "stm32f407_pin_map.csv")
 	
 	# test_do_di(hil)
-	test_ao_ai(hil)
+	# test_ao_ai(hil)
+	test_rly(hil)
 
 	hil.shutdown()
