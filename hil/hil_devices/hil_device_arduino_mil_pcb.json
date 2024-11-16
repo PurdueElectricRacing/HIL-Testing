@@ -15,6 +15,12 @@
         {"port":1,  "name":"D7",   "capabilities":["DI"],             "notes":"5V dig in (TX)"},
         {"port":0,  "name":"D8",   "capabilities":["DI"],             "notes":"5V dig in (RX)"},
 
+        {"port":16, "name":"DI3", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":14, "name":"DI4", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":15, "name":"DI5", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":8,  "name":"DI6", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+        {"port":4,  "name":"DI7", "capabilities":["DI"], "notes":"digital input 5V-30V"},
+
         {"port":10, "name":"RLY1", "capabilities":["DO"],             "notes":"relay"},
         {"port":11, "name":"RLY2", "capabilities":["DO"],             "notes":"relay"},
         {"port":12, "name":"RLY3", "capabilities":["DO"],             "notes":"relay"},
