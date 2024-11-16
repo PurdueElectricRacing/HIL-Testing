@@ -182,6 +182,9 @@ class HIL():
     
     def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
+    
+    def pwm(self, board: str, net: str) -> Component:
+        return self.add_component(board, net, 'PWM')
 
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:

@@ -86,6 +86,8 @@ class Component():
                 self.hiZ_func = lambda : dev.read_gpio(hil_port_num)
             elif(mode == "POT"):
                 self.write_func = lambda s: dev.write_pot(hil_port_num, s)
+            elif mode == "PWM":
+                self.write_func = lambda s: dev.write_pwm(hil_port_num, s)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:

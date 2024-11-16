@@ -75,6 +75,7 @@ enum GpioCommands
 	WRITE_GPIO = 3,
 	READ_ID    = 4,
 	WRITE_POT  = 5,
+	WRITE_PWM  = 6,
 };
 
 
@@ -212,6 +213,12 @@ void loop()
 				{
 					error("POT PIN COUNT EXCEEDED");
 				}
+				break;
+			}
+			case (WRITE_PWM):
+			{
+				pinMode(pin, OUTPUT);
+				analogWrite(pin, value & 0xFF);
 				break;
 			}
 		}
