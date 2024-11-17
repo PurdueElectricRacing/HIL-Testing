@@ -7,13 +7,13 @@ from hil.hil_devices.serial_manager import SerialManager
 import hil.utils as utils
 
 HIL_CMD_MASK       = 0xFF
-HIL_CMD_READ_ADC   = 0
-HIL_CMD_READ_GPIO  = 1
-HIL_CMD_WRITE_DAC  = 2
-HIL_CMD_WRITE_GPIO = 3
-HIL_CMD_READ_ID    = 4
-HIL_CMD_WRITE_POT  = 5
-HIL_CMD_WRITE_PWM  = 6
+HIL_CMD_READ_ADC   = 0 # command, pin
+HIL_CMD_READ_GPIO  = 1 # command, pin
+HIL_CMD_WRITE_DAC  = 2 # command, pin, value (2 bytes)
+HIL_CMD_WRITE_GPIO = 3 # command, pin, value
+HIL_CMD_READ_ID    = 4 # command
+HIL_CMD_WRITE_POT  = 5 # command, pin, value
+HIL_CMD_WRITE_PWM  = 6 # command, pin, value
 
 HIL_ID_MASK = 0xFF
 
@@ -82,14 +82,16 @@ class HilDevice():
         # print(f"write pin {pin} to {value}")
         self.sm.send_data(self.id, data)
 
-    def write_dac(self, pin: int, value: int) -> None: 
-        value = min(self.dac_max, max(0, int(value * self.volts_to_dac)))
-        data = [(HIL_CMD_WRITE_DAC & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
-        print(f"write pin {pin} to {value}")
+    def write_dac(self, pin: int, voltage: float) -> None:
+        value = int(voltage * self.volts_to_dac)
+        char_1 = (value >> 8) & 0xFF
+        char_2 = value & 0xFF
+        data = [(HIL_CMD_WRITE_DAC & HIL_CMD_MASK), (pin & HIL_ID_MASK), char_1, char_2]
+        print(f"write pin {pin} to {voltage}V = {value} ({char_1}, {char_2})")
         self.sm.send_data(self.id, data)
 
     def read_gpio(self, pin: int) -> int:
-        data = [(HIL_CMD_READ_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK), 0]
+        data = [(HIL_CMD_READ_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK)]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 1)
         if len(d) == 1:
@@ -98,7 +100,7 @@ class HilDevice():
         utils.log_error(f"Failed to read gpio pin {pin} on {self.name}")
 
     def read_analog(self, pin: int) -> float:
-        data = [(HIL_CMD_READ_ADC & HIL_CMD_MASK), (pin & HIL_ID_MASK), 0]
+        data = [(HIL_CMD_READ_ADC & HIL_CMD_MASK), (pin & HIL_ID_MASK)]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 2)
         if len(d) == 2:

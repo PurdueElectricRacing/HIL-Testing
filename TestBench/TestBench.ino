@@ -26,7 +26,7 @@ const int TESTER_ID = 1;
 
 	DFRobot_MCP4725 dacs[NUM_DACS];
 	uint8_t dac_power_down[NUM_DACS];
-	const uint16_t dac_vref = 255;
+	const uint16_t dac_vref = 4095;
 #endif
 
 #define DIGIPOT_EN
@@ -39,36 +39,7 @@ const int TESTER_ID = 1;
 	MCP4021 digipot2(DIGIPOT_CS2_PIN, DIGIPOT_UD_PIN, false);  // initialize Digipot 2
 #endif
 
-int count = 0;
-char data[3];
-
-struct Command
-{
-	Command(uint8_t command=0, uint8_t pin=0, uint8_t value=0)
-	{ 
-		data[0] = command;
-		data[1] = pin;
-		data[2] = value;
-	};
-
-	void reinit(char data[])
-	{
-		this->data[0] = data[0];
-		this->data[1] = data[1];
-		this->data[2] = data[2];
-	};
-
-	uint8_t command() { return data[0]; };
-	uint8_t pin()     { return data[1]; };
-	uint16_t value()  { return data[2]; };
-	int size()        { return 3 * sizeof(char); };
-	
-	char data[3];
-};
-
-
-enum GpioCommands
-{
+enum GpioCommand {
 	READ_ADC   = 0, 
 	READ_GPIO  = 1, 
 	WRITE_DAC  = 2, 
@@ -78,9 +49,23 @@ enum GpioCommands
 	WRITE_PWM  = 6,
 };
 
+int CHARS_TO_READ[] = {
+	2, // READ_ADC - command, pin
+	2, // READ_GPIO - command, pin
+	4, // WRITE_DAC - command, pin, value (2 bytes)
+	3, // WRITE_GPIO - command, pin, value
+	1, // READ_ID - command
+	3, // WRITE_POT - command, pin, value
+	3, // WRITE_PWM - command, pin, value
+};
 
-void setup()
-{
+// 4: max CHARS_TO_READ
+char data[4] = {-1, -1, -1, -1};
+int data_index = 0;
+bool data_ready = false;
+
+
+void setup() {
 	SERIAL.begin(115200);
 
 #ifdef DIGIPOT_EN
@@ -102,124 +87,117 @@ void setup()
 #endif
 }
 
-void error(String error_string)
-{
+void error(String error_string) {
 	SERIAL.write(0xFF);
 	SERIAL.write(0xFF);
 	SERIAL.println(error_string);
 }
 
-void loop()
-{
-	if (SERIAL.available() >= 3)
-	{
-		data[0] = SERIAL.read();
-		data[1] = SERIAL.read();
-		data[2] = SERIAL.read();
 
-		Command c;
-		c.reinit(data);
+void loop() {
+	if (data_ready) {
+		data_ready = false;
+		data_index = 0;
 
-		count++;
-		
-		uint8_t command = c.command();
-		uint8_t pin = c.pin();
-		uint16_t value = c.value();
+		GpioCommand command = (GpioCommand) data[0];
 
-		switch (command)
-		{
-			case (WRITE_GPIO):
-			{
-				//if (pin < DIGITAL_PIN_COUNT)
-				if (1)
-				{
-					pinMode(pin, OUTPUT);
-					digitalWrite(pin, value);
-					digitalWrite(LED_BUILTIN, value);
-				}
-				else
-				{
-					error("GPIO PIN COUNT EXCEEDED");
-				}
-				break;
+		switch (expression) {
+		case GpioCommand::READ_ADC: {
+			int pin = data[1];
+			// if (pin <= ANALOG_PIN_COUNT)
+			if (1) {
+				int val = analogRead(pin);
+				SERIAL.write((val >> 8) & 0xFF);
+				SERIAL.write(val & 0xFF);
+			} else {
+				error("ADC PIN COUNT EXCEEDED");
 			}
-			case (READ_GPIO):
-			{
-#ifdef DAC
-				if (pin >= 200 && pin < 200 + NUM_DACS)
-				{
+			break;
+		}
+		case GpioCommand::READ_GPIO: {
+			int pin = data[1];
+			#ifdef DAC
+				if (pin >= 200 && pin < 200 + NUM_DACS) {
 					dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
 					dac_power_down[pin - 200] = 1;
 					SERIAL.write(0x01);
-				}
-				else
-#endif
+				} else
+			#endif
 				{
 					pinMode(pin, INPUT);
 					int val = digitalRead(pin);
 					SERIAL.write(val & 0xFF);
 				}
-				break;
-			}
-			case (WRITE_DAC):
-			{
-#ifdef DAC
-				if (pin >= 200 && pin < 200 + NUM_DACS)
-				{
-					if (dac_power_down[pin-200])
-					{
+			break;
+		}
+		case GpioCommand::WRITE_DAC: {
+			int pin = data[1];
+			int value = (data[2] << 8) | data[3];
+			#ifdef DAC
+				if (pin >= 200 && pin < 200 + NUM_DACS) {
+					if (dac_power_down[pin-200]) {
 						dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
 						dac_power_down[pin - 200] = 0;
 					}
-					dacs[pin - 200].outputVoltage(value & 0xFF);
+					dacs[pin - 200].outputVoltage(value);
 				}
-#endif
-#ifdef STM32
-					// 4 and 5 have DAC on f407
-					pinMode(pin, OUTPUT);
-					analogWrite(pin, value & 0xFF); // max val 255
-#endif
-				break;
+			#endif
+			#ifdef STM32
+				// 4 and 5 have DAC on f407
+				pinMode(pin, OUTPUT);
+				analogWrite(pin, value & 0xFF); // max val 255
+			#endif
+
+			break;
+		}
+		case GpioCommand::WRITE_GPIO: {
+			int pin = data[1];
+			int value = data[2];
+			// if (pin < DIGITAL_PIN_COUNT)
+			if (1) {
+				pinMode(pin, OUTPUT);
+				digitalWrite(pin, value);
+				digitalWrite(LED_BUILTIN, value);
+			} else {
+				error("GPIO PIN COUNT EXCEEDED");
 			}
-			case (READ_ADC):
-			{
-				//if (pin <= ANALOG_PIN_COUNT)
-				if (1)
-				{
-					int val = analogRead(pin);
-					SERIAL.write((val >> 8) & 0xFF);
-					SERIAL.write(val & 0xFF);
-				}
-				else
-				{
-					error("ADC PIN COUNT EXCEEDED");
-				}
-				break;
-			}
-			case (READ_ID):
-			{
-				SERIAL.write(TESTER_ID);
-				break;
-			}
-			case (WRITE_POT):
-			{
-#ifdef DIGIPOT_EN
-				if (pin == 1)
+			break;
+		}
+		case GpioCommand::READ_ID: {
+			SERIAL.write(TESTER_ID);
+			break;
+		}
+		case GpioCommand::WRITE_POT: {
+			int pin = data[1];
+			int value = data[2];
+			#ifdef DIGIPOT_EN
+				if (pin == 1) {
 					digipot1.setTap((uint8_t) value);
-				else if (pin == 2)
+				} else if (pin == 2) {
 					digipot2.setTap((uint8_t) value); 
-				else
-#endif
+				} else
+			#endif
 				{
 					error("POT PIN COUNT EXCEEDED");
 				}
-				break;
-			}
-			case (WRITE_PWM):
-			{
-				pinMode(pin, OUTPUT);
-				analogWrite(pin, value & 0xFF);
-				break;
+			break;
+		}
+		case GpioCommand::WRITE_PWM: {
+			int pin = data[1];
+			int value = data[2];
+			pinMode(pin, OUTPUT);
+			analogWrite(pin, value & 0xFF);
+			break;
+		}
+		}
+	} else {
+		if (SERIAL.available() > 0) {
+			data[data_index] = SERIAL.read();
+			data_index++;
+
+			char command = data[0];
+			if (data_index == CHARS_TO_READ[command]) {
+				data_ready = true;
 			}
 		}
 	}
