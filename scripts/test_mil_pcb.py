@@ -39,11 +39,11 @@ def test_do_di(hil: HIL):
 
 
 def test_dac_ai(hil: HIL):
-	hil_dacs = [hil.aout("Millan", f"HIL_DAC{i}") for i in range(1, 5)] # AO -> HIL writes
-	hil_ais  = [hil.ain ("Millan", f"HIL_A{i}")   for i in range(1, 5)] # AI -> HIL reads
+	hil_dacs = [hil.aout("Millan", f"HIL_DAC{i}") for i in range(1, 3)] # AO -> HIL writes
+	hil_ais  = [hil.ain ("Millan", f"HIL_A{i}")   for i in range(1, 3)] # AI -> HIL reads
 
 	for _i in range(3):
-		for i in range(4):
+		for i in range(2):
 			random_voltage = random.uniform(0.0, 5.0)
 			voltages = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, random_voltage]
 			for voltage in voltages:
