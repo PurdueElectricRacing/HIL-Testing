@@ -37,25 +37,28 @@ def test_do_di(hil: HIL):
 
 		print()
 
+
 def test_dac_ai(hil: HIL):
-	hil_dac1 = hil.aout("Millan", "HIL_DAC1") # AO -> HIL writes
-	hil_a4   = hil.ain ("Millan", "HIL_A3")   # AI -> HIL reads
+	hil_dacs = [hil.aout("Millan", f"HIL_DAC{i}") for i in range(1, 5)] # AO -> HIL writes
+	hil_ais  = [hil.ain ("Millan", f"HIL_A{i}") for i in range(1, 5)]   # AI -> HIL reads
 
 	for _i in range(3):
-		random_voltage = random.uniform(0.0, 5.0)
-		voltages = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, random_voltage]
-		for voltage in voltages:
-			hil_dac1.state = voltage
-			time.sleep(0.2)
+		for i in range(4):
+			random_voltage = random.uniform(0.0, 5.0)
+			voltages = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, random_voltage]
+			for voltage in voltages:
+				hil_dacs[i].state = voltage
+				time.sleep(0.2)
 
-			hil_ai_voltage = hil_a4.state
-			within = abs(hil_ai_voltage - voltage) < 0.1
+				hil_ai_voltage = hil_ais[i].state
+				within = abs(hil_ai_voltage - voltage) < 0.1
 
-			print(f"{hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
+				print(f"{i}: {hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
 
-			time.sleep(0.5)
-
+				time.sleep(0.5)
+			print()
 		print()
+
 
 def test_rly(hil: HIL):
 	hil_a1   = hil.dout("Millan", "HIL_A1")   # DO -> HIL writes
@@ -83,6 +86,7 @@ def test_rly(hil: HIL):
 				# input("Press Enter to continue...")
 
 				time.sleep(0.5)
+
 
 def test_pwm(hil: HIL):
 	hil_pwms = [hil.pwm("Millan", f"HIL_PWM{i}") for i in range(1, 5)] # PWM -> HIL writes
