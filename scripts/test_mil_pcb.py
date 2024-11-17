@@ -81,11 +81,10 @@ def test_rly(hil: HIL):
 				hil_di_state = hil_a2.state
 				same = hil_di_state == expected_state
 
-				print(f"{hil_di_state} == {expected_state} -> {bool_to_color_str(same)}")
-
-				# input("Press Enter to continue...")
+				print(f"({do_state}, {rly_state}): {hil_di_state} == {expected_state} -> {bool_to_color_str(same)}")
 
 				time.sleep(0.5)
+		print()
 
 
 def test_pwm(hil: HIL):
@@ -106,9 +105,11 @@ def test_pwm(hil: HIL):
 				hil_ai_voltage = hil_as[i].state
 				within = abs(hil_ai_voltage - voltage) < 0.1
 
-				print(f"{hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
+				print(f"{i}: {hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
 
 				time.sleep(0.5)
+			print()
+		print()
 
 # TODO: test POT
 # ---------------------------------------------------------------------------- #
