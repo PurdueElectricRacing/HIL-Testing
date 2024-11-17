@@ -101,7 +101,7 @@ void loop() {
 
 		GpioCommand command = (GpioCommand) data[0];
 
-		switch (expression) {
+		switch (command) {
 		case GpioCommand::READ_ADC: {
 			int pin = data[1];
 			// if (pin <= ANALOG_PIN_COUNT)
