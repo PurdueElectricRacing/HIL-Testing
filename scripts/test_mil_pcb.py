@@ -84,8 +84,29 @@ def test_rly(hil: HIL):
 
 				time.sleep(0.5)
 
+def test_pwm(hil: HIL):
+	hil_pwms = [hil.pwm("Millan", f"HIL_PWM{i}") for i in range(1, 5)] # PWM -> HIL writes
+	hil_as   = [hil.ain("Millan", f"HIL_A{i}") for i in range(1, 5)]   # AI -> HIL writes
+
+	for _i in range(3):
+		for i in range(4):
+			random_voltage = random.uniform(0.0, 5.0)
+			voltages = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, random_voltage]
+			for voltage in voltages:
+				# voltage: [0.0, 5.0] -> pwm_value: [0, 255]
+				pwm_value = int(voltage / 5.0 * 255)
+
+				hil_pwms[i].state = pwm_value
+				time.sleep(0.2)
+
+				hil_ai_voltage = hil_as[i].state
+				within = abs(hil_ai_voltage - voltage) < 0.1
+
+				print(f"{hil_ai_voltage:1.2f} == {voltage:1.2f} -> {bool_to_color_str(within)}")
+
+				time.sleep(0.5)
+
 # TODO: test POT
-# TODO: test PWM?
 # ---------------------------------------------------------------------------- #
 
 
@@ -99,6 +120,7 @@ if __name__ == "__main__":
 	
 	# test_do_di(hil)
 	# test_dac_ai(hil)
-	test_rly(hil)
+	# test_rly(hil)
+	# test_pwm(hil)
 
 	hil.shutdown()
