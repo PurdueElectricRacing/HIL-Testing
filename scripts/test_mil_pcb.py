@@ -40,7 +40,7 @@ def test_do_di(hil: HIL):
 
 def test_dac_ai(hil: HIL):
 	hil_dacs = [hil.aout("Millan", f"HIL_DAC{i}") for i in range(1, 5)] # AO -> HIL writes
-	hil_ais  = [hil.ain ("Millan", f"HIL_A{i}") for i in range(1, 5)]   # AI -> HIL reads
+	hil_ais  = [hil.ain ("Millan", f"HIL_A{i}")   for i in range(1, 5)] # AI -> HIL reads
 
 	for _i in range(3):
 		for i in range(4):
@@ -89,7 +89,7 @@ def test_rly(hil: HIL):
 
 def test_pwm(hil: HIL):
 	hil_pwms = [hil.pwm("Millan", f"HIL_PWM{i}") for i in range(1, 5)] # PWM -> HIL writes
-	hil_as   = [hil.ain("Millan", f"HIL_A{i}") for i in range(1, 5)]   # AI -> HIL writes
+	hil_as   = [hil.ain("Millan", f"HIL_A{i}")   for i in range(1, 5)] # AI -> HIL writes
 
 	for _i in range(3):
 		for i in range(4):
