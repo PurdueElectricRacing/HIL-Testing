@@ -9,14 +9,11 @@ import time
 
 # ---------------------------------------------------------------------------- #
 def test_collector(hil: HIL):
-	# HIL ouputs -> Collector inputs
-	mux_a = hil.dout("Collector", "MUX_A")
-	mux_b = hil.dout("Collector", "MUX_B")
-	mux_c = hil.dout("Collector", "MUX_C")
-	mux_d = hil.dout("Collector", "MUX_D")
-
-	# HIL inputs -> Collector outputs
-	temp_out = hil.ain("Collector", "TEMP_OUT")
+	mux_a = hil.dout("Collector", "MUX_A")      # A1
+	mux_b = hil.dout("Collector", "MUX_B")      # A2
+	mux_d = hil.dout("Collector", "MUX_C")      # A3
+	mux_c = hil.dout("Collector", "MUX_D")      # RLY1: have to wire: 5V -> RLY1 -> MUX_D
+	temp_out = hil.ain("Collector", "TEMP_OUT") # A4
 
 	tolerance_v    = 0.1 # volts
 	current_res    = 9100.0 # ohms
@@ -41,7 +38,9 @@ def test_collector(hil: HIL):
 			mux_b.state = i & 0x2
 			mux_c.state = i & 0x4
 			mux_d.state = i & 0x8
-			time.sleep(0.01)
+
+			# Wait for relay
+			time.sleep(0.1)
 
 			temp_out_state = temp_out.state
 			if i == thermistor: expected_voltage = test_voltage
