@@ -64,13 +64,9 @@ char data[4] = {-1, -1, -1, -1};
 int data_index = 0;
 bool data_ready = false;
 
-bool led_builtin_state = false;
-
 
 void setup() {
 	SERIAL.begin(115200);
-
-	digitalWrite(LED_BUILTIN, led_builtin_state);
 
 #ifdef DIGIPOT_EN
 	// Setting up Digipot 1
@@ -102,9 +98,6 @@ void loop() {
 	if (data_ready) {
 		data_ready = false;
 		data_index = 0;
-
-		led_builtin_state = !led_builtin_state;
-		digitalWrite(LED_BUILTIN, led_builtin_state);
 
 		GpioCommand command = (GpioCommand) data[0];
 
