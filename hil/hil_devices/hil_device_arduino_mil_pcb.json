@@ -1,10 +1,10 @@
 {
     "communication_mode":"serial",
     "ports":[
-        {"port":18, "name":"A1",   "capabilities":["DI", "DO", "AI"], "notes":"5V dig / analog in"},
-        {"port":19, "name":"A2",   "capabilities":["DI", "DO", "AI"], "notes":"5V dig / analog in"},
-        {"port":20, "name":"A3",   "capabilities":["DI", "DO", "AI"], "notes":"5V dig / analog in"},
-        {"port":21, "name":"A4",   "capabilities":["DI", "DO", "AI"], "notes":"5V dig / analog in"},
+        {"port":18, "name":"A1",   "capabilities":["DO", "AI"], "notes":"5V dig / analog in"},
+        {"port":19, "name":"A2",   "capabilities":["DO", "AI"], "notes":"5V dig / analog in"},
+        {"port":20, "name":"A3",   "capabilities":["DO", "AI"], "notes":"5V dig / analog in"},
+        {"port":21, "name":"A4",   "capabilities":["DO", "AI"], "notes":"5V dig / analog in"},
 
             {"port":2,  "name":"D1",   "capabilities":[],                 "notes":"SDA (5V dig in)"},
             {"port":4,  "name":"D2",   "capabilities":[],             "notes":"(5V dig in)"},
