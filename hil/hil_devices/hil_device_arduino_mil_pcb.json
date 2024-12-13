@@ -22,8 +22,8 @@
 
         {"port":10, "name":"RLY1", "capabilities":["DO"],             "notes":"relay"},
         {"port":11, "name":"RLY2", "capabilities":["DO"],             "notes":"relay"},
-        {"port":12, "name":"RLY3", "capabilities":["DO"],             "notes":"relay"},
-        {"port":13, "name":"RLY4", "capabilities":["DO"],             "notes":"relay"},
+        {"port":13, "name":"RLY3", "capabilities":["DO"],             "notes":"relay"},
+        {"port":12, "name":"RLY4", "capabilities":["DO"],             "notes":"relay"},
         
         {"port":1, "name":"POT1", "capabilities":["POT"], "notes":"6-bit Digipot"},
         {"port":2, "name":"POT2", "capabilities":["POT"], "notes":"6-bit Digipot"},
