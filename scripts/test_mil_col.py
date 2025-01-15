@@ -12,7 +12,10 @@ def test_collector(hil: HIL):
 	mux_a = hil.dout("Collector", "MUX_A")      # A1
 	mux_b = hil.dout("Collector", "MUX_B")      # A2
 	mux_d = hil.dout("Collector", "MUX_C")      # A3
+	
 	mux_c = hil.dout("Collector", "MUX_D")      # RLY1: have to wire: 5V -> RLY1 -> MUX_D
+	mux_c.state = 1 # turn on relay (it is inverted)
+
 	temp_out = hil.ain("Collector", "TEMP_OUT") # A4
 
 	tolerance_v    = 0.1 # volts
@@ -36,7 +39,7 @@ def test_collector(hil: HIL):
 			# Encode the current thermistor into binary where each bit corresponds to each pin being high or low
 			mux_a.state = i & 0x1
 			mux_b.state = i & 0x2
-			mux_c.state = i & 0x4
+			mux_c.state = not (i & 0x4) # relay is inverted
 			mux_d.state = i & 0x8
 
 			# Wait for relay
