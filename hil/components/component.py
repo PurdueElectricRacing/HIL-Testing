@@ -2,8 +2,13 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 import hil.utils as utils
+import time
+
 if TYPE_CHECKING:
     from hil.hil import HIL
+
+
+SET_DELAY_TIME = 0.1 # seconds (for relay switching)
 
 class Component():
     """ 
@@ -12,8 +17,9 @@ class Component():
     When in measurement or emulation, a source must be specified.
     """
 
-    def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil: 'HIL'):
+    def __init__(self, name: str, hil_con: tuple[str, str], mode: str, hil: 'HIL', set_delay: bool = False):
         self.name: str = name
+        self.set_delay: bool = set_delay
 
         self._state = 0
         self.inv_meas: bool = False
@@ -109,6 +115,8 @@ class Component():
             self._state = s
         if self.write_func:
             self.write_func(s)
+            if self.set_delay:
+                time.sleep(SET_DELAY_TIME)
         else:
             utils.log_warning(f"Wrote to {self.name}, but no emulation source was found")
     

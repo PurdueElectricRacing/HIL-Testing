@@ -120,7 +120,7 @@ class HIL():
                     self.dut_connections[board_name][connector] = {}
                 self.dut_connections[board_name][connector][pin] = hil_port
 
-    def add_component(self, board: str, net: str, mode: str) -> Component:
+    def add_component(self, board: str, net: str, mode: str, set_delay=False) -> Component:
         # If board is a HIL device, net is expected to be port name
         # If board is a DUT device, net is expected to be a net name from the board
         if board in self.hil_devices:
@@ -129,7 +129,7 @@ class HIL():
             hil_con = self.get_hil_device_connection(board, net)
         comp_name = '.'.join([board, net])
         if not comp_name in self.components:
-            comp = Component(comp_name, hil_con, mode, self)
+            comp = Component(comp_name, hil_con, mode, self, set_delay=set_delay)
             self.components[comp_name] = comp
         else:
             utils.log_warning(f"Component {comp_name} already exists")
@@ -171,8 +171,8 @@ class HIL():
     def din(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DI')
 
-    def dout(self, board: str, net: str) -> Component:
-        return self.add_component(board, net, 'DO')
+    def dout(self, board: str, net: str, set_delay=False) -> Component:
+        return self.add_component(board, net, 'DO', set_delay=set_delay)
     
     def ain(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AI')
