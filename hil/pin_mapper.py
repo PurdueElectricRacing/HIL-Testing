@@ -42,10 +42,7 @@ class PinMapper():
     def load_mcu_pin_map(self, fname: str) -> None:
         self.mcu_pin_name_fname = fname
         self.mcu_pin_map = {}
-        # CSV format:
-        # Designator,Pin Name,Type
-        # Create dictionary as follows
-        # [designator] = (bank, pin)
+        # CSV format: Designator,Pin Name,Type
         with open(self.mcu_pin_name_fname, mode='r') as f:
             csv_file = csv.DictReader(f)
             for row in csv_file:
