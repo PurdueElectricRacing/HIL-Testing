@@ -83,7 +83,6 @@ class HilDevice():
         char_1 = (value >> SERIAL_BITS) & SERIAL_MASK
         char_2 = value & SERIAL_MASK
         data = [(HIL_CMD_WRITE_DAC & SERIAL_MASK), (pin & SERIAL_MASK), char_1, char_2]
-        print(f"write pin {pin} to {voltage}V = {value} ({char_1}, {char_2})")
         self.sm.send_data(self.id, data)
 
     def read_gpio(self, pin: int) -> int:
