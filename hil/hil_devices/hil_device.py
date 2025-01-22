@@ -108,7 +108,6 @@ class HilDevice():
     def write_pot(self, pin: int, value: float) -> None:
         value = min(self.pot_max, max(0, int(value * self.pot_max)))
         data = [(HIL_CMD_WRITE_POT & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
-        #print(f"sending {value} to pin {pin}")
         self.sm.send_data(self.id, data)
 
     def write_pwm(self, pin: int, value: int) -> None:
