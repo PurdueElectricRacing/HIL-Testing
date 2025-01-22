@@ -3,7 +3,6 @@ import hil.utils as utils
 import os
 import signal
 import sys
-# import time
 from hil.pin_mapper import PinMapper
 from hil.hil_devices.hil_device import HilDevice
 from hil.hil_devices.serial_manager import SerialManager

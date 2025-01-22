@@ -1,7 +1,4 @@
 import os
-# import time
-# import serial
-# import serial.tools.list_ports
 from hil.hil_devices.serial_manager import SerialManager
 
 import hil.utils as utils
