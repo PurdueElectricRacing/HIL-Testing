@@ -13,7 +13,6 @@ import hil.utils as utils
 import time
 import threading
 import numpy as np
-# import math
 
 CAN_READ_TIMEOUT_S = 1.0
 
