@@ -3,7 +3,6 @@ from hil.hil_devices.serial_manager import SerialManager
 
 import hil.utils as utils
 
-HIL_CMD_MASK       = 0xFF
 HIL_CMD_READ_ADC   = 0 # command, pin
 HIL_CMD_READ_GPIO  = 1 # command, pin
 HIL_CMD_WRITE_DAC  = 2 # command, pin, value (2 bytes)
@@ -12,7 +11,8 @@ HIL_CMD_READ_ID    = 4 # command
 HIL_CMD_WRITE_POT  = 5 # command, pin, value
 HIL_CMD_WRITE_PWM  = 6 # command, pin, value
 
-HIL_ID_MASK = 0xFF
+SERIAL_MASK = 0xFF # 2^8 - 1
+SERIAL_BITS = 8 # char
 
 HIL_DEVICES_PATH = "../hil/hil_devices"
 
@@ -75,19 +75,19 @@ class HilDevice():
         return -1
 
     def write_gpio(self, pin: int, value: int) -> None: 
-        data = [(HIL_CMD_WRITE_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
+        data = [(HIL_CMD_WRITE_GPIO & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
 
     def write_dac(self, pin: int, voltage: float) -> None:
         value = int(voltage * self.volts_to_dac)
-        char_1 = (value >> 8) & 0xFF
-        char_2 = value & 0xFF
-        data = [(HIL_CMD_WRITE_DAC & HIL_CMD_MASK), (pin & HIL_ID_MASK), char_1, char_2]
+        char_1 = (value >> SERIAL_BITS) & SERIAL_MASK
+        char_2 = value & SERIAL_MASK
+        data = [(HIL_CMD_WRITE_DAC & SERIAL_MASK), (pin & SERIAL_MASK), char_1, char_2]
         print(f"write pin {pin} to {voltage}V = {value} ({char_1}, {char_2})")
         self.sm.send_data(self.id, data)
 
     def read_gpio(self, pin: int) -> int:
-        data = [(HIL_CMD_READ_GPIO & HIL_CMD_MASK), (pin & HIL_ID_MASK)]
+        data = [(HIL_CMD_READ_GPIO & SERIAL_MASK), (pin & SERIAL_MASK)]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 1)
         if len(d) == 1:
@@ -96,7 +96,7 @@ class HilDevice():
         utils.log_error(f"Failed to read gpio pin {pin} on {self.name}")
 
     def read_analog(self, pin: int) -> float:
-        data = [(HIL_CMD_READ_ADC & HIL_CMD_MASK), (pin & HIL_ID_MASK)]
+        data = [(HIL_CMD_READ_ADC & SERIAL_MASK), (pin & SERIAL_MASK)]
         self.sm.send_data(self.id, data)
         d = self.sm.read_data(self.id, 2)
         if len(d) == 2:
@@ -107,10 +107,10 @@ class HilDevice():
 
     def write_pot(self, pin: int, value: float) -> None:
         value = min(self.pot_max, max(0, int(value * self.pot_max)))
-        data = [(HIL_CMD_WRITE_POT & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
+        data = [(HIL_CMD_WRITE_POT & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
 
     def write_pwm(self, pin: int, value: int) -> None:
-        data = [(HIL_CMD_WRITE_PWM & HIL_CMD_MASK), (pin & HIL_ID_MASK), value]
+        data = [(HIL_CMD_WRITE_PWM & SERIAL_MASK), (pin & SERIAL_MASK), value]
         print(f"writing {value} to pin {pin}")
         self.sm.send_data(self.id, data)
