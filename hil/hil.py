@@ -42,7 +42,6 @@ class HIL():
         self.daq_config = utils.load_json_config(os.path.join(config['firmware_path'], config['daq_config_path']), os.path.join(config['firmware_path'], config['daq_schema_path']))
         self.can_config = utils.load_json_config(os.path.join(config['firmware_path'], config['can_config_path']), os.path.join(config['firmware_path'], config['can_schema_path']))
 
-        print(f"PATH: {os.path.join(config['firmware_path'], config['dbc_path'])}")
         self.can_bus = CanBus(os.path.join(config['firmware_path'], config['dbc_path']), config['default_ip'], self.can_config)
         self.daq_protocol = DaqProtocol(self.can_bus, self.daq_config)
 
