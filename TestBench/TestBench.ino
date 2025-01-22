@@ -46,7 +46,6 @@ enum GpioCommand {
 	WRITE_GPIO = 3,
 	READ_ID    = 4,
 	WRITE_POT  = 5,
-	WRITE_PWM  = 6,
 };
 
 int CHARS_TO_READ[] = {
@@ -56,7 +55,6 @@ int CHARS_TO_READ[] = {
 	3, // WRITE_GPIO - command, pin, value
 	1, // READ_ID - command
 	3, // WRITE_POT - command, pin, value
-	3, // WRITE_PWM - command, pin, value
 };
 
 // 4: max CHARS_TO_READ
@@ -179,13 +177,6 @@ void loop() {
 				{
 					error("POT PIN COUNT EXCEEDED");
 				}
-			break;
-		}
-		case GpioCommand::WRITE_PWM: {
-			int pin = data[1];
-			int value = data[2];
-			pinMode(pin, OUTPUT);
-			analogWrite(pin, value & 0xFF);
 			break;
 		}
 		}

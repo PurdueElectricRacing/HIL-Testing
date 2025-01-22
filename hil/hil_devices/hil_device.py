@@ -9,7 +9,6 @@ HIL_CMD_WRITE_DAC  = 2 # command, pin, value (2 bytes)
 HIL_CMD_WRITE_GPIO = 3 # command, pin, value
 HIL_CMD_READ_ID    = 4 # command
 HIL_CMD_WRITE_POT  = 5 # command, pin, value
-HIL_CMD_WRITE_PWM  = 6 # command, pin, value
 
 SERIAL_MASK = 0xFF # 2^8 - 1
 SERIAL_BITS = 8 # char
@@ -107,9 +106,4 @@ class HilDevice():
     def write_pot(self, pin: int, value: float) -> None:
         value = min(self.pot_max, max(0, int(value * self.pot_max)))
         data = [(HIL_CMD_WRITE_POT & SERIAL_MASK), (pin & SERIAL_MASK), value]
-        self.sm.send_data(self.id, data)
-
-    def write_pwm(self, pin: int, value: int) -> None:
-        data = [(HIL_CMD_WRITE_PWM & SERIAL_MASK), (pin & SERIAL_MASK), value]
-        print(f"writing {value} to pin {pin}")
         self.sm.send_data(self.id, data)
