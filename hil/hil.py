@@ -67,15 +67,12 @@ class HIL():
         self.serial_manager.close_devices()
 
     def shutdown(self) -> None:
-        print(f"{utils.bcolors.OKCYAN}HIL shutdown START{utils.bcolors.ENDC}")
         self.clear_components()
         self.clear_hil_devices()
         self.stop_can()
-        print(f"{utils.bcolors.OKGREEN}HIL shutdown END{utils.bcolors.OKGREEN}")
 
     def stop_can(self) -> None:
         if not self.can_bus: return
-        print(f"{utils.bcolors.OKCYAN}HIL stop_can START{utils.bcolors.ENDC}")
         
         if self.can_bus.connected:
             self.can_bus.connected = False
@@ -84,7 +81,6 @@ class HIL():
             #     # wait for bus receive to finish
             #     pass
         self.can_bus.disconnect_bus()
-        print(f"{utils.bcolors.OKGREEN}HIL stop_can END{utils.bcolors.ENDC}")
 
     def load_config(self, config_name: str) -> None:
         config = utils.load_json_config(os.path.join(CONFIG_PATH, config_name), None) # TODO: validate w/ schema
