@@ -216,8 +216,6 @@ class DaqProtocol():
         self.can_bus: CanBus = bus
         self.can_bus.handle_daq_msg = self.handleDaqMsg
 
-        # self.can_bus.new_msg_sig.connect(self.handleDaqMsg)
-
         self.updateVarDict(daq_config)
 
         # eeprom saving (prevent a load while save taking place)
