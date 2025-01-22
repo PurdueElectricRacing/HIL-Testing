@@ -35,6 +35,14 @@ class HIL():
         self.can_bus: CanBus = None
         utils.hilProt = self
         signal.signal(signal.SIGINT, signal_int_handler)
+        # self.global_failed_checks = []
+        # self.global_test_names = []
+        # self.global_check_count = 0 # multiple checks within a test
+        # self.global_test_count = 0
+        # self.global_failed_checks = []
+        # self.global_test_names = []
+        # self.global_check_count = 0 # multiple checks within a test
+        # self.global_test_count = 0
 
     def init_can(self) -> None:
         config = self.hil_params
@@ -196,6 +204,31 @@ class HIL():
         if bank == None:
             self.handle_error(f"Failed to get mcu pin for {board} net {net}")
         return DAQPin(net, board, bank, pin)
+
+    # def start_test(self, name):
+    #     print(f"{utils.bcolors.OKCYAN}Starting {name}{utils.bcolors.ENDC}")
+    #     self.curr_test = name
+    #     self.curr_test_fail_count = 0
+    #     self.curr_test_count = 0
+    #     self.global_test_count = self.global_test_count + 1
+    #     self.global_test_names.append(name)
+
+    # def check(self, stat, check_name):
+    #     stat_str = "PASS" if stat else "FAIL"
+    #     stat_clr = utils.bcolors.OKGREEN if stat else utils.bcolors.FAIL
+    #     print(f"{self.curr_test + ' - ' + check_name:<50}: {stat_clr+'['+stat_str+']'+utils.bcolors.ENDC:>10}")
+    #     if (not stat): 
+    #         self.curr_test_fail_count = self.curr_test_fail_count + 1
+    #         self.global_failed_checks.append((self.curr_test,check_name))
+    #     self.curr_test_count = self.curr_test_count + 1
+    #     self.global_check_count = self.global_check_count + 1
+    #     return stat
+
+    # def check_within(self, val1, val2, thresh, check_name):
+    #     self.check(abs(val1 - val2) <= thresh, check_name)
+
+    # def end_test(self):
+    #     print(f"{utils.bcolors.OKCYAN}{self.curr_test} failed {self.curr_test_fail_count} out of {self.curr_test_count} checks{utils.bcolors.ENDC}")
 
     def handle_error(self, msg: str) -> None:
         utils.log_error(msg)
