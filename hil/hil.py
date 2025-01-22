@@ -1,3 +1,4 @@
+from types import FrameType
 import hil.utils as utils
 import os
 import signal
@@ -203,9 +204,9 @@ class HIL():
         exit(0)
 
 
-def signal_int_handler(signum, frame) -> None:
+def signal_int_handler(signum: int, frame: FrameType) -> None:
     utils.log("Received signal interrupt, shutting down")
-    if (utils.hilProt):
+    if utils.hilProt:
         utils.hilProt.shutdown()
     sys.exit(0)
 
