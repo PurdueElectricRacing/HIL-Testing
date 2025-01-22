@@ -89,7 +89,6 @@ class DAQVariable(BusSignal):
 
         self.pub_period_ms: int = 0
 
-        # TODO: not sure if the type hints are correct
         self.scale: int = scale
         self.offset: int = offset
 
@@ -121,7 +120,6 @@ class DAQVariable(BusSignal):
     
     @classmethod
     def fromDAQFileVar(cls, id: int, var: dict, file_name: str, file_lbl: str, node: dict, bus: dict) -> DAQVariable:
-        # TODO: not sure if the type hints are correct
         send_dtype = utils.data_types[var['type']]
         # If there is scaling going on, don't store as an integer on accident
         if ('scale' in var and var['scale'] != 1) or ('offset' in var and var['offset'] != 0):
@@ -146,11 +144,9 @@ class DAQVariable(BusSignal):
         super().update(val, timestamp)
 
     def reverseScale(self, val: float) -> float:
-        # TODO: not sure if the type hint is correct
         return (val - self.offset) / self.scale
 
     def valueSendable(self, val: float) -> bool:
-        # TODO: not sure if the type hint is correct
         # TODO: check max and min from json config
         val = self.reverseScale(val)
         if 'uint' in str(self.send_dtype):
@@ -168,7 +164,6 @@ class DAQVariable(BusSignal):
         return (np.array([self.reverseScale(val)], dtype=self.send_dtype).tobytes())
 
     def getSendValue(self, val: float) -> float | bool:
-        # TODO: not sure if the type hint is correct
         if not self.valueSendable(val): return False # Value will not fit in the given dtype
         # Convert to send
         a = np.array([self.reverseScale(val)], dtype=self.send_dtype)[0]
@@ -185,7 +180,6 @@ class DAQVariable(BusSignal):
 
     @property
     def state(self) -> int:
-        # TODO: not sure if the type hints are correct
         """ Read the value in blocking manner """
         old_t = self.last_update_time
         utils.daqProt.readVar(self) 
@@ -199,7 +193,6 @@ class DAQVariable(BusSignal):
         
     @state.setter
     def state(self, s: int) -> None:
-        # TODO: not sure if the type hint is correct
         """ Writes the value in blocking manner """
         if (self.read_only):
             utils.log_error(f"Can't write to read-only DAQ variable {self.signal_name} of {self.node_name}")
@@ -258,7 +251,6 @@ class DaqProtocol():
                                          data=data))
 
     def writeVar(self, var: DAQVariable, new_val: float) -> None:
-        # TODO: not sure if the type hint is correct
         """ Writes to a variable """
         dbc_msg = self.can_bus.db.get_message_by_name(f"daq_command_{var.node_name.upper()}")
         data = [((var.id & DAQ_ID_MASK) << DAQ_CMD_LENGTH) | DAQ_CMD_WRITE]
@@ -323,7 +315,6 @@ class DaqProtocol():
                                          data=data))
 
     def forceFault(self, id: int, state: int) -> None:
-        # TODO: not sure if the type hint is correct
         print(f"Id: {id}, State: {state}")
         fault_msg = self.can_bus.db.get_message_by_name(f"set_fault")
         data = fault_msg.encode({"id": id, "value": state})

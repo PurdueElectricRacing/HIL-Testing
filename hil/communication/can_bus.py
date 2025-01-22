@@ -227,7 +227,6 @@ class CanBus(threading.Thread):
             self.tcpbus.stop_logging()
 
     def sendFormatMsg(self, msg_name: str, msg_data: dict) -> None:
-        # TODO: not sure if the type hints are correct
         """ Sends a message using a dictionary of its data """
         dbc_msg = self.db.get_message_by_name(msg_name)
         data = dbc_msg.encode(msg_data)
@@ -389,7 +388,7 @@ class BusSignal():
         else:
             self.store_dtype: np.dtype = store_dtype
         
-        self.data: int = 0 # TODO: n
+        self.data: int = 0
         self.time: float = 0
         self.stale_timestamp: float = time.time()
 
@@ -409,7 +408,6 @@ class BusSignal():
                          msg_period=msg['msg_period'])
 
     def update(self, val: int, timestamp: float) -> None:
-        # TODO: not sure if the type hints are correct
         """ update the value of the signal """
         self.data = val
         self.time = timestamp
@@ -422,7 +420,6 @@ class BusSignal():
 
     @property
     def curr_val(self) -> int:
-        # TODO: not sure if the type hints are correct
         """ last value recorded """
         return self.data
 
@@ -440,7 +437,6 @@ class BusSignal():
 
     @property
     def state(self) -> int:
-        # TODO: not sure if the type hints are correct
         start_t = time.time()
         while (self.is_stale):
             if (time.time() >= start_t + CAN_READ_TIMEOUT_S):
