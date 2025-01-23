@@ -1,0 +1,27 @@
+Board,Net,Component,Designator,Connector Name,,
+
+Millan,HIL_PWM1,breadboard,5,FRED,,
+Millan,HIL_PWM2,breadboard,6,FRED,,
+Millan,HIL_PWM3,breadboard,7,FRED,,
+Millan,HIL_PWM4,breadboard,8,FRED,,
+
+Millan,HIL_A1,breadboard,9,FRED,,
+Millan,HIL_A2,breadboard,10,FRED,,
+Millan,HIL_A3,breadboard,11,FRED,,
+Millan,HIL_A4,breadboard,12,FRED,,
+
+Millan,HIL_RLY1,breadboard,13,FRED,,
+Millan,HIL_RLY2,breadboard,14,FRED,,
+Millan,HIL_RLY3,breadboard,15,FRED,,
+Millan,HIL_RLY4,breadboard,16,FRED,,
+
+Millan,HIL_D2,breadboard,17,FRED,,
+Millan,HIL_D3,breadboard,18,FRED,,
+Millan,HIL_D4,breadboard,19,FRED,,
+Millan,HIL_D5,breadboard,20,FRED,,
+Millan,HIL_D6,breadboard,21,FRED,,
+Millan,HIL_D7,breadboard,22,FRED,,
+Millan,HIL_D8,breadboard,23,FRED,,
+
+Millan,HIL_DAC1,breadboard,24,FRED,,
+Millan,HIL_DAC2,breadboard,25,FRED,,
