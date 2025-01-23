@@ -14,7 +14,7 @@ def test_collector(hil: HIL):
 	mux_d = hil.dout("Collector", "MUX_C")      # A3
 	
 	mux_c = hil.dout("Collector", "MUX_D")      # RLY1: have to wire: 5V -> RLY1 -> MUX_D
-	mux_c.state = 1 # turn on relay (it is inverted)
+	mux_c.state = 1 # turn on relay -> disconnect (it is inverted)
 
 	temp_out = hil.ain("Collector", "TEMP_OUT") # A4
 
