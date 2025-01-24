@@ -48,7 +48,7 @@ enum GpioCommand {
 	WRITE_POT  = 5,
 };
 
-int CHARS_TO_READ[] = {
+int TO_READ[] = { // Parrallel to GpioCommand
 	2, // READ_ADC - command, pin
 	2, // READ_GPIO - command, pin
 	4, // WRITE_DAC - command, pin, value (2 bytes)
@@ -57,8 +57,8 @@ int CHARS_TO_READ[] = {
 	3, // WRITE_POT - command, pin, value
 };
 
-// 4: max CHARS_TO_READ
-char data[4] = {-1, -1, -1, -1};
+// 4 = max(TO_READ)
+uint8_t data[4] = {-1, -1, -1, -1};
 int data_index = 0;
 bool data_ready = false;
 
@@ -185,8 +185,8 @@ void loop() {
 			data[data_index] = SERIAL.read();
 			data_index++;
 
-			char command = data[0];
-			if (data_index == CHARS_TO_READ[command]) {
+			uint8_t command = data[0];
+			if (data_index == TO_READ[command]) {
 				data_ready = true;
 			}
 		}
