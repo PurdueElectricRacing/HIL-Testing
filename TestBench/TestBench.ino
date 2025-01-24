@@ -58,7 +58,7 @@ int CHARS_TO_READ[] = {
 };
 
 // 4: max CHARS_TO_READ
-char data[4] = {-1, -1, -1, -1};
+uint8_t data[4] = {-1, -1, -1, -1};
 int data_index = 0;
 bool data_ready = false;
 
@@ -138,6 +138,8 @@ void loop() {
 						dac_power_down[pin - 200] = 0;
 					}
 					dacs[pin - 200].outputVoltage(value);
+					SERIAL.write(data[2]);
+					SERIAL.write(data[3]);
 				}
 			#endif
 			#ifdef STM32
@@ -185,7 +187,7 @@ void loop() {
 			data[data_index] = SERIAL.read();
 			data_index++;
 
-			char command = data[0];
+			uint8_t command = data[0];
 			if (data_index == CHARS_TO_READ[command]) {
 				data_ready = true;
 			}
