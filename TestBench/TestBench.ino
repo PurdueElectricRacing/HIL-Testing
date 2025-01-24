@@ -138,8 +138,6 @@ void loop() {
 						dac_power_down[pin - 200] = 0;
 					}
 					dacs[pin - 200].outputVoltage(value);
-					SERIAL.write(data[2]);
-					SERIAL.write(data[3]);
 				}
 			#endif
 			#ifdef STM32
