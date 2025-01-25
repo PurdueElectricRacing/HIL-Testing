@@ -177,7 +177,6 @@ class HIL():
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     def can_var(self, board: str, message_name: str, signal_name: str) -> BusSignal:
-        # TODO: not sure if any of the type hints are correct
         try:
             return utils.signals[utils.b_str][board][message_name][signal_name]
         except KeyError:
