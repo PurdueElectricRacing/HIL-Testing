@@ -151,13 +151,8 @@ void loop() {
 		case GpioCommand::WRITE_GPIO: {
 			int pin = data[1];
 			int value = data[2];
-			// if (pin < DIGITAL_PIN_COUNT)
-			if (1) {
-				pinMode(pin, OUTPUT);
-				digitalWrite(pin, value);
-			} else {
-				error("GPIO PIN COUNT EXCEEDED");
-			}
+			pinMode(pin, OUTPUT);
+			digitalWrite(pin, value);
 			break;
 		}
 		case GpioCommand::READ_ID: {
