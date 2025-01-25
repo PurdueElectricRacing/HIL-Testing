@@ -200,6 +200,8 @@ def signal_int_handler(signum: int, frame: FrameType) -> None:
         utils.hilProt.shutdown()
     sys.exit(0)
 
+
+# Old testing code. When run directly (python hil.py), this code will run.
 # if __name__ == "__main__":
 #     hil = HIL()
 #     hil.load_config("config_test.json")
