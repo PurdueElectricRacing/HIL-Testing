@@ -173,7 +173,7 @@ class HIL():
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
-        except KeyError as e:
+        except KeyError:
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     def can_var(self, board: str, message_name: str, signal_name: str) -> BusSignal:
