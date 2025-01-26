@@ -1,8 +1,6 @@
-from os import sys, path
-# adds "./HIL-Testing" to the path, basically making it so these scripts were run one folder level higher
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-import hil.utils as utils
+from os import sys, path 
+sys.path.append(path.join(path.dirname(path.dirname(path.abspath(__file__))), 'hil'))
+import utils
 
 # NOTE: each value in this file should be a physical or electrical property of the vehicle
 

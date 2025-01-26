@@ -1,3 +1,6 @@
+from __future__ import annotations
+from collections.abc import Callable
+
 from datetime import datetime
 import can
 import can.interfaces.gs_usb
@@ -5,57 +8,58 @@ import gs_usb
 import socket
 import usb
 import cantools
-from communication.client import TCPBus, UDPBus
-import utils
+from hil.communication.client import TCPBus, UDPBus
+import hil.utils as utils
 import time
 import threading
 import numpy as np
-import math
 
 CAN_READ_TIMEOUT_S = 1.0
 
 
+# ---------------------------------------------------------------------------- #
 class CanBus(threading.Thread):
     """
     Handles sending and receiving can bus messages,
     tracks all degined signals (BusSignal)
     """
 
-    def __init__(self, dbc_path, default_ip, can_config: dict):
+    def __init__(self, dbc_path: str, default_ip: str, can_config: dict):
         super(CanBus, self).__init__()
-        self.db = cantools.db.load_file(dbc_path)
+        self.db: cantools.database.can.database.Database = cantools.db.load_file(dbc_path)
 
         utils.log(f"CAN version: {can.__version__}")
         utils.log(f"gs_usb version: {gs_usb.__version__}")
 
-        self.connected = False
-        self.bus = None
-        self.start_time_bus = -1
-        self.start_date_time_str = ""
-        self.tcp = False
-        self.tcpbus = None
+        self.connected: bool = False
+        self.bus: can.ThreadSafeBus | UDPBus = None
+        self.start_time_bus: float = -1
+        self.start_date_time_str: str = ""
+        self.tcp: bool = False
+        self.tcpbus: TCPBus = None
 
-        self.handle_daq_msg = None
+        self.handle_daq_msg: Callable[[can.Message], None] = None
 
         # Bus Load Estimation
-        self.total_bits = 0
-        self.last_estimate_time = 0
+        self.total_bits: int = 0
+        self.last_estimate_time: float = 0
 
         # Load Bus Signals
-        self.can_config = can_config
+        self.can_config: dict = can_config
         self.updateSignals(self.can_config)
 
-        self.is_importing = False
+        self.is_importing: bool = False
 
         #self.port = 8080
-        self.port = 5005
-        self.ip = default_ip
         #self.ip = "10.42.0.1"
-        self.password = None
-        self.is_wireless = False
+        self.port: int = 5005
+        self.ip: str = default_ip
+        
+        self.password: str | None = None
+        self.is_wireless: bool = False
 
 
-    def connect(self):
+    def connect(self) -> None:
         """ Connects to the bus """
         utils.log("Trying usb")
         # Attempt usb connection first
@@ -117,7 +121,7 @@ class CanBus(threading.Thread):
         # self.connect_sig.emit(self.connected)
         self.connectError()
 
-    def connect_tcp(self):
+    def connect_tcp(self) -> None:
         # Usb failed, trying tcp
         utils.log("Trying tcp")
         self.connected_disp = 1
@@ -178,9 +182,7 @@ class CanBus(threading.Thread):
         self.connected_disp = 0
         # self.write_sig.emit(self.connected_disp)
 
-
-
-    def disconnect_bus(self):
+    def disconnect_bus(self) -> None:
         self.connected = False
         # self.connect_sig.emit(self.connected)
         if self.tcpbus:
@@ -191,7 +193,7 @@ class CanBus(threading.Thread):
             del(self.bus)
             self.bus = None
 
-    def disconnect_tcp(self):
+    def disconnect_tcp(self) -> None:
         self.connected_disp = 0
         # self.write_sig.emit(self.connected_disp)
         if self.tcpbus:
@@ -200,7 +202,7 @@ class CanBus(threading.Thread):
             self.tcpbus = None
 
 
-    def reconnect(self):
+    def reconnect(self) -> None:
         """ destroy usb connection, attempt to reconnect """
         self.connected = False
         # while(not self.isFinished()):
@@ -216,14 +218,14 @@ class CanBus(threading.Thread):
         self.start_date_time_str = datetime.now().strftime("%m-%d-%Y %H:%M:%S")
         self.start()
 
-    def sendLogCmd(self, option : bool):
+    def sendLogCmd(self, option: bool) -> None:
         """Send the start logging function"""
         if option == True:
             self.tcpbus.start_logging()
         else:
             self.tcpbus.stop_logging()
 
-    def sendFormatMsg(self, msg_name, msg_data: dict):
+    def sendFormatMsg(self, msg_name: str, msg_data: dict) -> None:
         """ Sends a message using a dictionary of its data """
         dbc_msg = self.db.get_message_by_name(msg_name)
         data = dbc_msg.encode(msg_data)
@@ -233,7 +235,7 @@ class CanBus(threading.Thread):
         if self.tcp:
             self.tcpbus.send(msg)
 
-    def sendMsg(self, msg: can.Message):
+    def sendMsg(self, msg: can.Message) -> None:
         """ Sends a can message over the bus """
         if self.connected:
             if not self.is_wireless:
@@ -247,7 +249,7 @@ class CanBus(threading.Thread):
         else:
             utils.log_error("Tried to send msg without connection")
 
-    def onMessageReceived(self, msg: can.Message):
+    def onMessageReceived(self, msg: can.Message) -> None:
         """ Emits new message signal and updates the corresponding signals """
         if self.start_time_bus == -1:
             self.start_time_bus = msg.timestamp
@@ -286,7 +288,7 @@ class CanBus(threading.Thread):
         msg_bit_length_max = 64 + msg.dlc * 8 + 18
         self.total_bits += msg_bit_length_max
 
-    def connectError(self):
+    def connectError(self) -> None:
         """ Creates message box prompting to try to reconnect """
         # self.ip = ConnectionErrorDialog.connectionError(self.ip)
         utils.log_error("Ip wrong")
@@ -294,7 +296,7 @@ class CanBus(threading.Thread):
         #     self.connect_tcp()
 
 
-    def updateSignals(self, can_config: dict):
+    def updateSignals(self, can_config: dict) -> None:
         """ Creates dictionary of BusSignals of all signals in can_config """
         utils.signals.clear()
         for bus in can_config['busses']:
@@ -308,7 +310,7 @@ class CanBus(threading.Thread):
                                     [msg['msg_name']][signal['sig_name']]\
                                     = BusSignal.fromCANMsg(signal, msg, node, bus)
 
-    def run(self):
+    def run(self) -> None:
         """ Thread loop to receive can messages """
         self.last_estimate_time = time.time()
         loop_count = 0
@@ -341,8 +343,10 @@ class CanBus(threading.Thread):
                 skips = 0
         #self.connect_sig.emit(self.connected and self.bus.is_connected)
         # if (self.connected and self.is_wireless): self.connect_sig.emit(self.bus and self.bus.is_connected)
+# ---------------------------------------------------------------------------- #
 
 
+# ---------------------------------------------------------------------------- #
 class BusSignal():
     """ Signal that can be subscribed (connected) to for updates """
 
@@ -353,68 +357,85 @@ class BusSignal():
     # NOTE: don't need lock for now as long as only one writer
     # However, when timestamp and data are read, it is possible an older timestamp is read for newer data
 
-    def __init__(self, bus_name, node_name, msg_name, sig_name, dtype, store_dtype=None, unit="", msg_desc="", sig_desc="", msg_period=0):
-        self.bus_name = bus_name
-        self.node_name = node_name
-        self.message_name = msg_name
-        self.signal_name = sig_name
-        self.name = '.'.join([self.bus_name, self.node_name, self.message_name, self.signal_name])
+    def __init__(
+        self,
+        bus_name: str,
+        node_name: str,
+        msg_name: str,
+        sig_name: str,
+        dtype: np.dtype,
+        store_dtype: np.dtype | None = None,
+        unit: str = "",
+        msg_desc: str = "",
+        sig_desc: str = "",
+        msg_period = 0
+    ):
+        self.bus_name: str = bus_name
+        self.node_name: str = node_name
+        self.message_name: str = msg_name
+        self.signal_name: str = sig_name
+        self.name: str = '.'.join([self.bus_name, self.node_name, self.message_name, self.signal_name])
 
-        self.unit = unit
-        self.msg_desc = msg_desc
-        self.sig_desc = sig_desc
+        self.unit: str = unit
+        self.msg_desc: str = msg_desc
+        self.sig_desc: str = sig_desc
         self.msg_period = msg_period
-        self.send_dtype = dtype
-        if not store_dtype: self.store_dtype = self.send_dtype
-        else: self.store_dtype = store_dtype
-        self.data  = 0
-        self.time  = 0
-        self.stale_timestamp = time.time()
 
-    def fromCANMsg(sig, msg, node, bus):
+        self.send_dtype: np.dtype = dtype
+        if not store_dtype:
+            self.store_dtype: np.dtype = self.send_dtype
+        else:
+            self.store_dtype: np.dtype = store_dtype
+        
+        self.data: int = 0
+        self.time: float = 0
+        self.stale_timestamp: float = time.time()
+
+    @classmethod
+    def fromCANMsg(cls, sig: dict, msg: dict, node: dict, bus: dict) -> BusSignal:
         send_dtype = utils.data_types[sig['type']]
         # If there is scaling going on, don't store as an integer on accident
         if ('scale' in sig and sig['scale'] != 1) or ('offset' in sig and sig['offset'] != 0):
             parse_dtype = utils.data_types['float']
         else:
             parse_dtype = send_dtype
-        return BusSignal(bus['bus_name'], node['node_name'], msg['msg_name'], sig['sig_name'],
+        return cls(bus['bus_name'], node['node_name'], msg['msg_name'], sig['sig_name'],
                          send_dtype, store_dtype=parse_dtype,
                          unit=(sig['unit'] if 'unit' in sig else ""),
                          msg_desc=(msg['msg_desc'] if 'msg_desc' in msg else ""),
                          sig_desc=(sig['sig_desc'] if 'sig_desc' in sig else ""),
                          msg_period=msg['msg_period'])
 
-    def update(self, val, timestamp):
+    def update(self, val: int, timestamp: float) -> None:
         """ update the value of the signal """
         self.data = val
         self.time = timestamp
         self.stale_timestamp = time.time()
 
-    def clear(self):
+    def clear(self) -> None:
         """ clears stored signal values """
         self.data = 0
         self.time = 0
 
     @property
-    def curr_val(self):
+    def curr_val(self) -> int:
         """ last value recorded """
         return self.data
 
     @property
-    def last_update_time(self):
+    def last_update_time(self) -> float:
         """ timestamp of last value recorded """
         return self.time
 
     @property
-    def is_stale(self):
+    def is_stale(self) -> bool:
         """ based on last receive time """
         if self.msg_period == 0: return False
         else:
             return ((time.time() - self.stale_timestamp) * 1000) > self.msg_period * 1.5
 
     @property
-    def state(self):
+    def state(self) -> int:
         start_t = time.time()
         while (self.is_stale):
             if (time.time() >= start_t + CAN_READ_TIMEOUT_S):
