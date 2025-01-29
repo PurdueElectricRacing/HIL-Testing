@@ -23,6 +23,14 @@ PIN_MAP_PATH = os.path.join("..", "pin_maps")
 
 PARAMS_PATH = os.path.join("..", "hil_params.json")
 
+DAQ_CONFIG_PATH = os.path.join("common", "daq", "daq_config.json")
+DAQ_SCHEMA_PATH = os.path.join("common", "daq", "daq_schema.json")
+DBC_PATH = os.path.join("common", "daq", "per_dbc.dbc")
+CAN_CONFIG_PATH = os.path.join("common", "daq", "can_config.json")
+CAN_SCHEMA_PATH = os.path.join("common", "daq", "can_schema.json")
+# FAULT_CONFIG_PATH = os.path.join("common", "faults", "fault_config.json")
+# FAULT_SCHEMA_PATH = os.path.join("common", "faults", "fault_schema.json")
+
 
 class HIL():
     def __init__(self):
@@ -36,12 +44,13 @@ class HIL():
         utils.hilProt = self
         signal.signal(signal.SIGINT, signal_int_handler)
 
-    def init_can(self) -> None:
-        config = self.hil_params
-        self.daq_config = utils.load_json_config(os.path.join(config['firmware_path'], config['daq_config_path']), os.path.join(config['firmware_path'], config['daq_schema_path']))
-        self.can_config = utils.load_json_config(os.path.join(config['firmware_path'], config['can_config_path']), os.path.join(config['firmware_path'], config['can_schema_path']))
+    def init_can(self):
+        firmware_path = self.hil_params["firmware_path"]
 
-        self.can_bus = CanBus(os.path.join(config['firmware_path'], config['dbc_path']), config['default_ip'], self.can_config)
+        self.daq_config = utils.load_json_config(os.path.join(firmware_path, DAQ_CONFIG_PATH), os.path.join(firmware_path, DAQ_SCHEMA_PATH))
+        self.can_config = utils.load_json_config(os.path.join(firmware_path, CAN_CONFIG_PATH), os.path.join(firmware_path, CAN_SCHEMA_PATH))
+
+        self.can_bus = CanBus(os.path.join(firmware_path, DBC_PATH), self.hil_params["default_ip"], self.can_config)
         self.daq_protocol = DaqProtocol(self.can_bus, self.daq_config)
 
         self.can_bus.connect()
