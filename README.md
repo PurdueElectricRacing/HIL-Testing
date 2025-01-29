@@ -8,8 +8,6 @@
 - Code in `./scripts` runs on your laptop
 	- It uses all the Python files
 	- Each file in `./scripts` can run a Pytest script to test some board on the car
-	- Do `./test.sh [filename]` to run the script, or no filename to run all of them
-		- (Note: have to run from the `./scripts` directory)
 - Make sure you correctly set `firmware_path` in `./hil_params.json` to the path of the primary PER firmware repo!
 
 ## Notes
