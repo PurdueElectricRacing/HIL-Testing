@@ -1,37 +1,15 @@
-from os import sys, path
-# adds "./HIL-Testing" to the path, basically making it so these scripts were run one folder level higher
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-from hil.hil import HIL
-# import hil.utils as utils
+from os import sys, path 
+sys.path.append(path.join(path.dirname(path.dirname(path.abspath(__file__))), 'hil'))
+from hil import HIL
+import utils
 import time
 import can
 from rules_constants import *
 from vehicle_constants import *
 
-import pytest_check as check
-import pytest
-
-
-# ---------------------------------------------------------------------------- #
-@pytest.fixture(scope="session")
-def hil():
-    hil_instance = HIL()
-
-    # hil.load_config("config_testing.json")
-    hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-    hil_instance.init_can()
-    
-    yield hil_instance
-    
-    hil_instance.shutdown() 
-# ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
 def test_bspd(hil):
     # Begin the test
-    # hil.start_test(test_bspd.__name__)
+    hil.start_test(test_bspd.__name__)
 
     # Inputs
     d2 = hil.din("Test_HIL", "AI2")
@@ -75,15 +53,10 @@ def test_bspd(hil):
             time.sleep(1)
         time.sleep(2)
 
-    check.is_true(True, "TODO")
+    hil.end_test()
 
-    # hil.end_test()
-# ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
 def test_dac(hil):
-    # hil.start_test(test_dac.__name__)
+    hil.start_test(test_dac.__name__)
     
     dac1 = hil.aout("Test_HIL", "DAC1")
     dac2 = hil.aout("Test_HIL", "DAC2")
@@ -98,13 +71,8 @@ def test_dac(hil):
     dac2.state = 0.25
     input(".25")
 
-    check.is_true(True, "TODO")
+    hil.end_test()
 
-    # hil.end_test()
-# ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
 def test_pot(hil):
 
     pot1 = hil.pot("Test_HIL", "POT1")
@@ -139,13 +107,8 @@ def test_pot(hil):
     pot2.state = 0.5
     input("-------")
 
-    check.is_true(True, "TODO")
-# ---------------------------------------------------------------------------- #
-
-
-# ---------------------------------------------------------------------------- #
 def test_mcu_pin(hil):
-    # hil.start_test(test_mcu_pin.__name__)
+    hil.start_test(test_mcu_pin.__name__)
 
     brk_stat_tap = hil.mcu_pin("Dashboard", "BRK_STAT_TAP")
 
@@ -160,16 +123,12 @@ def test_mcu_pin(hil):
         delta_cnt = delta_cnt + 1
     
     print(f"Average: {delta_avg/delta_cnt}")
-
-    check.is_true(True, "TODO")
     
-    # hil.end_test()
-# ---------------------------------------------------------------------------- #
+    hil.end_test()
 
 
-# ---------------------------------------------------------------------------- #
 def test_daq(hil):
-    # hil.start_test(test_daq.__name__)
+    hil.start_test(test_daq.__name__)
 
     counter = 0
     start_time = time.time()
@@ -194,8 +153,20 @@ def test_daq(hil):
         if (delta < 0): delta = 0
         time.sleep(delta)
 
-    check.is_true(True, "TODO")
-
     print("Done")
     print(f"Last count sent: {counter - 1}")
-# ---------------------------------------------------------------------------- #
+
+
+if __name__ == "__main__":
+    hil = HIL()
+    #hil.load_config("config_testing.json")
+    hil.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
+
+    hil.init_can()
+    #test_bspd(hil)
+    #test_dac(hil)
+    # test_pot(hil)
+    # test_mcu_pin(hil)
+    test_daq(hil)
+
+    hil.shutdown()

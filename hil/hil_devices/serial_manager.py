@@ -6,10 +6,10 @@ class SerialManager():
     """ Manages hil device discovery and communication """
 
     def __init__(self):
-        self.devices = {}
+        self.devices: dict[int, serial.Serial] = {}
 
-    def discover_devices(self):
-        #print([a[1] for  a in serial.tools.list_ports.comports()])
+    def discover_devices(self) -> None:
+        # print([a[0] for  a in serial.tools.list_ports.comports()])
         ports = [a[0] for a in serial.tools.list_ports.comports() if ("Arduino" in a[1] or "USB Serial Device" in a[1])]
         self.devices = {}
         print('Arduinos found on ports ' + str(ports))
@@ -26,8 +26,8 @@ class SerialManager():
             ard.setDTR(True)
             # Uno takes a while startup, have to treat it nicely
             for _ in range(5):
-                # Get Tester id
-                ard.write(b'\x04\x00\x00')
+                # 4 = HIL_CMD_READ_ID
+                ard.write(b'\x04')
                 i = ard.read(1)
                 if (len(i) == 1):
                     break
@@ -39,15 +39,15 @@ class SerialManager():
                 ard.close()
         print('Tester ids: ' + str(list(self.devices.keys())))
 
-    def port_exists(self, id):
+    def port_exists(self, id: int) -> bool:
         return id in self.devices
     
-    def send_data(self, id, data):
+    def send_data(self, id: int, data: list[int]) -> None:
         self.devices[id].write(data)
 
-    def read_data(self, id, length):
+    def read_data(self, id: int, length: int) -> bytes:
         return self.devices[id].read(length)
 
-    def close_devices(self):
+    def close_devices(self) -> None:
         for d in self.devices.values():
             d.close()

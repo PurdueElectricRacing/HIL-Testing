@@ -1,5 +1,5 @@
 {
-    "firmware_path": "C:/users/lukeo/Documents/firmware",
+    "firmware_path": "/home/millankumar/Documents/PER/firmware",
     "default_ip": "192.168.10.40",
     "the wifi ip": "ubuntu.local",
     "the ubiquiti ip:":"192.168.10.40",
