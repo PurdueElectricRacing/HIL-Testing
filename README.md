@@ -10,6 +10,14 @@
 	- Each file in `./scripts` can run a Pytest script to test some board or signal set on the car
 - Make sure you correctly set `firmware_path` in `./hil_params.json` to the path of the primary PER firmware repo!
 
+## Python ibraries
+
+- `pyserial` for serial communication
+- `pytest` (and `pytest-check`) for testing
+- `python-can`, `cantools`, and `gs_usb` for CAN communication
+- `numpy` for data types
+- `jsonschema` for validating JSON files
+
 ## Notes
 
 ### Input vs Output
