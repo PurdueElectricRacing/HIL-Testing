@@ -1,4 +1,3 @@
-from types import FrameType
 import hil.utils as utils
 import os
 import signal
@@ -16,12 +15,12 @@ from hil.communication.daq_protocol import DAQVariable
 """ HIL TESTER """
 
 JSON_CONFIG_SCHEMA_PATH = ""
-CONFIG_PATH = os.path.join("..", "configurations")
+CONFIG_PATH = "../configurations"
 
-NET_MAP_PATH = os.path.join("..", "net_maps")
-PIN_MAP_PATH = os.path.join("..", "pin_maps")
+NET_MAP_PATH = "../net_maps"
+PIN_MAP_PATH = "../pin_maps"
 
-PARAMS_PATH = os.path.join("..", "hil_params.json")
+PARAMS_PATH = "../hil_params.json"
 
 
 class HIL():
@@ -35,12 +34,21 @@ class HIL():
         self.can_bus: CanBus = None
         utils.hilProt = self
         signal.signal(signal.SIGINT, signal_int_handler)
+        # self.global_failed_checks = []
+        # self.global_test_names = []
+        # self.global_check_count = 0 # multiple checks within a test
+        # self.global_test_count = 0
+        # self.global_failed_checks = []
+        # self.global_test_names = []
+        # self.global_check_count = 0 # multiple checks within a test
+        # self.global_test_count = 0
 
     def init_can(self) -> None:
         config = self.hil_params
         self.daq_config = utils.load_json_config(os.path.join(config['firmware_path'], config['daq_config_path']), os.path.join(config['firmware_path'], config['daq_schema_path']))
         self.can_config = utils.load_json_config(os.path.join(config['firmware_path'], config['can_config_path']), os.path.join(config['firmware_path'], config['can_schema_path']))
 
+        print(f"PATH: {os.path.join(config['firmware_path'], config['dbc_path'])}")
         self.can_bus = CanBus(os.path.join(config['firmware_path'], config['dbc_path']), config['default_ip'], self.can_config)
         self.daq_protocol = DaqProtocol(self.can_bus, self.daq_config)
 
@@ -65,12 +73,15 @@ class HIL():
         self.serial_manager.close_devices()
 
     def shutdown(self) -> None:
+        print(f"{utils.bcolors.OKCYAN}HIL shutdown START{utils.bcolors.ENDC}")
         self.clear_components()
         self.clear_hil_devices()
         self.stop_can()
+        print(f"{utils.bcolors.OKGREEN}HIL shutdown END{utils.bcolors.OKGREEN}")
 
     def stop_can(self) -> None:
         if not self.can_bus: return
+        print(f"{utils.bcolors.OKCYAN}HIL stop_can START{utils.bcolors.ENDC}")
         
         if self.can_bus.connected:
             self.can_bus.connected = False
@@ -79,6 +90,7 @@ class HIL():
             #     # wait for bus receive to finish
             #     pass
         self.can_bus.disconnect_bus()
+        print(f"{utils.bcolors.OKGREEN}HIL stop_can END{utils.bcolors.ENDC}")
 
     def load_config(self, config_name: str) -> None:
         config = utils.load_json_config(os.path.join(CONFIG_PATH, config_name), None) # TODO: validate w/ schema
@@ -170,10 +182,13 @@ class HIL():
     def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
     
+    def pwm(self, board: str, net: str) -> Component:
+        return self.add_component(board, net, 'PWM')
+
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
-        except KeyError:
+        except KeyError as e:
             self.handle_error(f"Unable to locate DAQ variable {var_name} of {board}")
 
     def can_var(self, board: str, message_name: str, signal_name: str) -> BusSignal:
@@ -188,20 +203,43 @@ class HIL():
             self.handle_error(f"Failed to get mcu pin for {board} net {net}")
         return DAQPin(net, board, bank, pin)
 
+    # def start_test(self, name):
+    #     print(f"{utils.bcolors.OKCYAN}Starting {name}{utils.bcolors.ENDC}")
+    #     self.curr_test = name
+    #     self.curr_test_fail_count = 0
+    #     self.curr_test_count = 0
+    #     self.global_test_count = self.global_test_count + 1
+    #     self.global_test_names.append(name)
+
+    # def check(self, stat, check_name):
+    #     stat_str = "PASS" if stat else "FAIL"
+    #     stat_clr = utils.bcolors.OKGREEN if stat else utils.bcolors.FAIL
+    #     print(f"{self.curr_test + ' - ' + check_name:<50}: {stat_clr+'['+stat_str+']'+utils.bcolors.ENDC:>10}")
+    #     if (not stat): 
+    #         self.curr_test_fail_count = self.curr_test_fail_count + 1
+    #         self.global_failed_checks.append((self.curr_test,check_name))
+    #     self.curr_test_count = self.curr_test_count + 1
+    #     self.global_check_count = self.global_check_count + 1
+    #     return stat
+
+    # def check_within(self, val1, val2, thresh, check_name):
+    #     self.check(abs(val1 - val2) <= thresh, check_name)
+
+    # def end_test(self):
+    #     print(f"{utils.bcolors.OKCYAN}{self.curr_test} failed {self.curr_test_fail_count} out of {self.curr_test_count} checks{utils.bcolors.ENDC}")
+
     def handle_error(self, msg: str) -> None:
         utils.log_error(msg)
         self.shutdown()
         exit(0)
 
 
-def signal_int_handler(signum: int, frame: FrameType) -> None:
+def signal_int_handler(signum, frame) -> None:
     utils.log("Received signal interrupt, shutting down")
-    if utils.hilProt:
+    if (utils.hilProt):
         utils.hilProt.shutdown()
     sys.exit(0)
 
-
-# Old testing code. When run directly (python hil.py), this code will run.
 # if __name__ == "__main__":
 #     hil = HIL()
 #     hil.load_config("config_test.json")
