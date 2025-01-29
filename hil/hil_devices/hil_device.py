@@ -13,7 +13,8 @@ HIL_CMD_WRITE_POT  = 5 # command, pin, value
 SERIAL_MASK = 0xFF # 2^8 - 1
 SERIAL_BITS = 8 # char
 
-HIL_DEVICES_PATH = "../hil/hil_devices"
+HIL_DEVICES_PATH = os.path.join("..", "hil", "hil_devices")
+
 
 class HilDevice():
     def __init__(self, name: str, type: str, id: int, serial_manager: SerialManager):

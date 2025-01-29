@@ -78,8 +78,8 @@ class PinMapper():
 
     
 if __name__ == "__main__":
-    pm = PinMapper('../net_maps/per_24_net_map.csv')
-    pm.load_mcu_pin_map('../pin_maps/stm32f407_pin_map.csv')
+    pm = PinMapper(os.path.join("..", "net_maps", "per_24_net_map.csv"))
+    pm.load_mcu_pin_map(os.path.join("..", "pin_maps", "stm32f407_pin_map.csv"))
 
     print(pm.get_mcu_pin('ur mom', 'idk'))
     print(pm.get_mcu_pin('a_box', 'ur mom'))
