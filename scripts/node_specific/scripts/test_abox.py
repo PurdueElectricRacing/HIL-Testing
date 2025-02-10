@@ -5,8 +5,8 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 
 import pytest_check as check
@@ -26,7 +26,7 @@ def hil():
 
     yield hil_instance
 
-    hil_instance.shutdown() 
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -120,7 +120,7 @@ def test_precharge(hil):
     bat_p.state = RLY_ON
 
     print("Combo 1")
-    n_pchg_cmplt.state = 0 
+    n_pchg_cmplt.state = 0
     sdc.state   = RLY_OFF
     time.sleep(RLY_DLY)
     # hil.check(resistor.state == 0, "Resistor disconnected")
@@ -292,7 +292,7 @@ def test_imd(hil):
     imd_in = hil.din('a_box', 'IMD_STATUS_LV_COMP')
     imd_mcu = hil.mcu_pin('a_box', 'IMD_STATUS_LV_COMP')
 
-    
+
     imd_out.state = RLY_OFF
     time.sleep(RLY_DLY)
 

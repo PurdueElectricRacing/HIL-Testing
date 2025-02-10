@@ -5,8 +5,8 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 import pytest_check as check
 import pytest
@@ -38,7 +38,7 @@ def cycle_power():
     time.sleep(CYCLE_POWER_ON_DELAY)
 
 
-IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S 
+IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S
 IMD_RC_MAX_TRIP_TIME_S = R_IMD_MAX_TRIP_TIME_S - IMD_MEASURE_TIME_S
 IMD_CTRL_OKAY = 1
 IMD_CTRL_TRIP = 0
@@ -54,14 +54,14 @@ def hil():
 
     hil_instance.load_config("config_charger.json")
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-    
+
     # hil_instance.init_can()
-    
+
     power = hil_instance.dout("RearTester", "RLY1")
-    
+
     yield hil_instance
-    
-    hil_instance.shutdown() 
+
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -96,7 +96,7 @@ def test_imd(hil):
     # hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Trip")
     check.between(t, IMD_RC_MIN_TRIP_TIME_S, IMD_RC_MAX_TRIP_TIME_S, "IMD Trip Time")
     check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Trip")
-        
+
     imd_stat.state = IMD_STAT_OKAY
     time.sleep(IMD_RC_MAX_TRIP_TIME_S * 1.1)
     # hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Fault Stays Latched")
@@ -120,8 +120,8 @@ def test_imd(hil):
     # hil.check(t < R_IMD_MAX_TRIP_TIME_S, "IMD Floating Trip Time")
     # hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Floating Trip")
     check.less(t, R_IMD_MAX_TRIP_TIME_S, "IMD Floating Trip Time")
-    check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Floating Trip") 
-    
+    check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Floating Trip")
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
@@ -181,6 +181,6 @@ def test_ams(hil):
     # hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Floating Trip")
     check.between(t, 0, AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time", ge=True)
     check.equal(ams_ctrl.state, AMS_CTRL_TRIP, "AMS Floating Trip")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #

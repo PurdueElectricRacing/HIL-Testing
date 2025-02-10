@@ -5,8 +5,8 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 import pytest_check as check
 import pytest
@@ -68,10 +68,10 @@ def hil():
     hil_instance.init_can()
 
     power = hil_instance.dout("Arduino2", "RLY1")
-    
+
     yield hil_instance
-    
-    hil_instance.shutdown() 
+
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -127,13 +127,13 @@ def test_precharge(hil):
         print(f"Precharge triggered at {thresh_hv / v * 100:.4}% ({thresh_hv:.5}V) of vbat={v}.")
         # hil.check_within(thresh_hv / v, R_PCHG_V_BAT_THRESH, 0.03, f"Precharge threshold of {R_PCHG_V_BAT_THRESH*100}% at vbat = {v}V")
         check.almost_equal(thresh_hv / v, R_PCHG_V_BAT_THRESH, abs=0.03, rel=0.0, msg=f"Precharge threshold of {R_PCHG_V_BAT_THRESH*100}% at vbat = {v}V")
-        
+
         v_mc.state = tiff_hv_to_lv(v)
         time.sleep(0.25)
         # hil.check(pchg_cmplt.state == 1, f"Precharge completed at vbat = {v}V")
         check.equal(pchg_cmplt.state, 1, f"Precharge completed at vbat = {v}V")
 
-    
+
     # Floating conditions (check never precharge complete)
     reset_pchg(v_bat, v_mc)
     v_bat.hiZ()
@@ -372,7 +372,7 @@ def test_bspd(hil):
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
-IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S 
+IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S
 IMD_RC_MAX_TRIP_TIME_S = R_IMD_MAX_TRIP_TIME_S - IMD_MEASURE_TIME_S
 IMD_CTRL_OKAY = 1
 IMD_CTRL_TRIP = 0
@@ -432,7 +432,7 @@ def test_imd(hil):
     # hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Floating Trip")
     check.between(t, 0, R_IMD_MAX_TRIP_TIME_S, "IMD Floating Trip Time")
     check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Floating Trip")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
@@ -491,7 +491,7 @@ def test_ams(hil):
     # hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Floating Trip")
     check.between(t, 0, AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time")
     check.equal(ams_ctrl.state, AMS_CTRL_TRIP, "AMS Floating Trip")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 

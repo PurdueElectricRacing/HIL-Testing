@@ -6,8 +6,8 @@ from hil.hil import HIL
 # import hil.utils as utils
 import time
 import can
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 import pytest_check as check
 import pytest
@@ -21,10 +21,10 @@ def hil():
     # hil.load_config("config_testing.json")
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
     hil_instance.init_can()
-    
+
     yield hil_instance
-    
-    hil_instance.shutdown() 
+
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -84,7 +84,7 @@ def test_bspd(hil):
 # ---------------------------------------------------------------------------- #
 def test_dac(hil):
     # hil.start_test(test_dac.__name__)
-    
+
     dac1 = hil.aout("Test_HIL", "DAC1")
     dac2 = hil.aout("Test_HIL", "DAC2")
 
@@ -109,7 +109,7 @@ def test_pot(hil):
 
     pot1 = hil.pot("Test_HIL", "POT1")
     pot2 = hil.pot("Test_HIL", "POT2")
-    
+
     print("initial")
     input(" - ")
     print("0.5, 1")
@@ -158,11 +158,11 @@ def test_mcu_pin(hil):
         t_start = time.time() - t_start
         delta_avg += t_start
         delta_cnt = delta_cnt + 1
-    
+
     print(f"Average: {delta_avg/delta_cnt}")
 
     check.is_true(True, "TODO")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 

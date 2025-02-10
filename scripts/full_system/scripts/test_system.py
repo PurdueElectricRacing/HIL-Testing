@@ -5,8 +5,8 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 import pytest_check as check
 import pytest
@@ -67,14 +67,14 @@ def hil():
 
     hil_instance.load_config("config_charger.json")
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
-    
+
     # hil_instance.init_can()
-    
+
     power = hil_instance.dout("RearTester", "RLY1")
-    
+
     yield hil_instance
-    
-    hil_instance.shutdown() 
+
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -147,7 +147,7 @@ def test_precharge(hil):
         # hil.check(pchg_cmplt.state == 1, f"Precharge completed at vbat = {v}V")
         check.equal(pchg_cmplt.state, 1, f"Precharge completed at vbat = {v}V")
 
-    
+
     # Floating conditions (check never precharge complete)
     reset_pchg(v_bat, v_mc)
     v_bat.hiZ()
@@ -275,52 +275,52 @@ def test_bspd(hil):
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 2 Starts 0")
     check.equal(brk_fail_tap.state, 0, "Brake Fail Check 2 Starts 0")
-    
+
     brk2.state = 0.0 # Force 0
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Short GND")
     check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Short GND")
-    
+
     brk2.state = BRK_2_REST_V
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 3 Starts 0")
     check.equal(brk_fail_tap.state, 0, "Brake Fail Check 3 Starts 0")
-    
+
     brk1.state = 5.0 # Short VCC
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Short VCC")
     check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 1 Short VCC")
-    
+
     brk1.state = BRK_1_REST_V
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 4 Starts 0")
     check.equal(brk_fail_tap.state, 0, "Brake Fail Check 4 Starts 0")
-    
+
     brk2.state = 5.0 # Short VCC
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Short VCC")
     check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Short VCC")
-    
+
     brk2.state = BRK_2_REST_V
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 5 Starts 0")
     check.equal(brk_fail_tap.state, 0, "Brake Fail Check 5 Starts 0")
-    
+
     brk1.hiZ()
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 1 Hi-Z")
     check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 1 Hi-Z")
-    
+
     brk1.state = BRK_1_REST_V
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail Check 6 Starts 0")
     check.equal(brk_fail_tap.state, 0, "Brake Fail Check 6 Starts 0")
-    
+
     brk2.hiZ()
     time.sleep(0.1)
     # hil.check(brk_fail_tap.state == 1, "Brake Fail Brk 2 Hi-Z")
     check.equal(brk_fail_tap.state, 1, "Brake Fail Brk 2 Hi-Z")
-    
+
     brk2.state = BRK_2_REST_V
 
     # Brake Fail
@@ -329,14 +329,14 @@ def test_bspd(hil):
     time.sleep(BSPD_DASH_ON_TIME)
     # hil.check(bspd_ctrl.state == 1, "Power On")
     check.equal(bspd_ctrl.state, 1, "Power On")
-    
+
     brk1.state = 0.0
     t = utils.measure_trip_time(bspd_ctrl, 5.0, is_falling=True)
     # hil.check(t < R_BSPD_MAX_TRIP_TIME_S, "Brake Fail")
     # hil.check(brk_fail_tap.state == 1, "Brake Fail went high")
     check.less(t, R_BSPD_MAX_TRIP_TIME_S, "Brake Fail")
     check.equal(brk_fail_tap.state, 1, "Brake Fail went high")
-    
+
     brk1.state = BRK_1_REST_V
     time.sleep(R_BSPD_MAX_TRIP_TIME_S)
     # hil.check(brk_fail_tap.state == 0, "Brake Fail returned low")
@@ -523,7 +523,7 @@ def test_bspd(hil):
 
 
 # ---------------------------------------------------------------------------- #
-IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S 
+IMD_RC_MIN_TRIP_TIME_S = IMD_STARTUP_TIME_S
 IMD_RC_MAX_TRIP_TIME_S = R_IMD_MAX_TRIP_TIME_S - IMD_MEASURE_TIME_S
 IMD_CTRL_OKAY = 1
 IMD_CTRL_TRIP = 0
@@ -583,7 +583,7 @@ def test_imd(hil):
     # hil.check(imd_ctrl.state == IMD_CTRL_TRIP, "IMD Floating Trip")
     check.less(t, R_IMD_MAX_TRIP_TIME_S, "IMD Floating Trip Time")
     check.equal(imd_ctrl.state, IMD_CTRL_TRIP, "IMD Floating Trip")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
@@ -643,7 +643,7 @@ def test_ams(hil):
     # hil.check(ams_ctrl.state == AMS_CTRL_TRIP, "AMS Floating Trip")
     check.between(t, 0, AMS_MAX_TRIP_DELAY_S, "AMS Floating Trip Time")
     check.equal(ams_ctrl.state, AMS_CTRL_TRIP, "AMS Floating Trip")
-    
+
     # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
@@ -719,7 +719,7 @@ def test_tsal(hil):
         thresh = stop
     # hil.check(tripped, "TSAL tripped")
     check.is_true(tripped, "TSAL tripped")
-    
+
     thresh = tiff_lv_to_hv(thresh)
     print(f"TSAL on at {thresh:.4} V")
     hil.check_within(thresh, R_TSAL_HV_V, 4, f"TSAL trips at {R_TSAL_HV_V:.4} +-4")
@@ -761,7 +761,7 @@ def test_buzzer(hil):
     # hil.start_test(test_buzzer.__name__)
 
     # Outputs
-    buzzer_ctrl = hil.daq_var("Main_Module", "daq_buzzer") 
+    buzzer_ctrl = hil.daq_var("Main_Module", "daq_buzzer")
 
     # Inputs
     buzzer_stat = hil.mcu_pin("Main_Module", "Buzzer_Prot")
@@ -805,7 +805,7 @@ def test_brake_light(hil):
     # hil.start_test(test_brake_light.__name__)
 
     # Outputs
-    brk_ctrl = hil.daq_var("Main_Module", "daq_brake") 
+    brk_ctrl = hil.daq_var("Main_Module", "daq_brake")
 
     # Inputs
     brk_stat = hil.mcu_pin("Main_Module", "Brake_Light_CTRL_Prot")
@@ -844,8 +844,8 @@ def test_light_tsal_buz(hil):
     # hil.start_test(test_light_tsal_buz.__name__)
 
     # Outputs
-    brk_ctrl = hil.daq_var("Main_Module", "daq_brake") 
-    buzzer_ctrl = hil.daq_var("Main_Module", "daq_buzzer") 
+    brk_ctrl = hil.daq_var("Main_Module", "daq_brake")
+    buzzer_ctrl = hil.daq_var("Main_Module", "daq_buzzer")
 
     brk_ctrl.state = 1
     buzzer_ctrl.state = 1

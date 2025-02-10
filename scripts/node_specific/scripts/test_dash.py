@@ -5,8 +5,8 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-from rules_constants import *
-from vehicle_constants import *
+from scripts.common.constants.rules_constants import *
+from scripts.common.constants.vehicle_constants import *
 
 import pytest_check as check
 import pytest
@@ -21,10 +21,10 @@ def hil():
     hil_instance.load_pin_map("per_24_net_map.csv", "stm32f407_pin_map.csv")
 
     hil_instance.init_can()
-    
+
     yield hil_instance
-    
-    hil_instance.shutdown() 
+
+    hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
 
@@ -178,4 +178,3 @@ def test_bspd(hil):
 
 
 # TODO: add throttle checks
-
