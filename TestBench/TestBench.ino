@@ -5,10 +5,10 @@
 
 // #define STM32
 #ifdef STM32
-	#define SERIAL SerialUSB
+	#define SERIAL_CON SerialUSB
 	#define HAL_DAC_MODULE_ENABLED 1
 #else
-	#define SERIAL Serial
+	#define SERIAL_CON Serial
 #endif
 
 const int TESTER_ID = 1;
@@ -72,13 +72,13 @@ int TO_READ[] = { // Parrallel to GpioCommand
 };
 
 // 4 = max(TO_READ)
-uint8_t data[4] = {-1, -1, -1, -1};
+uint8_t data[4] = { 0 };
 int data_index = 0;
 bool data_ready = false;
 
 
 void setup() {
-	SERIAL.begin(115200);
+	SERIAL_CON.begin(115200);
 
 #ifdef DAC_EN
 	// dacs[0].init(0x62, dac_vref);
@@ -115,9 +115,9 @@ void setup() {
 }
 
 void error(String error_string) {
-	SERIAL.write(0xFF);
-	SERIAL.write(0xFF);
-	SERIAL.println(error_string);
+	SERIAL_CON.write(0xFF);
+	SERIAL_CON.write(0xFF);
+	SERIAL_CON.println(error_string);
 }
 
 
@@ -134,8 +134,8 @@ void loop() {
 			// if (pin <= ANALOG_PIN_COUNT)
 			if (1) {
 				int val = analogRead(pin);
-				SERIAL.write((val >> 8) & 0xFF);
-				SERIAL.write(val & 0xFF);
+				SERIAL_CON.write((val >> 8) & 0xFF);
+				SERIAL_CON.write(val & 0xFF);
 			} else {
 				error("ADC PIN COUNT EXCEEDED");
 			}
@@ -147,13 +147,13 @@ void loop() {
 			// 	if (pin >= 200 && pin < 200 + NUM_DACS) {
 			// 		dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
 			// 		dac_power_down[pin - 200] = 1;
-			// 		SERIAL.write(0x01);
+			// 		SERIAL_CON.write(0x01);
 			// 	} else
 			// #endif
 				{
 					pinMode(pin, INPUT);
 					int val = digitalRead(pin);
-					SERIAL.write(val & 0xFF);
+					SERIAL_CON.write(val & 0xFF);
 				}
 			break;
 		}
@@ -188,7 +188,7 @@ void loop() {
 			break;
 		}
 		case GpioCommand::READ_ID: {
-			SERIAL.write(TESTER_ID);
+			SERIAL_CON.write(TESTER_ID);
 			break;
 		}
 		case GpioCommand::WRITE_POT: {
@@ -208,8 +208,8 @@ void loop() {
 		}
 		}
 	} else {
-		if (SERIAL.available() > 0) {
-			data[data_index] = SERIAL.read();
+		if (SERIAL_CON.available() > 0) {
+			data[data_index] = SERIAL_CON.read();
 			data_index++;
 
 			uint8_t command = data[0];
