@@ -24,8 +24,8 @@ const int TESTER_ID = 1;
 	#include "Adafruit_MCP4706.h"
 	#define NUM_DACS 8
 	#define DAC_WIRE Wire
-	#define DAC_SDA 18
-	#define DAC_SCL 19
+	#define DAC_SDA 17
+	#define DAC_SCL 24
 
 	Adafruit_MCP4706 dacs[NUM_DACS];
 
@@ -78,8 +78,8 @@ void setup() {
 	// dac_power_down[0] = 1;
 	// dac_power_down[1] = 1;
 
-	DAC_WIRE.setSDA(18);  // SDA on first i2c bus on T4.1
-	DAC_WIRE.setSCL(19);  // SCL on first i2c bus on T4.1
+	DAC_WIRE.setSDA(DAC_SDA);
+	DAC_WIRE.setSCL(DAC_SCL);
 
 	for (int i = 0; i < NUM_DACS; i++) {
 		uint8_t addr = 0x60 + i;
