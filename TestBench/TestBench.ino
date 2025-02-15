@@ -67,15 +67,6 @@ bool data_ready = false;
 void setup() {
 	SERIAL.begin(115200);
 
-#ifdef DIGIPOT_EN
-	// Setting up Digipot 1
-	digipot1.setup();
-	digipot1.begin();
-
-	// Setting up Digipot 2
-	digipot2.setup();
-	digipot2.begin();
-#endif
 #ifdef DAC
 	// dacs[0].init(0x62, dac_vref);
 	// dacs[1].init(0x63, dac_vref);
@@ -88,6 +79,16 @@ void setup() {
 		uint8_t addr = 0x60 + i;
 		dacs[i].begin(addr);
 	}
+#endif
+
+#ifdef DIGIPOT_EN
+	// Setting up Digipot 1
+	digipot1.setup();
+	digipot1.begin();
+
+	// Setting up Digipot 2
+	digipot2.setup();
+	digipot2.begin();
 #endif
 }
 
