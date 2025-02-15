@@ -45,8 +45,11 @@ const int TESTER_ID = 1;
 	#define DIGIPOT_2_SDA 18
 	#define DIGIPOT_2_SCL 19
 
-	MCP4017 digipot1(128, 100000);
-	MCP4017 digipot2(128, 100000);
+	const uint8_t DIGIPOT_MAX_STEPS = 128;
+	const float DIGIPOT_MAX_OHMS = 10000;
+
+	MCP4017 digipot1(DIGIPOT_MAX_STEPS, DIGIPOT_MAX_OHMS);
+	MCP4017 digipot2(DIGIPOT_MAX_STEPS, DIGIPOT_MAX_OHMS);
 #endif
 
 enum GpioCommand {
