@@ -21,12 +21,13 @@ const int TESTER_ID = 1;
 #endif
 
 #ifdef DAC
-	#include "DFRobot_MCP4725.h"
-	#define NUM_DACS 2
+	#include "Adafruit_MCP4706.h"
+	#define NUM_DACS 8
 
-	DFRobot_MCP4725 dacs[NUM_DACS];
-	uint8_t dac_power_down[NUM_DACS];
-	const uint16_t dac_vref = 4095;
+	Adafruit_MCP4706 dacs[NUM_DACS];
+
+	// DFRobot_MCP4725 dacs[NUM_DACS];
+	// uint8_t dac_power_down[NUM_DACS];
 #endif
 
 #define DIGIPOT_EN
@@ -51,7 +52,7 @@ enum GpioCommand {
 int TO_READ[] = { // Parrallel to GpioCommand
 	2, // READ_ADC - command, pin
 	2, // READ_GPIO - command, pin
-	4, // WRITE_DAC - command, pin, value (2 bytes)
+	3, // WRITE_DAC - command, pin, value
 	3, // WRITE_GPIO - command, pin, value
 	1, // READ_ID - command
 	3, // WRITE_POT - command, pin, value
@@ -76,12 +77,17 @@ void setup() {
 	digipot2.begin();
 #endif
 #ifdef DAC
-	dacs[0].init(0x62, dac_vref);
-	dacs[1].init(0x63, dac_vref);
-	dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
-	dacs[1].setMode(MCP4725_POWER_DOWN_500KRES);
-	dac_power_down[0] = 1;
-	dac_power_down[1] = 1;
+	// dacs[0].init(0x62, dac_vref);
+	// dacs[1].init(0x63, dac_vref);
+	// dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
+	// dacs[1].setMode(MCP4725_POWER_DOWN_500KRES);
+	// dac_power_down[0] = 1;
+	// dac_power_down[1] = 1;
+
+	for (int i = 0; i < NUM_DACS; i++) {
+		uint8_t addr = 0x60 + i;
+		dacs[i].begin(addr);
+	}
 #endif
 }
 
@@ -114,13 +120,13 @@ void loop() {
 		}
 		case GpioCommand::READ_GPIO: {
 			int pin = data[1];
-			#ifdef DAC
-				if (pin >= 200 && pin < 200 + NUM_DACS) {
-					dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
-					dac_power_down[pin - 200] = 1;
-					SERIAL.write(0x01);
-				} else
-			#endif
+			// #ifdef DAC
+			// 	if (pin >= 200 && pin < 200 + NUM_DACS) {
+			// 		dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
+			// 		dac_power_down[pin - 200] = 1;
+			// 		SERIAL.write(0x01);
+			// 	} else
+			// #endif
 				{
 					pinMode(pin, INPUT);
 					int val = digitalRead(pin);
@@ -130,14 +136,17 @@ void loop() {
 		}
 		case GpioCommand::WRITE_DAC: {
 			int pin = data[1];
-			int value = (data[2] << 8) | data[3];
+			uint8_t value = data[2];
+			// int value = (data[2] << 8) | data[3];
 			#ifdef DAC
 				if (pin >= 200 && pin < 200 + NUM_DACS) {
-					if (dac_power_down[pin-200]) {
-						dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
-						dac_power_down[pin - 200] = 0;
-					}
-					dacs[pin - 200].outputVoltage(value);
+					// if (dac_power_down[pin-200]) {
+					// 	dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
+					// 	dac_power_down[pin - 200] = 0;
+					// }
+					// dacs[pin - 200].outputVoltage(value);
+					int dac_pin = pin - 200;
+					dacs[dac_pin].setVoltage(value);
 				}
 			#endif
 			#ifdef STM32

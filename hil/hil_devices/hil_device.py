@@ -80,9 +80,7 @@ class HilDevice():
 
     def write_dac(self, pin: int, voltage: float) -> None:
         value = int(voltage * self.volts_to_dac)
-        char_1 = (value >> SERIAL_BITS) & SERIAL_MASK
-        char_2 = value & SERIAL_MASK
-        data = [(HIL_CMD_WRITE_DAC & SERIAL_MASK), (pin & SERIAL_MASK), char_1, char_2]
+        data = [(HIL_CMD_WRITE_DAC & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
 
     def read_gpio(self, pin: int) -> int:
