@@ -13,15 +13,17 @@
 
 const int TESTER_ID = 1;
 
-#define DAC
+#define DAC_EN
+#define DIGIPOT_EN
+
 
 #ifdef STM32
-	#ifdef DAC
-		#warning "Can't have both DAC and STM32 enabled"
+	#ifdef DAC_EN
+		#warning "Can't have both DAC_EN and STM32 enabled"
 	#endif
 #endif
 
-#ifdef DAC
+#ifdef DAC_EN
 	#include "Adafruit_MCP4706.h"
 	#define NUM_DACS 8
 	#define DAC_WIRE Wire
@@ -34,7 +36,6 @@ const int TESTER_ID = 1;
 	// uint8_t dac_power_down[NUM_DACS];
 #endif
 
-#define DIGIPOT_EN
 #ifdef DIGIPOT_EN
 	#define DIGIPOT_1_WIRE Wire1
 	#define DIGIPOT_1_SDA 25
@@ -79,7 +80,7 @@ bool data_ready = false;
 void setup() {
 	SERIAL.begin(115200);
 
-#ifdef DAC
+#ifdef DAC_EN
 	// dacs[0].init(0x62, dac_vref);
 	// dacs[1].init(0x63, dac_vref);
 	// dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
@@ -142,7 +143,7 @@ void loop() {
 		}
 		case GpioCommand::READ_GPIO: {
 			int pin = data[1];
-			// #ifdef DAC
+			// #ifdef DAC_EN
 			// 	if (pin >= 200 && pin < 200 + NUM_DACS) {
 			// 		dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
 			// 		dac_power_down[pin - 200] = 1;
@@ -160,7 +161,7 @@ void loop() {
 			int pin = data[1];
 			uint8_t value = data[2];
 			// int value = (data[2] << 8) | data[3];
-			#ifdef DAC
+			#ifdef DAC_EN
 				if (pin >= 200 && pin < 200 + NUM_DACS) {
 					// if (dac_power_down[pin-200]) {
 					// 	dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
@@ -172,7 +173,7 @@ void loop() {
 				}
 			#endif
 			#ifdef STM32
-				// 4 and 5 have DAC on f407
+				// 4 and 5 have DACs on f407
 				pinMode(pin, OUTPUT);
 				analogWrite(pin, value & 0xFF); // max val 255
 			#endif
