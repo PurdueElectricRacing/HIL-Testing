@@ -1,5 +1,6 @@
 
 #include <Arduino.h>
+#include <Wire.h>
 #include "MCP4021.h"
 
 // #define STM32
@@ -35,6 +36,14 @@ const int TESTER_ID = 1;
 
 #define DIGIPOT_EN
 #ifdef DIGIPOT_EN
+	#define DIGIPOT_1_WIRE Wire1
+	#define DIGIPOT_1_SDA 25
+	#define DIGIPOT_1_SCL 16
+
+	#define DIGIPOT_2_WIRE Wire2
+	#define DIGIPOT_2_SDA 18
+	#define DIGIPOT_2_SCL 19
+
 	const uint8_t DIGIPOT_UD_PIN  = 7;
 	const uint8_t DIGIPOT_CS1_PIN = 22; // A4
 	const uint8_t DIGIPOT_CS2_PIN = 23; // A5
@@ -88,6 +97,12 @@ void setup() {
 #endif
 
 #ifdef DIGIPOT_EN
+	DIGIPOT_1_WIRE.setSDA(DIGIPOT_1_SDA);
+	DIGIPOT_1_WIRE.setSCL(DIGIPOT_1_SCL);
+
+	DIGIPOT_2_WIRE.setSDA(DIGIPOT_2_SDA);
+	DIGIPOT_2_WIRE.setSCL(DIGIPOT_2_SCL);
+
 	// Setting up Digipot 1
 	digipot1.setup();
 	digipot1.begin();
