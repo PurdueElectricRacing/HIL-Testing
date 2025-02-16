@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+import os
 
 import sys
 import time
@@ -48,10 +49,10 @@ def initGlobals():
     #   }
     # }
 
-        
+
     global b_str
     b_str = "Main"
-    
+
     global data_types
     data_types = {
         'uint8_t':  np.dtype('<u1'),
@@ -64,7 +65,7 @@ def initGlobals():
         'int64_t':  np.dtype('<i8'),
         'float':    np.dtype('<f4') # 32 bit
     }
-    
+
     global data_type_length
     data_type_length = {
         'uint8_t':  8,
@@ -77,13 +78,13 @@ def initGlobals():
         'int64_t':  64,
         'float':    32
     }
-    
+
     global debug_mode
     debug_mode = True
-    
+
     global daqProt
     daqProt = None
-    
+
     global hilProt
     hilProt = None
 
@@ -115,6 +116,7 @@ def log(phrase: str) -> None:
 
 def load_json_config(config_path: str, schema_path: str = None) -> dict:
     """ loads config from json and validates with schema """
+    print(os.path.abspath(__file__))
     config = json.load(open(config_path))
     if (schema_path == None): return config # Bypass schema check
     schema = json.load(open(schema_path))
@@ -163,7 +165,7 @@ class VoltageDivider():
 
     def div(self, input: float) -> float:
         return input * self.ratio
-    
+
     def reverse(self, output: float) -> float:
         return output / self.ratio
 
@@ -209,4 +211,3 @@ def measure_trip_thresh(
         return stop
     else:
         return thresh
-    

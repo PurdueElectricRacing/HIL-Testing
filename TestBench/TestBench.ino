@@ -10,7 +10,7 @@
 	#define SERIAL Serial
 #endif
 
-const int TESTER_ID = 1;
+const int TESTER_ID = 2;
 
 #define DAC
 
@@ -83,6 +83,8 @@ void setup() {
 	dac_power_down[0] = 1;
 	dac_power_down[1] = 1;
 #endif
+
+  // Get scale factor for ADC
 }
 
 void error(String error_string) {

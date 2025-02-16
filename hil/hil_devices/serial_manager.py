@@ -10,11 +10,13 @@ class SerialManager():
 
     def discover_devices(self) -> None:
         # print([a[0] for  a in serial.tools.list_ports.comports()])
-        ports = [a[0] for a in serial.tools.list_ports.comports() if ("Arduino" in a[1] or "USB Serial Device" in a[1])]
+        for p in serial.tools.list_ports.comports():
+            print(p)
+        ports = [a[0] for a in serial.tools.list_ports.comports() if ("Arduino" in a[1] or "USB Serial Device" in a[1] or "IOUSBHostDevice" in a[1])]
         self.devices = {}
         print('Arduinos found on ports ' + str(ports))
         for p in ports:
-            ard = serial.Serial(p,115200, timeout=0.1, 
+            ard = serial.Serial(p,115200, timeout=0.1,
                                 bytesize=serial.EIGHTBITS,
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
@@ -41,7 +43,7 @@ class SerialManager():
 
     def port_exists(self, id: int) -> bool:
         return id in self.devices
-    
+
     def send_data(self, id: int, data: list[int]) -> None:
         self.devices[id].write(data)
 

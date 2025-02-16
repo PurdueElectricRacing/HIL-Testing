@@ -16,12 +16,13 @@ from hil.communication.daq_protocol import DAQVariable
 """ HIL TESTER """
 
 JSON_CONFIG_SCHEMA_PATH = ""
-CONFIG_PATH = os.path.join("..", "configurations")
+CONFIG_PATH = os.path.join("../../..", "configurations")
+DEVICES_PATH = "hil_devices"
 
-NET_MAP_PATH = os.path.join("..", "net_maps")
-PIN_MAP_PATH = os.path.join("..", "pin_maps")
+NET_MAP_PATH = os.path.join("../../..", "net_maps")
+PIN_MAP_PATH = os.path.join("../../..", "pin_maps")
 
-PARAMS_PATH = os.path.join("..", "hil_params.json")
+PARAMS_PATH = os.path.join("../../..", "hil_params.json")
 
 DAQ_CONFIG_PATH = os.path.join("common", "daq", "daq_config.json")
 DAQ_SCHEMA_PATH = os.path.join("common", "daq", "daq_schema.json")
@@ -80,7 +81,7 @@ class HIL():
 
     def stop_can(self) -> None:
         if not self.can_bus: return
-        
+
         if self.can_bus.connected:
             self.can_bus.connected = False
             self.can_bus.join()
@@ -99,7 +100,7 @@ class HIL():
 
         # Setup corresponding components
         self.load_connections(config['dut_connections'])
-    
+
     def load_connections(self, dut_connections: dict) -> None:
         self.dut_connections = {}
         # Dictionary format:
@@ -163,22 +164,22 @@ class HIL():
         utils.log_warning(f"The net {net} is available on {board} via ...")
         utils.log_warning(net_cons)
         self.handle_error(f"Connect dut to {net} on {board}.")
-    
+
     def din(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DI')
 
     def dout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DO')
-    
+
     def ain(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AI')
-    
+
     def aout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AO')
-    
+
     def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
-    
+
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]

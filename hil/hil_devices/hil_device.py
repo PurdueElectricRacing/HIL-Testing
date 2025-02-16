@@ -13,7 +13,7 @@ HIL_CMD_WRITE_POT  = 5 # command, pin, value
 SERIAL_MASK = 0xFF # 2^8 - 1
 SERIAL_BITS = 8 # char
 
-HIL_DEVICES_PATH = os.path.join("..", "hil", "hil_devices")
+HIL_DEVICES_PATH = os.path.join("../../..", "hil", "hil_devices")
 
 
 class HilDevice():
@@ -52,10 +52,10 @@ class HilDevice():
         if "dac_config" in self.config:
             self.dac_max = pow(2, self.config['dac_config']['bit_resolution']) - 1
             if self.rail_5v == 0:
-                self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v']) 
+                self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v'])
             else:
                 self.volts_to_dac = self.dac_max / self.rail_5v
-        
+
         self.pot_max = 0
         if "pot_config" in self.config:
             self.pot_max = pow(2, self.config['pot_config']['bit_resolution']) - 1
@@ -74,7 +74,7 @@ class HilDevice():
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
 
-    def write_gpio(self, pin: int, value: int) -> None: 
+    def write_gpio(self, pin: int, value: int) -> None:
         data = [(HIL_CMD_WRITE_GPIO & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
 

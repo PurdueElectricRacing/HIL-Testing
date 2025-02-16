@@ -1,6 +1,7 @@
 from os import sys, path
+
 # adds "./HIL-Testing" to the path, basically making it so these scripts were run one folder level higher
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(path.dirname(path.dirname(path.dirname(path.dirname(path.abspath(__file__))))))
 
 from hil.hil import HIL
 import hil.utils as utils
@@ -24,64 +25,50 @@ def hil():
     hil_instance.shutdown()
 # ---------------------------------------------------------------------------- #
 
-# ---------------------------------------------------------------------------- #
-def test_collector(hil):
-    # Begin the test
-    # hil.start_test(test_collector.__name__)
+# Constants
+TOP_RES = 30000 # Top resistor of thermistor voltage divider
+INPUT_RES = 10000 # Simulated Thermistor resistance
+TEST_VOLTAGE = 3.3 # Voltage of measurement on collector plate
+THERMISTOR_CONNECTED_VOLTAGE = (TEST_VOLTAGE / (TOP_RES + INPUT_RES)) *  INPUT_RES # Expected voltage when thermistor is connected
+# THERMISTOR_CONNECTED_VOLTAGE = 0.85
+THERMISTOR_DISCONNECTED_VOLTAGE = 3.0 # Expected voltage when thermistor is disconnected
+TOLERANCE_V = 0.15 # Tolerance to account for resistors, measurement inaccuracy, etc
+DISCONNECTED_TOLERANC_V = 1.1
+CURRENT_THERMISTOR_NUMBER = 2 # Current Thermistor being simulated
+TOTAL_NUM_THERMISTORS = 10
 
-    # Outputs
-    m1 = hil.dout("Collector", "MUX_A")
-    m2 = hil.dout("Collector", "MUX_B")
-    m3 = hil.dout("Collector", "MUX_C")
-    m4 = hil.dout("Collector", "MUX_D")
+# Time delays
+ARBITRARY_MUX_READ_WAIT_TIME_S = 0.01
 
-    # Inputs
-    to = hil.ain("Collector", "TEMP_OUT")
+@pytest.mark.parametrize("thermistor_number", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+def test_collector(hil, thermistor_number):
+    # Set up Outputs
 
-    tolerance_v    = 0.1 # volts
-    current_res    = 9100.0 # ohms
-    pullup_res     = 4700.0 # ohms
-    test_voltage   = 3.3 # volts
-    pullup_voltage = 5 # volts
-    num_therm      = 10
+    # Digital outputs controlling mux
+    mux0 = hil.dout("firstCollTester", "D2")
+    mux1 = hil.dout("firstCollTester", "D3")
+    mux2 = hil.dout("firstCollTester", "D4")
+    mux3 = hil.dout("firstCollTester", "D5")
 
-    test_voltage = (pullup_voltage / (current_res + pullup_res)) * current_res
+    vIn = hil.ain("firstCollTester", "A1")
 
-    utils.log_warning(test_voltage)
+    # for idx in range(TOTAL_NUM_THERMISTORS):
+      # Select a thermistor
+    mux0.state = int(thermistor_number) & 0x1
+    mux1.state = int(thermistor_number) & 0x2
+    mux2.state = int(thermistor_number) & 0x4
+    mux3.state = int(thermistor_number) & 0x8
 
-    for thermistor in range(num_therm):
-        print(f"\nPlace test input on thermistor {thermistor}.")
+    # Wait for mux to select proper signal
+    time.sleep(ARBITRARY_MUX_READ_WAIT_TIME_S)
 
-        # TODO: find some way to wait for user input
-        # input("Press Enter when ready...")
+    expected_voltage = THERMISTOR_CONNECTED_VOLTAGE if thermistor_number == CURRENT_THERMISTOR_NUMBER else THERMISTOR_DISCONNECTED_VOLTAGE
 
-        for i in range(num_therm):
-            # MUX (multiplexer) = choose which output to return from the thermistor based on the input
-            # Like a giant switch statement (0 -> return thermistor 0, 1 -> return thermistor 1, etc.)
-            # Encode the current thermistor into binary where each bit corresponds to each pin being high or low
-            m1.state = i & 0x1
-            m2.state = i & 0x2
-            m3.state = i & 0x4
-            m4.state = i & 0x8
-            time.sleep(0.01)
+    read_voltage = vIn.state
 
-            to_state = to.state
-            if i == thermistor:
-                expected_voltage = test_voltage
-            else:
-                expected_voltage = pullup_voltage
-            within = abs(to_state - expected_voltage) < tolerance_v
+    print(f"Expected {expected_voltage}, real {read_voltage}", flush = True, )
 
-            print(f"({thermistor=}, {i=}) {to_state=} ?= {expected_voltage=} -> {within=}")
-            check.almost_equal(to_state, expected_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
+    msg = f"Applying input to thermistor {CURRENT_THERMISTOR_NUMBER}. Reading value of thermistor {thermistor_number}. \
+            Expected voltage: {expected_voltage}. Actual voltage: {read_voltage}."
 
-            # if i == thermistor:
-            #     # hil.check_within(to.state, test_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
-            #     # check.almost_equal(to.state, test_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
-            # else:
-            #     # hil.check_within(to.state, pullup_voltage, tolerance_v, f"Input on therm {thermistor}, selecting {i}")
-            #     # check.almost_equal(to.state, pullup_voltage, abs=tolerance_v, rel=0.0, msg=f"Input on therm {thermistor}, selecting {i}")
-
-    # End the test
-    # hil.end_test()
-# ---------------------------------------------------------------------------- #
+    check.almost_equal(read_voltage, expected_voltage, abs=TOLERANCE_V if CURRENT_THERMISTOR_NUMBER == thermistor_number else DISCONNECTED_TOLERANC_V, rel=0.0, msg=msg)
