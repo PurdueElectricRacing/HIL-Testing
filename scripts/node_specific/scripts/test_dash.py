@@ -32,7 +32,7 @@ def hil():
 BRK_SWEEP_DELAY = 0.1
 
 """
-0v: Brake released
+0v: Released
 5v: Fully pressed
 
 test_bspd (brake signal plausibility detection)
@@ -49,7 +49,14 @@ APPS (Accelerator Pedal Position Sensor)
         other failure as defined in this Section T.4.2.
 - T.4.2.5:
     - If an Implausibility occurs between the values of the APPSs and persists for more than 100
-        msec, the power to the (IC) Electronic Throttle / (EV) Motor(s) must be immediately stopped completely.
+        msec, the power to the (IC) Electronic Throttle / (EV) Motor(s) must be immediately stopped
+        completely.
+- T.4.2.10:
+    - When an analogue signal is used, the APPS will be considered to have failed when they achieve
+        an open circuit or short circuit condition which generates a signal outside of the normal
+        operating range, for example <0.5 V or >4.5 V.
+
+
 """
 
 
@@ -196,3 +203,25 @@ def test_bspd(hil):
 
 
 # TODO: add throttle checks
+
+# ---------------------------------------------------------------------------- #
+def test_throttle(hil):
+    # HIL outputs (hil writes)
+    thrtl1 = hil.aout("Dashboard", "THRTL1_RAW")
+    thrtl2 = hil.aout("Dashboard", "THRTL2_RAW")
+
+    # HIL inputs (hil reads)
+    # TODO: CAN??????????
+
+
+    # Test set 1: throttles at rest
+    # Test set 2: throttle 1 trips
+    # Test set 3: throttle 2 trips
+    # Test set 4: throttle 1 and 2 trip
+    # Test set 5: throttle 1 and 2 trip at the correct voltage
+    # Test set 6: throttle 1 and 2 at rest
+
+
+    # Test throttle high and brakes high
+# ---------------------------------------------------------------------------- #
+
