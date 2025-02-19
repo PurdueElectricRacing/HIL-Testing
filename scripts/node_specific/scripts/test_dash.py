@@ -34,6 +34,26 @@ BRK_SWEEP_DELAY = 0.1
 def test_bspd(hil):
     # Begin the test
     # hil.start_test(test_bspd.__name__)
+"""
+0v: Brake released
+5v: Fully pressed
+
+test_bspd (brake signal plausibility detection)
+
+BSE (Brake System Encoder)
+- T.4.3.4
+    - When an analogue signal is used, the BSE sensors will be considered to have failed when they
+        achieve an open circuit or short circuit condition which generates a signal outside of the
+        normal operating range, for example <0.5 V or >4.5 V.
+
+APPS (Accelerator Pedal Position Sensor)
+- T.4.2.4:
+    - Implausibility is defined as a deviation of more than 10% Pedal Travel between the sensors or
+        other failure as defined in this Section T.4.2.
+- T.4.2.5:
+    - If an Implausibility occurs between the values of the APPSs and persists for more than 100
+        msec, the power to the (IC) Electronic Throttle / (EV) Motor(s) must be immediately stopped completely.
+"""
 
     # Outputs
     brk1    = hil.aout("Dashboard",   "BRK1_RAW")
