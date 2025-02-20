@@ -5,6 +5,7 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
+import random
 from scripts.common.constants.rules_constants import *
 from scripts.common.constants.vehicle_constants import *
 
@@ -30,34 +31,6 @@ def hil():
 
 # ---------------------------------------------------------------------------- #
 BRK_SWEEP_DELAY = 0.1
-
-"""
-0v: Released
-5v: Fully pressed
-
-test_bspd (brake signal plausibility detection)
-
-BSE (Brake System Encoder)
-- T.4.3.4
-    - When an analogue signal is used, the BSE sensors will be considered to have failed when they
-        achieve an open circuit or short circuit condition which generates a signal outside of the
-        normal operating range, for example <0.5 V or >4.5 V.
-
-APPS (Accelerator Pedal Position Sensor)
-- T.4.2.4:
-    - Implausibility is defined as a deviation of more than 10% Pedal Travel between the sensors or
-        other failure as defined in this Section T.4.2.
-- T.4.2.5:
-    - If an Implausibility occurs between the values of the APPSs and persists for more than 100
-        msec, the power to the (IC) Electronic Throttle / (EV) Motor(s) must be immediately stopped
-        completely.
-- T.4.2.10:
-    - When an analogue signal is used, the APPS will be considered to have failed when they achieve
-        an open circuit or short circuit condition which generates a signal outside of the normal
-        operating range, for example <0.5 V or >4.5 V.
-
-
-"""
 
 
 def test_bspd(hil):
@@ -205,23 +178,40 @@ def test_bspd(hil):
 # TODO: add throttle checks
 
 # ---------------------------------------------------------------------------- #
+THROTTLE_VARIANCE = 0.1
+
+
 def test_throttle(hil):
     # HIL outputs (hil writes)
     thrtl1 = hil.aout("Dashboard", "THRTL1_RAW")
     thrtl2 = hil.aout("Dashboard", "THRTL2_RAW")
 
     # HIL inputs (hil reads)
-    # TODO: CAN??????????
+    thrtl1_flt = hil.mcu_pin("Dashboard", "THRTL1_FLT")
+    thrtl2_flt = hil.mcu_pin("Dashboard", "THRTL2_FLT")
 
+    # 0-5V throttle sweep with 0.2
+    throttle_values = [x / 10.0 for x in range(0, 52, 2)]
+    random.shuffle(throttle_values)
 
-    # Test set 1: throttles at rest
-    # Test set 2: throttle 1 trips
-    # Test set 3: throttle 2 trips
-    # Test set 4: throttle 1 and 2 trip
-    # Test set 5: throttle 1 and 2 trip at the correct voltage
-    # Test set 6: throttle 1 and 2 at rest
-
-
-    # Test throttle high and brakes high
+    # Sweep throttle 1
+    for v in throttle_values:
+        thrtl1.state = v
+        time.sleep(0.1)
+        check.almost_equal(
+            thrtl1_flt.state, v,
+            abs=THROTTLE_VARIANCE, rel=0.0,
+            msg=f"Throttle 1: {v}V"
+        )
+    
+    # Sweep throttle 2
+    for v in throttle_values:
+        thrtl2.state = v
+        time.sleep(0.1)
+        check.almost_equal(
+            thrtl2_flt.state, v,
+            abs=THROTTLE_VARIANCE, rel=0.0,
+            msg=f"Throttle 2: {v}V"
+        )
 # ---------------------------------------------------------------------------- #
 
