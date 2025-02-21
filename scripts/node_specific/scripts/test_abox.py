@@ -68,7 +68,8 @@ def test_abox_ams(hil, combo):
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
-def test_isense(hil):
+@pytest.mark.parametrize("voltage", [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0])
+def test_isense(hil, voltage):
     """Current sensor voltage divider transfer function"""
 
     # HIL outputs (hil writes)
@@ -77,12 +78,11 @@ def test_isense(hil):
     # HIL inputs (hil reads)
     ch1_filt = hil.ain("a_box", "ISense Ch1")
 
-    for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0]:
-        ch1_raw.state = v
-        time.sleep(1)
-        expected_out = ABOX_DHAB_CH1_DIV.div(v)
-        # input(f"enter to meas, set to {v}, expected {exp_out}")
-        check.almost_equal(ch1_filt.state, expected_out, abs=0.05, rel=0.0, msg=f"Isense v={v:.3}")
+    ch1_raw.state = voltage
+    time.sleep(1)
+    expected_out = ABOX_DHAB_CH1_DIV.div(voltage)
+    # input(f"enter to meas, set to {v}, expected {exp_out}")
+    check.almost_equal(ch1_filt.state, expected_out, abs=0.05, rel=0.0, msg=f"Isense v={voltage:.3}")
 
     # Test float (hi-Z) is pulled down
     ch1_raw.hiZ()
