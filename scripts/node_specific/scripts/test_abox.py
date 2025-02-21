@@ -223,12 +223,13 @@ def test_tmu_mux(hil, combo):
 def test_tmu(hil, combo):
     """Thermal Management Unit temperature sensors"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     tmu_a_do = hil.dout("a_box", "TMU_1")
     tmu_b_do = hil.dout("a_box", "TMU_2")
     tmu_c_do = hil.dout("a_box", "TMU_3")
     tmu_d_do = hil.dout("a_box", "TMU_4")
 
+    # HIL inputs (hil reads)
     daq_override = hil.daq_var("a_box", "tmu_daq_override")
     daq_therm    = hil.daq_var("a_box", "tmu_daq_therm")
 
