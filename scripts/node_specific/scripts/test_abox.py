@@ -97,10 +97,10 @@ RLY_OFF = 1
 RLY_ON  = 0
 
 @pytest.mark.parametrize("n_pchg_cmplt_set, sdc_set, expected_resistor", [
-    (0, RLY_OFF, 0),  Precharge complete, SDC off -> resistor disconnected
-    (1, RLY_OFF, 0),  Precharge active, SDC off -> resistor disconnected
-    (1, RLY_ON,  1),  Precharge active, SDC on  -> resistor connected
-    (0, RLY_ON,  0),  Precharge complete, SDC on -> resistor disconnected
+    (0, RLY_OFF, 0),  # Precharge complete, SDC off -> resistor disconnected
+    (1, RLY_OFF, 0),  # Precharge active, SDC off -> resistor disconnected
+    (1, RLY_ON,  1),  # Precharge active, SDC on  -> resistor connected
+    (0, RLY_ON,  0),  # Precharge complete, SDC on -> resistor disconnected
 ])
 def test_not_precharge_complete(hil, n_pchg_cmplt_set, sdc_set, expected_resistor):
     """Not precharge complete"""
