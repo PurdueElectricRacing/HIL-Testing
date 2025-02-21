@@ -17,6 +17,31 @@
             {"dut":{"connector":"J1","pin":10}, "hil":{"device":"FrontTester", "port":"DAC2"}},
             {"dut":{"connector":"J1","pin":11}, "hil":{"device":"FrontTester", "port":"DAC1", "_": "can't do breaks and throttle at once, not enough DACs"}},
             {"dut":{"connector":"J1","pin":12}, "hil":{"device":"FrontTester", "port":"DAC2"}}
+        ]},
+        {"board":"a_box", "harness_connections":[
+            {"dut":{"connector":"P9","pin":2}, "hil":{"device":"RearTester", "port":"AI1"}},
+            {"dut":{"connector":"P9","pin":4}, "hil":{"device":"RearTester", "port":"AI2"}},
+            {"dut":{"connector":"P12","pin":3}, "hil":{"device":"RearTester", "port":"AI2"}},
+            {"dut":{"connector":"P12","pin":1}, "hil":{"device":"RearTester", "port":"AI3"}},
+            {"dut":{"connector":"P9","pin":6}, "hil":{"device":"RearTester", "port":"AI4"}},
+            {"dut":{"connector":"P9","pin":11}, "hil":{"device":"RearTester", "port":"RLY1"}},
+            {"dut":{"connector":"P9","pin":5}, "hil":{"device":"RearTester", "port":"RLY2"}},
+            {"dut":{"connector":"P7","pin":6}, "hil":{"device":"RearTester", "port":"RLY3"}},
+            {"dut":{"connector":"P9","pin":3}, "hil":{"device":"RearTester", "port":"DI3"}},
+            {"dut":{"connector":"P9","pin":7}, "hil":{"device":"RearTester", "port":"DI4"}},
+            {"dut":{"connector":"P13","pin":3}, "hil":{"device":"RearTester", "port":"DI5"}},
+            {"dut":{"connector":"P5","pin":3}, "hil":{"device":"RearTester", "port":"DI6"}},
+            {"dut":{"connector":"P12","pin":11}, "hil":{"device":"RearTester", "port":"DAC1"}},
+            {"dut":{"connector":"P4","pin":2}, "hil":{"device":"RearTesterArd", "port":"D2"}},
+            {"dut":{"connector":"P4","pin":3}, "hil":{"device":"RearTesterArd", "port":"D3"}},
+            {"dut":{"connector":"P4","pin":4}, "hil":{"device":"RearTesterArd", "port":"D4"}},
+            {"dut":{"connector":"P4","pin":5}, "hil":{"device":"RearTesterArd", "port":"D5"}},
+            {"dut":{"connector":"P4","pin":7}, "hil":{"device":"RearTesterArd", "port":"D6"}},
+            {"dut":{"connector":"P3","pin":7}, "hil":{"device":"RearTesterArd", "port":"D7"}},
+            {"dut":{"connector":"P2","pin":7}, "hil":{"device":"RearTesterArd", "port":"D8"}},
+            {"dut":{"connector":"P1","pin":7}, "hil":{"device":"RearTesterArd", "port":"D9"}},
+            {"dut":{"connector":"P10","pin":3}, "hil":{"device":"RearTester", "port":"RLY4"}},
+            {"dut":{"connector":"P9","pin":8}, "hil":{"device":"RearTester", "port":"DI7"}}
         ]}
     ],
     "hil_devices":[
