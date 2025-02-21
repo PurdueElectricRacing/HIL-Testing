@@ -207,6 +207,7 @@ def test_tiffomy(hil):
 
 # ---------------------------------------------------------------------------- #
 def test_tmu(hil):
+    # redo!!
     # Begin the test
     # hil.start_test(test_tmu.__name__)
 
