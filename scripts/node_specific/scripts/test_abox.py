@@ -187,7 +187,8 @@ def test_tiffomy(hil):
 TMU_TOLERANCE = 100
 TMU_HIGH_VALUE = 1970 #2148
 
-def test_tmu_mux(hil):
+@pytest.mark.parametrize("combo", list(range(16)))
+def test_tmu_mux(hil, combo):
     """Thermal Management Unit MUX"""
 
     # HIL outputs (hil writes)
@@ -203,14 +204,18 @@ def test_tmu_mux(hil):
     daq_therm.state = 0
     daq_override.state = 1
 
-    # mux line test
-    for i in range(0, 16):
-        daq_therm.state = i
-        time.sleep(0.05)
-        check.equal(mux_a.state, bool(i & 0x1), f"Mux A test {i}")
-        check.equal(mux_b.state, bool(i & 0x2), f"Mux B test {i}")
-        check.equal(mux_c.state, bool(i & 0x4), f"Mux C test {i}")
-        check.equal(mux_d.state, bool(i & 0x8), f"Mux D test {i}")
+    daq_therm.state = combo
+    time.sleep(0.05)
+
+    expected_a = bool(combo & 0x1)
+    expected_b = bool(combo & 0x2)
+    expected_c = bool(combo & 0x4)
+    expected_d = bool(combo & 0x8)
+
+    check.equal(mux_a.state, expected_a, f"Mux A test ({combo})")
+    check.equal(mux_b.state, expected_b, f"Mux B test ({combo})")
+    check.equal(mux_c.state, expected_c, f"Mux C test ({combo})")
+    check.equal(mux_d.state, expected_d, f"Mux D test ({combo})")
 
     daq_override.state = 0
 
