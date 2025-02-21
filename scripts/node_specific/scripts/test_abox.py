@@ -32,6 +32,8 @@ def hil():
 
 # ---------------------------------------------------------------------------- #
 def test_abox_ams(hil):
+    """Accumulator Management System"""
+
     # HIL outputs (hil writes)
     discharge_en = hil.dout("a_box", "Discharge Enable")
     charge_safe = hil.dout("a_box", "Charger Safety")
@@ -59,8 +61,8 @@ def test_abox_ams(hil):
         bms_stat.state = bms_set
         time.sleep(0.1)
 
-        check.equal(charge_stat.state, expected_charge, f"Chrg stat {expected_charge}")
-        check.equal(main_stat.state, expected_discharge, f"Main stat {expected_discharge}")
+        check.equal(charge_stat.state, expected_charge, f"Charge stat ({i:b}) {expected_charge}")
+        check.equal(main_stat.state, expected_discharge, f"Main stat ({i:b}) {expected_discharge}")
 
     # Reset the override
     bms_override.state = 0
