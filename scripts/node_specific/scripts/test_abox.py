@@ -31,7 +31,8 @@ def hil():
 
 
 # ---------------------------------------------------------------------------- #
-def test_abox_ams(hil):
+@pytest.mark.parametrize("combo", [0, 1, 2, 3, 4, 5, 6, 7])
+def test_abox_ams(hil, combo):
     """Accumulator Management System"""
 
     # HIL outputs (hil writes)
@@ -47,22 +48,20 @@ def test_abox_ams(hil):
     # Force manual overridec
     bms_override.state = 1
 
-    # Try every combination of the 3 inputs
-    for i in range(0, 8):
-        discharge_set = bool(i & 0x1)
-        charge_set    = bool(i & 0x2)
-        bms_set       = bool(i & 0x4)
-        
-        expected_charge    = not (charge_set or bms_set)
-        expected_discharge = not (discharge_set or bms_set)
+    discharge_set = bool(combo & 0x1)
+    charge_set    = bool(combo & 0x2)
+    bms_set       = bool(combo & 0x4)
+    
+    expected_charge    = not (charge_set or bms_set)
+    expected_discharge = not (discharge_set or bms_set)
 
-        discharge_en.state = discharge_set
-        charge_safe.state  = charge_set
-        bms_stat.state     = bms_set
-        time.sleep(0.1)
+    discharge_en.state = discharge_set
+    charge_safe.state  = charge_set
+    bms_stat.state     = bms_set
+    time.sleep(0.1)
 
-        check.equal(charge_stat.state, expected_charge, f"Charge stat ({i:b}) {expected_charge}")
-        check.equal(main_stat.state, expected_discharge, f"Main stat ({i:b}) {expected_discharge}")
+    check.equal(charge_stat.state, expected_charge, f"Charge stat ({combo:b}) {expected_charge}")
+    check.equal(main_stat.state, expected_discharge, f"Main stat ({combo:b}) {expected_discharge}")
 
     # Reset the override
     bms_override.state = 0
@@ -126,6 +125,7 @@ def test_precharge(hil):
             message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
             check.equal(resistor.state, expected_resistor, message)
 
+    # split
 
     # Duration test
     time.sleep(1)
@@ -209,7 +209,7 @@ def test_tmu(hil):
     daq_override.state = 1
 
     # mux line test
-    for i in range(0,16):
+    for i in range(0, 16):
         daq_therm.state = i
         time.sleep(0.05)
         # hil.check(mux_a.state == bool(i & 0x1), f"Mux A test {i}")
@@ -225,6 +225,8 @@ def test_tmu(hil):
 
     TMU_TOLERANCE = 100
     TMU_HIGH_VALUE = 1970 #2148
+
+    # split
 
     # thermistors
     for i in range(0,16):
