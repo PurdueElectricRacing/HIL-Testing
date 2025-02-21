@@ -219,7 +219,8 @@ def test_tmu_mux(hil, combo):
 
     daq_override.state = 0
 
-def test_tmu(hil):
+@pytest.mark.parametrize("combo", list(range(16)))
+def test_tmu(hil, combo):
     """Thermal Management Unit temperature sensors"""
 
     # Outputs
@@ -239,32 +240,31 @@ def test_tmu(hil):
     daq_therm.state = 0
     daq_override.state = 0
 
-    for i in range(0, 16):
-        a_set = bool(i & 0x1)
-        b_set = bool(i & 0x2)
-        c_set = bool(i & 0x4)
-        d_set = bool(i & 0x8)
+    a_set = bool(combo & 0x1)
+    b_set = bool(combo & 0x2)
+    c_set = bool(combo & 0x4)
+    d_set = bool(combo & 0x8)
 
-        tmu_a_do.state = a_set
-        tmu_b_do.state = b_set
-        tmu_c_do.state = c_set
-        tmu_d_do.state = d_set
-        time.sleep(1.0)
+    tmu_a_do.state = a_set
+    tmu_b_do.state = b_set
+    tmu_c_do.state = c_set
+    tmu_d_do.state = d_set
+    time.sleep(1.0)
 
-        a = int(tmu_a_ai.state)
-        b = int(tmu_b_ai.state)
-        c = int(tmu_c_ai.state)
-        d = int(tmu_d_ai.state)
+    a = int(tmu_a_ai.state)
+    b = int(tmu_b_ai.state)
+    c = int(tmu_c_ai.state)
+    d = int(tmu_d_ai.state)
 
-        expected_a = TMU_HIGH_VALUE if a_set else 0
-        expected_b = TMU_HIGH_VALUE if b_set else 0
-        expected_c = TMU_HIGH_VALUE if c_set else 0
-        expected_d = TMU_HIGH_VALUE if d_set else 0
-        
-        check.almost_equal(a, expected_a, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 1 test ({i})")
-        check.almost_equal(b, expected_b, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 2 test ({i})")
-        check.almost_equal(c, expected_c, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 3 test ({i})")
-        check.almost_equal(d, expected_d, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 4 test ({i})")
+    expected_a = TMU_HIGH_VALUE if a_set else 0
+    expected_b = TMU_HIGH_VALUE if b_set else 0
+    expected_c = TMU_HIGH_VALUE if c_set else 0
+    expected_d = TMU_HIGH_VALUE if d_set else 0
+    
+    check.almost_equal(a, expected_a, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 1 test ({combo})")
+    check.almost_equal(b, expected_b, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 2 test ({combo})")
+    check.almost_equal(c, expected_c, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 3 test ({combo})")
+    check.almost_equal(d, expected_d, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 4 test ({combo})")
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
