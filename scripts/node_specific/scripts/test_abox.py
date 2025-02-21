@@ -96,8 +96,8 @@ def test_isense(hil, voltage):
 RLY_OFF = 1
 RLY_ON  = 0
 
-def test_precharge(hil):
-    """Precharge"""
+def test_not_precharge_complete(hil):
+    """Not precharge complete"""
 
     # HIL outputs (hil writes)
     n_pchg_cmplt = hil.dout("a_box", "NotPrechargeComplete")
@@ -125,17 +125,25 @@ def test_precharge(hil):
             message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
             check.equal(resistor.state, expected_resistor, message)
 
-    # split
 
-    # Duration test
+def test_precharge_duration(hil):
+    """Precharge duration"""
+
+    # HIL outputs (hil writes)
+    n_pchg_cmplt = hil.dout("a_box", "NotPrechargeComplete")
+    sdc          = hil.dout("a_box", "SDC")
+
+    # HIL inputs (hil reads)
+    resistor = hil.din("a_box", "NetK1_4") # To precharge resistor
+
     time.sleep(1)
     n_pchg_cmplt.state = 1
     sdc.state = RLY_ON
     time.sleep(0.1)
-    check.equal(resistor.state, 1, "Duration init")
+    check.equal(resistor.state, 1, "Duration start")
 
     time.sleep(9)
-    check.equal(resistor.state, 1, "Duration mid")
+    check.equal(resistor.state, 1, "Duration middle")
 
     n_pchg_cmplt.state = 0
     time.sleep(0.1)
