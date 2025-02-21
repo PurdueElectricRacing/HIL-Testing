@@ -148,13 +148,12 @@ SUPPLY_VOLTAGE = 24.0
 TIFF_DLY = 0.3
 
 def test_tiffomy(hil):
-    # Begin the test
-    # hil.start_test(test_tiffomy.__name__)
+    """Tractive Isolation Fault Detection"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     bat_p = hil.dout("a_box", "Batt+")
 
-    # Inputs
+    # HIL inputs (hil reads)
     vbat   = hil.ain("a_box", "VBatt")
     imd_hv = hil.din("a_box", "Batt+_Fused")
 
@@ -163,13 +162,12 @@ def test_tiffomy(hil):
 
     utils.log_warning(f"Assuming supply = {SUPPLY_VOLTAGE} V")
     utils.log_warning(f"Do not reverse polarity Vbat, it will kill Arduino ADC")
-    input("Click enter to acknowledge or ctrl+c to cancel")
+    # input("Click enter to acknowledge or ctrl+c to cancel")
 
     bat_p.state = RLY_OFF
     time.sleep(TIFF_DLY)
-    # hil.check_within(vbat.state, 0.0, 0.1, "TIff off")
-    # hil.check(imd_hv.state == 0, "IMD HV off")
-    check.almost_equal(vbat.state, 0.0, abs=0.1, rel=0.0, msg="TIff off")
+
+    check.almost_equal(vbat.state, 0.0, abs=0.1, rel=0.0, msg="Tiff off")
     check.equal(imd_hv.state, 0, "IMD HV off")
 
     bat_p.state = RLY_ON
@@ -177,13 +175,8 @@ def test_tiffomy(hil):
     exp = SUPPLY_VOLTAGE
     #input("press enter, tiff should be getting volts")
     meas = tiff_lv_to_hv(vbat.state)
-    print(f"Tiff HV reading: {meas} V, expect: {SUPPLY_VOLTAGE} V")
-    # hil.check_within(meas, exp, 2.5, "Tiff on")
-    # hil.check(imd_hv.state == 1, "IMD HV on")
     check.almost_equal(meas, exp, abs=2.5, rel=0.0, msg="Tiff on")
     check.equal(imd_hv.state, 1, "IMD HV on")
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
