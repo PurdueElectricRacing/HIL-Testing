@@ -32,48 +32,42 @@ def hil():
 
 # ---------------------------------------------------------------------------- #
 def test_abox_ams(hil):
-    # Begin the test
-    # hil.start_test(test_abox_ams.__name__)
-
-    # Outputs
-    den = hil.dout("a_box", "Discharge Enable")
-    csafe = hil.dout("a_box", "Charger Safety")
+    # HIL outputs (hil writes)
+    discharge_en = hil.dout("a_box", "Discharge Enable")
+    charge_safe = hil.dout("a_box", "Charger Safety")
     bms_override = hil.daq_var("a_box", "bms_daq_override")
     bms_stat = hil.daq_var("a_box", "bms_daq_stat")
 
-    # Inputs
-    chrg_stat = hil.din("a_box", "BMS Status Charger")
-    main_stat = hil.din("a_box", "BMS Status PDU")
+    # HIL inputs (hil reads)
+    charge_stat = hil.din("a_box", "BMS Status Charger")
+    main_stat = hil.din("a_box", "BMS Status PDU") # Main power status = discharge
 
+    # Force manual overridec
     bms_override.state = 1
 
+    # Try every combination of the 3 inputs
     for i in range(0, 8):
-        dchg_set = bool(i & 0x1)
-        chg_set = bool(i & 0x2)
+        discharge_set = bool(i & 0x1)
+        charge_set = bool(i & 0x2)
         bms_set = bool(i & 0x4)
-        exp_chrg = not (chg_set or bms_set)
-        exp_dchg = not (dchg_set or bms_set)
+        
+        expected_charge = not (charge_set or bms_set)
+        expected_discharge = not (discharge_set or bms_set)
 
-        den.state = dchg_set
-        csafe.state = chg_set
+        discharge_en.state = discharge_set
+        charge_safe.state = charge_set
         bms_stat.state = bms_set
-        print(f"Combo {i}")
         time.sleep(0.1)
-        # hil.check(chrg_stat.state == exp_chrg, f"Chrg stat {exp_chrg}")
-        # hil.check(main_stat.state == exp_dchg, f"Main stat {exp_dchg}")
-        check.equal(chrg_stat.state, exp_chrg, f"Chrg stat {exp_chrg}")
-        check.equal(main_stat.state, exp_dchg, f"Main stat {exp_dchg}")
 
+        check.equal(charge_stat.state, expected_charge, f"Chrg stat {expected_charge}")
+        check.equal(main_stat.state, expected_discharge, f"Main stat {expected_discharge}")
+
+    # Reset the override
     bms_override.state = 0
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
 def test_isense(hil):
-    # Begin the test
-    # hil.start_test(test_isense.__name__)
-
     # Outputs
     ch1_raw = hil.aout("a_box", "Isense_Ch1_raw")
 
