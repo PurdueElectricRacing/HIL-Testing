@@ -96,7 +96,13 @@ def test_isense(hil, voltage):
 RLY_OFF = 1
 RLY_ON  = 0
 
-def test_not_precharge_complete(hil):
+@pytest.mark.parametrize("n_pchg_cmplt_set, sdc_set, expected_resistor", [
+    (0, RLY_OFF, 0),  Precharge complete, SDC off -> resistor disconnected
+    (1, RLY_OFF, 0),  Precharge active, SDC off -> resistor disconnected
+    (1, RLY_ON,  1),  Precharge active, SDC on  -> resistor connected
+    (0, RLY_ON,  0),  Precharge complete, SDC on -> resistor disconnected
+])
+def test_not_precharge_complete(hil, n_pchg_cmplt_set, sdc_set, expected_resistor):
     """Not precharge complete"""
 
     # HIL outputs (hil writes)
@@ -109,22 +115,12 @@ def test_not_precharge_complete(hil):
 
     bat_p.state = RLY_ON
 
-    # Test all combinations of the two inputs
-    # Expected resistor state is not perchage and sdc on
-    sdc_states = [RLY_OFF, RLY_ON]
-    n_pchg_cmplt_states = [0, 1]
+    n_pchg_cmplt.state = n_pchg_cmplt_set
+    sdc.state = sdc_set
+    time.sleep(0.1)
 
-    for sdc_set in sdc_states:
-        for n_pchg_cmplt_set in n_pchg_cmplt_states:
-            n_pchg_cmplt.state = n_pchg_cmplt_set
-            sdc.state = sdc_set
-            time.sleep(0.1)
-
-            expected_resistor = n_pchg_cmplt_set and (sdc_set == RLY_ON)
-
-            message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
-            check.equal(resistor.state, expected_resistor, message)
-
+    message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
+    check.equal(resistor.state, expected_resistor, message)
 
 def test_precharge_duration(hil):
     """Precharge duration"""
