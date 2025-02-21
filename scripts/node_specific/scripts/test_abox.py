@@ -262,39 +262,30 @@ def test_tmu(hil):
 
 # ---------------------------------------------------------------------------- #
 def test_imd(hil):
-    # hil.start_test(test_imd.__name__)
+    """Insulation Monitoring Device"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     imd_out = hil.dout('a_box', 'IMD_Status')
 
-    # Inputs
-    imd_in = hil.din('a_box', 'IMD_STATUS_LV_COMP')
+    # HIL inputs (hil reads)
+    imd_in  = hil.din('a_box', 'IMD_STATUS_LV_COMP')
     imd_mcu = hil.mcu_pin('a_box', 'IMD_STATUS_LV_COMP')
-
 
     imd_out.state = RLY_OFF
     time.sleep(0.1)
 
-    # hil.check(imd_in.state == 0, 'IMD LV OFF')
-    # hil.check(imd_mcu.state == 0, 'IMD MCU OFF')
-    check.equal(imd_in.state, 0, 'IMD LV OFF')
-    check.equal(imd_mcu.state, 0, 'IMD MCU OFF')
+    check.equal(imd_in.state, 0, 'IMD LV off')
+    check.equal(imd_mcu.state, 0, 'IMD MCU off')
 
     imd_out.state = RLY_ON
     time.sleep(0.1)
 
-    # hil.check(imd_in.state == 1, 'IMD LV ON')
-    # hil.check(imd_mcu.state == 1, 'IMD MCU ON')
-    check.equal(imd_in.state, 1, 'IMD LV ON')
-    check.equal(imd_mcu.state, 1, 'IMD MCU ON')
+    check.equal(imd_in.state, 1, 'IMD LV on')
+    check.equal(imd_mcu.state, 1, 'IMD MCU on')
 
     imd_out.state = RLY_OFF
     time.sleep(0.1)
 
-    # hil.check(imd_in.state == 0, 'IMD LV BACK OFF')
-    # hil.check(imd_mcu.state == 0, 'IMD MCU BACK OFF')
-    check.equal(imd_in.state, 0, 'IMD LV BACK OFF')
-    check.equal(imd_mcu.state, 0, 'IMD MCU BACK OFF')
-
-    # hil.end_test()
+    check.equal(imd_in.state, 0, 'IMD LV BACK off')
+    check.equal(imd_mcu.state, 0, 'IMD MCU BACK off')
 # ---------------------------------------------------------------------------- #
