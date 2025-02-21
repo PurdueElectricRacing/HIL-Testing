@@ -94,70 +94,52 @@ def test_isense(hil):
 
 
 # ---------------------------------------------------------------------------- #
-RLY_ON  = 0
 RLY_OFF = 1
-RLY_DLY = 0.01 # Mechanicl relay takes time to transition
+RLY_ON  = 0
 
 def test_precharge(hil):
-    # Begin the test
-    # hil.start_test(test_precharge.__name__)
+    """Precharge"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     n_pchg_cmplt = hil.dout("a_box", "NotPrechargeComplete")
     sdc          = hil.dout("a_box", "SDC")
     bat_p        = hil.dout("a_box", "Batt+")
 
-    # Inputs
+    # HIL inputs (hil reads)
     resistor = hil.din("a_box", "NetK1_4") # To precharge resistor
 
     bat_p.state = RLY_ON
 
-    print("Combo 1")
-    n_pchg_cmplt.state = 0
-    sdc.state   = RLY_OFF
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 1, resistor disconnected")
+    # Test all combinations of the two inputs
+    # Expected resistor state is not perchage and sdc on
+    sdc_states = [RLY_OFF, RLY_ON]
+    n_pchg_cmplt_states = [0, 1]
 
-    print("Combo 2")
-    n_pchg_cmplt.state = 1
-    sdc.state   = RLY_OFF
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 2, resistor disconnected")
+    for sdc_set in sdc_states:
+        for n_pchg_cmplt_set in n_pchg_cmplt_states:
+            n_pchg_cmplt.state = n_pchg_cmplt_set
+            sdc.state = sdc_set
+            time.sleep(0.1)
 
-    print("Combo 3")
-    n_pchg_cmplt.state = 1
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 1, "Resistor connected")
-    check.equal(resistor.state, 1, "Combo 3, resistor connected")
+            expected_resistor = n_pchg_cmplt_set and (sdc_set == RLY_ON)
 
-    print("Combo 4")
-    n_pchg_cmplt.state = 0
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 4, resistor disconnected")
+            message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
+            check.equal(resistor.state, expected_resistor, message)
+
 
     # Duration test
     time.sleep(1)
     n_pchg_cmplt.state = 1
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 1, "Duration init")
+    sdc.state = RLY_ON
+    time.sleep(0.1)
     check.equal(resistor.state, 1, "Duration init")
 
     time.sleep(9)
-    # hil.check(resistor.state == 1, "Duration mid")
     check.equal(resistor.state, 1, "Duration mid")
 
     n_pchg_cmplt.state = 0
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Duration end")
+    time.sleep(0.1)
     check.equal(resistor.state, 0, "Duration end")
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 
@@ -288,7 +270,7 @@ def test_imd(hil):
 
 
     imd_out.state = RLY_OFF
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
     # hil.check(imd_in.state == 0, 'IMD LV OFF')
     # hil.check(imd_mcu.state == 0, 'IMD MCU OFF')
@@ -296,7 +278,7 @@ def test_imd(hil):
     check.equal(imd_mcu.state, 0, 'IMD MCU OFF')
 
     imd_out.state = RLY_ON
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
     # hil.check(imd_in.state == 1, 'IMD LV ON')
     # hil.check(imd_mcu.state == 1, 'IMD MCU ON')
@@ -304,7 +286,7 @@ def test_imd(hil):
     check.equal(imd_mcu.state, 1, 'IMD MCU ON')
 
     imd_out.state = RLY_OFF
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
     # hil.check(imd_in.state == 0, 'IMD LV BACK OFF')
     # hil.check(imd_mcu.state == 0, 'IMD MCU BACK OFF')
