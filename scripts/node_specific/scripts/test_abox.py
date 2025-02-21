@@ -36,13 +36,13 @@ def test_abox_ams(hil):
 
     # HIL outputs (hil writes)
     discharge_en = hil.dout("a_box", "Discharge Enable")
-    charge_safe = hil.dout("a_box", "Charger Safety")
+    charge_safe  = hil.dout("a_box", "Charger Safety")
     bms_override = hil.daq_var("a_box", "bms_daq_override")
-    bms_stat = hil.daq_var("a_box", "bms_daq_stat")
+    bms_stat     = hil.daq_var("a_box", "bms_daq_stat")
 
     # HIL inputs (hil reads)
     charge_stat = hil.din("a_box", "BMS Status Charger")
-    main_stat = hil.din("a_box", "BMS Status PDU") # Main power status = discharge
+    main_stat   = hil.din("a_box", "BMS Status PDU") # Main power status = discharge
 
     # Force manual overridec
     bms_override.state = 1
@@ -50,15 +50,15 @@ def test_abox_ams(hil):
     # Try every combination of the 3 inputs
     for i in range(0, 8):
         discharge_set = bool(i & 0x1)
-        charge_set = bool(i & 0x2)
-        bms_set = bool(i & 0x4)
+        charge_set    = bool(i & 0x2)
+        bms_set       = bool(i & 0x4)
         
-        expected_charge = not (charge_set or bms_set)
+        expected_charge    = not (charge_set or bms_set)
         expected_discharge = not (discharge_set or bms_set)
 
         discharge_en.state = discharge_set
-        charge_safe.state = charge_set
-        bms_stat.state = bms_set
+        charge_safe.state  = charge_set
+        bms_stat.state     = bms_set
         time.sleep(0.1)
 
         check.equal(charge_stat.state, expected_charge, f"Charge stat ({i:b}) {expected_charge}")
@@ -81,10 +81,9 @@ def test_isense(hil):
     for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0]:
         ch1_raw.state = v
         time.sleep(1)
-        exp_out = ABOX_DHAB_CH1_DIV.div(v)
+        expected_out = ABOX_DHAB_CH1_DIV.div(v)
         # input(f"enter to meas, set to {v}, expected {exp_out}")
-        meas = ch1_filt.state
-        check.almost_equal(meas, exp_out, abs=0.05, rel=0.0, msg=f"Isense v={v:.3}")
+        check.almost_equal(ch1_filt.state, expected_out, abs=0.05, rel=0.0, msg=f"Isense v={v:.3}")
 
     # Test float (hi-Z) is pulled down
     ch1_raw.hiZ()
