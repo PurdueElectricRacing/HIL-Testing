@@ -70,29 +70,27 @@ def test_abox_ams(hil):
 
 # ---------------------------------------------------------------------------- #
 def test_isense(hil):
-    # Outputs
+    """Current sensor voltage divider transfer function"""
+
+    # HIL outputs (hil writes)
     ch1_raw = hil.aout("a_box", "Isense_Ch1_raw")
 
-    # Inputs
+    # HIL inputs (hil reads)
     ch1_filt = hil.ain("a_box", "ISense Ch1")
 
-    # Need to test voltage divider transfer function correct
     for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0]:
         ch1_raw.state = v
         time.sleep(1)
         exp_out = ABOX_DHAB_CH1_DIV.div(v)
-        input(f"enter to meas, set to {v}, expected {exp_out}")
+        # input(f"enter to meas, set to {v}, expected {exp_out}")
         meas = ch1_filt.state
-        print(f"isense expected: {exp_out}V, measured: {meas}V")
-        # hil.check_within(meas, exp_out, 0.05, f"Isense v={v:.3}")
         check.almost_equal(meas, exp_out, abs=0.05, rel=0.0, msg=f"Isense v={v:.3}")
 
+    # Test float (hi-Z) is pulled down
     ch1_raw.hiZ()
     time.sleep(0.01)
-    # hil.check_within(ch1_filt.state, 0.0, 0.05, f"Isense float pulled down")
-    check.almost_equal(ch1_filt.state, 0.0, abs=0.05, rel=0.0, msg="Isense float pulled down")
 
-    # hil.end_test()
+    check.almost_equal(ch1_filt.state, 0.0, abs=0.05, rel=0.0, msg="Isense float (hi-Z) pulled down")
 # ---------------------------------------------------------------------------- #
 
 
