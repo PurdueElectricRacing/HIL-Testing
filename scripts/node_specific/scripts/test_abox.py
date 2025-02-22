@@ -185,7 +185,7 @@ def test_tiffomy(hil):
 
 # ---------------------------------------------------------------------------- #
 TMU_TOLERANCE = 100
-TMU_HIGH_VALUE = 1970 #2148
+TMU_HIGH_VALUE = 1970 # 2148
 
 @pytest.mark.parametrize("mux_value", list(range(16)))
 def test_tmu_mux(hil, mux_value):
@@ -219,73 +219,79 @@ def test_tmu_mux(hil, mux_value):
 
     daq_override.state = 0
 
-@pytest.mark.parametrize("combo", list(range(16)))
+@pytest.mark.parametrize("combo", list(range(2 ** 10)))
 def test_tmu(hil, combo):
-    """Thermal Management Unit temperature sensors"""
+    """Thermal Management Unit temperature sensors (test every combo of TMU_X_Y and read from daq_var)"""
 
     # HIL outputs (hil writes)
-    tmu_11_do = hil.dout("a_box", "TMU_1_1")
-    tmu_12_do = hil.dout("a_box", "TMU_1_2")
-    tmu_21_do = hil.dout("a_box", "TMU_2_1")
-    tmu_22_do = hil.dout("a_box", "TMU_2_2")
-    tmu_31_do = hil.dout("a_box", "TMU_3_1")
-    tmu_32_do = hil.dout("a_box", "TMU_3_2")
-    tmu_41_do = hil.dout("a_box", "TMU_4_1")
-    tmu_42_do = hil.dout("a_box", "TMU_4_2")
+    tmu_dos = [
+        hil.dout("a_box", f"TMU_{i+1}_{j+1}")
+        for i in range(5)
+        for j in range(2)
+    ]
 
     # HIL inputs (hil reads)
     daq_override = hil.daq_var("a_box", "tmu_daq_override")
     daq_therm    = hil.daq_var("a_box", "tmu_daq_therm")
 
-    tmu_11_ai = hil.daq_var("a_box", "tmu_1_1")
-    tmu_12_ai = hil.daq_var("a_box", "tmu_1_2")
-    tmu_21_ai = hil.daq_var("a_box", "tmu_2_1")
-    tmu_22_ai = hil.daq_var("a_box", "tmu_2_2")
-    tmu_31_ai = hil.daq_var("a_box", "tmu_3_1")
-    tmu_32_ai = hil.daq_var("a_box", "tmu_3_2")
-    tmu_41_ai = hil.daq_var("a_box", "tmu_4_1")
-    tmu_42_ai = hil.daq_var("a_box", "tmu_4_2")
+    tmu_ais = [
+        hil.daq_var("a_box", f"tmu_{i+1}_{j+1}")
+        for i in range(5)
+        for j in range(2)
+    ]
 
     daq_therm.state = 0
     daq_override.state = 0
 
-    a_set = bool(combo & 0x1)
-    b_set = bool(combo & 0x2)
-    c_set = bool(combo & 0x4)
-    d_set = bool(combo & 0x8)
+    for i in range(10):
+        tmu_dos[i].state = bool(combo & (1 << i))
 
-    tmu_11_do.state = a_set
-    tmu_12_do.state = a_set
-    tmu_21_do.state = b_set
-    tmu_22_do.state = b_set
-    tmu_31_do.state = c_set
-    tmu_32_do.state = c_set
-    tmu_41_do.state = d_set
-    tmu_42_do.state = d_set
     time.sleep(1.0)
 
-    a1 = int(tmu_11_ai.state)
-    a2 = int(tmu_12_ai.state)
-    b1 = int(tmu_21_ai.state)
-    b2 = int(tmu_22_ai.state)
-    c1 = int(tmu_31_ai.state)
-    c2 = int(tmu_32_ai.state)
-    d1 = int(tmu_41_ai.state)
-    d2 = int(tmu_42_ai.state)
+    for i in range(10):
+        meas = int(tmu_ais[i].state)
+        expected = TMU_HIGH_VALUE if bool(combo & (1 << i)) else 0
 
-    expected_a = TMU_HIGH_VALUE if a_set else 0
-    expected_b = TMU_HIGH_VALUE if b_set else 0
-    expected_c = TMU_HIGH_VALUE if c_set else 0
-    expected_d = TMU_HIGH_VALUE if d_set else 0
-    
-    check.almost_equal(a1, expected_a, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_1_1 test ({combo})")
-    check.almost_equal(a2, expected_a, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_1_2 test ({combo})")
-    check.almost_equal(b1, expected_b, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_2_1 test ({combo})")
-    check.almost_equal(b2, expected_b, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_2_2 test ({combo})")
-    check.almost_equal(c1, expected_c, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_3_1 test ({combo})")
-    check.almost_equal(c2, expected_c, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_3_2 test ({combo})")
-    check.almost_equal(d1, expected_d, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_4_1 test ({combo})")
-    check.almost_equal(d2, expected_d, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU_4_2 test ({combo})")
+        message = f"TMU_{i // 2 + 1}_{i % 2 + 1} test ({combo})"
+        check.almost_equal(meas, expected, abs=TMU_TOLERANCE, rel=0.0, msg=message)
+
+
+    # # OLD TEST!
+    # # HIL outputs (hil writes)
+    # tmu_a_do = hil.dout("a_box", "TMU_1")
+    # tmu_b_do = hil.dout("a_box", "TMU_2")
+    # tmu_c_do = hil.dout("a_box", "TMU_3")
+    # tmu_d_do = hil.dout("a_box", "TMU_4")
+
+    # daq_override = hil.daq_var("a_box", "tmu_daq_override")
+    # daq_therm    = hil.daq_var("a_box", "tmu_daq_therm")
+
+    # # HIL inputs (hil reads)
+    # tmu_a_ai = hil.daq_var("a_box", "tmu_1")
+    # tmu_b_ai = hil.daq_var("a_box", "tmu_2")
+    # tmu_c_ai = hil.daq_var("a_box", "tmu_3")
+    # tmu_d_ai = hil.daq_var("a_box", "tmu_4")
+
+    # daq_therm.state = 0
+    # daq_override.state = 0
+
+    # for i in range(0,16):
+    #     tmu_a_do.state = bool(i & 0x1)
+    #     tmu_b_do.state = bool(i & 0x2)
+    #     tmu_c_do.state = bool(i & 0x4)
+    #     tmu_d_do.state = bool(i & 0x8)
+    #     time.sleep(1.0)
+
+    #     a = int(tmu_a_ai.state)
+    #     b = int(tmu_b_ai.state)
+    #     c = int(tmu_c_ai.state)
+    #     d = int(tmu_d_ai.state)
+    #     print(f"Readings at therm={i}: {a}, {b}, {c}, {d}")
+
+    #     check.almost_equal(a, TMU_HIGH_VALUE if (i & 0x1) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 1 test {i}")
+    #     check.almost_equal(b, TMU_HIGH_VALUE if (i & 0x2) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 2 test {i}")
+    #     check.almost_equal(c, TMU_HIGH_VALUE if (i & 0x4) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 3 test {i}")
+    #     check.almost_equal(d, TMU_HIGH_VALUE if (i & 0x8) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 4 test {i}")
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
