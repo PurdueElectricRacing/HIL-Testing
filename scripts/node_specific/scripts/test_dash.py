@@ -175,13 +175,12 @@ def test_bspd(hil):
 # ---------------------------------------------------------------------------- #
 
 
-# TODO: add throttle checks
-
 # ---------------------------------------------------------------------------- #
 THROTTLE_VARIANCE = 0.1
 
-
-def test_throttle(hil):
+# 0-5V throttle sweep with 0.2 step
+@pytest.mark.parametrize("voltage", [x / 10.0 for x in range(0, 52, 2)])
+def test_throttle(hil, voltage):
     # HIL outputs (hil writes)
     thrtl1 = hil.aout("Dashboard", "THRTL1_RAW")
     thrtl2 = hil.aout("Dashboard", "THRTL2_RAW")
@@ -190,28 +189,23 @@ def test_throttle(hil):
     thrtl1_flt = hil.mcu_pin("Dashboard", "THRTL1_FLT")
     thrtl2_flt = hil.mcu_pin("Dashboard", "THRTL2_FLT")
 
-    # 0-5V throttle sweep with 0.2
     throttle_values = [x / 10.0 for x in range(0, 52, 2)]
     random.shuffle(throttle_values)
 
-    # Sweep throttle 1
-    for v in throttle_values:
-        thrtl1.state = v
-        time.sleep(0.1)
-        check.almost_equal(
-            thrtl1_flt.state, v,
-            abs=THROTTLE_VARIANCE, rel=0.0,
-            msg=f"Throttle 1: {v}V"
-        )
-    
-    # Sweep throttle 2
-    for v in throttle_values:
-        thrtl2.state = v
-        time.sleep(0.1)
-        check.almost_equal(
-            thrtl2_flt.state, v,
-            abs=THROTTLE_VARIANCE, rel=0.0,
-            msg=f"Throttle 2: {v}V"
-        )
+    thrtl1.state = voltage
+    time.sleep(0.1)
+    check.almost_equal(
+        thrtl1_flt.state, voltage,
+        abs=THROTTLE_VARIANCE, rel=0.0,
+        msg=f"Throttle 1: {voltage}V"
+    )
+
+    thrtl2.state = voltage
+    time.sleep(0.1)
+    check.almost_equal(
+        thrtl2_flt.state, voltage,
+        abs=THROTTLE_VARIANCE, rel=0.0,
+        msg=f"Throttle 2: {voltage}V"
+    )
 # ---------------------------------------------------------------------------- #
 
