@@ -5,7 +5,6 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from hil.hil import HIL
 import hil.utils as utils
 import time
-import random
 from scripts.common.constants.rules_constants import *
 from scripts.common.constants.vehicle_constants import *
 
@@ -188,9 +187,6 @@ def test_throttle(hil, voltage):
     # HIL inputs (hil reads)
     thrtl1_flt = hil.mcu_pin("Dashboard", "THRTL1_FLT")
     thrtl2_flt = hil.mcu_pin("Dashboard", "THRTL2_FLT")
-
-    throttle_values = [x / 10.0 for x in range(0, 52, 2)]
-    random.shuffle(throttle_values)
 
     thrtl1.state = voltage
     time.sleep(0.1)
