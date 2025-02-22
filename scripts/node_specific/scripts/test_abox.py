@@ -31,140 +31,119 @@ def hil():
 
 
 # ---------------------------------------------------------------------------- #
-def test_abox_ams(hil):
-    # Begin the test
-    # hil.start_test(test_abox_ams.__name__)
+@pytest.mark.parametrize("combo", [0, 1, 2, 3, 4, 5, 6, 7])
+def test_abox_ams(hil, combo):
+    """Accumulator Management System"""
 
-    # Outputs
-    den = hil.dout("a_box", "Discharge Enable")
-    csafe = hil.dout("a_box", "Charger Safety")
+    # HIL outputs (hil writes)
+    discharge_en = hil.dout("a_box", "Discharge Enable")
+    charge_safe  = hil.dout("a_box", "Charger Safety")
     bms_override = hil.daq_var("a_box", "bms_daq_override")
-    bms_stat = hil.daq_var("a_box", "bms_daq_stat")
+    bms_stat     = hil.daq_var("a_box", "bms_daq_stat")
 
-    # Inputs
-    chrg_stat = hil.din("a_box", "BMS Status Charger")
-    main_stat = hil.din("a_box", "BMS Status PDU")
+    # HIL inputs (hil reads)
+    charge_stat = hil.din("a_box", "BMS Status Charger")
+    main_stat   = hil.din("a_box", "BMS Status PDU") # Main power status = discharge
 
+    # Force manual overridec
     bms_override.state = 1
 
-    for i in range(0, 8):
-        dchg_set = bool(i & 0x1)
-        chg_set = bool(i & 0x2)
-        bms_set = bool(i & 0x4)
-        exp_chrg = not (chg_set or bms_set)
-        exp_dchg = not (dchg_set or bms_set)
+    discharge_set = bool(combo & 0x1)
+    charge_set    = bool(combo & 0x2)
+    bms_set       = bool(combo & 0x4)
+    
+    expected_charge    = not (charge_set or bms_set)
+    expected_discharge = not (discharge_set or bms_set)
 
-        den.state = dchg_set
-        csafe.state = chg_set
-        bms_stat.state = bms_set
-        print(f"Combo {i}")
-        time.sleep(0.1)
-        # hil.check(chrg_stat.state == exp_chrg, f"Chrg stat {exp_chrg}")
-        # hil.check(main_stat.state == exp_dchg, f"Main stat {exp_dchg}")
-        check.equal(chrg_stat.state, exp_chrg, f"Chrg stat {exp_chrg}")
-        check.equal(main_stat.state, exp_dchg, f"Main stat {exp_dchg}")
+    discharge_en.state = discharge_set
+    charge_safe.state  = charge_set
+    bms_stat.state     = bms_set
+    time.sleep(0.1)
 
+    check.equal(charge_stat.state, expected_charge, f"Charge stat ({combo:b}) {expected_charge}")
+    check.equal(main_stat.state, expected_discharge, f"Main stat ({combo:b}) {expected_discharge}")
+
+    # Reset the override
     bms_override.state = 0
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
-def test_isense(hil):
-    # Begin the test
-    # hil.start_test(test_isense.__name__)
+@pytest.mark.parametrize("voltage", [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0])
+def test_isense(hil, voltage):
+    """Current sensor voltage divider transfer function"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     ch1_raw = hil.aout("a_box", "Isense_Ch1_raw")
 
-    # Inputs
+    # HIL inputs (hil reads)
     ch1_filt = hil.ain("a_box", "ISense Ch1")
 
-    # Need to test voltage divider transfer function correct
-    for v in [0.0, DHAB_S124_MIN_OUT_V, DHAB_S124_OFFSET_V, 3.2, DHAB_S124_MAX_OUT_V, 5.0]:
-        ch1_raw.state = v
-        time.sleep(1)
-        exp_out = ABOX_DHAB_CH1_DIV.div(v)
-        input(f"enter to meas, set to {v}, expected {exp_out}")
-        meas = ch1_filt.state
-        print(f"isense expected: {exp_out}V, measured: {meas}V")
-        # hil.check_within(meas, exp_out, 0.05, f"Isense v={v:.3}")
-        check.almost_equal(meas, exp_out, abs=0.05, rel=0.0, msg=f"Isense v={v:.3}")
+    ch1_raw.state = voltage
+    time.sleep(1)
+    expected_out = ABOX_DHAB_CH1_DIV.div(voltage)
+    # input(f"enter to meas, set to {v}, expected {exp_out}")
+    check.almost_equal(ch1_filt.state, expected_out, abs=0.05, rel=0.0, msg=f"Isense v={voltage:.3}")
 
+    # Test float (hi-Z) is pulled down
     ch1_raw.hiZ()
     time.sleep(0.01)
-    # hil.check_within(ch1_filt.state, 0.0, 0.05, f"Isense float pulled down")
-    check.almost_equal(ch1_filt.state, 0.0, abs=0.05, rel=0.0, msg="Isense float pulled down")
 
-    # hil.end_test()
+    check.almost_equal(ch1_filt.state, 0.0, abs=0.05, rel=0.0, msg="Isense float (hi-Z) pulled down")
 # ---------------------------------------------------------------------------- #
 
 
 # ---------------------------------------------------------------------------- #
-RLY_ON  = 0
 RLY_OFF = 1
-RLY_DLY = 0.01 # Mechanicl relay takes time to transition
+RLY_ON  = 0
 
-def test_precharge(hil):
-    # Begin the test
-    # hil.start_test(test_precharge.__name__)
+@pytest.mark.parametrize("n_pchg_cmplt_set, sdc_set, expected_resistor", [
+    (0, RLY_OFF, 0),  # Precharge complete, SDC off -> resistor disconnected
+    (1, RLY_OFF, 0),  # Precharge active, SDC off -> resistor disconnected
+    (1, RLY_ON,  1),  # Precharge active, SDC on  -> resistor connected
+    (0, RLY_ON,  0),  # Precharge complete, SDC on -> resistor disconnected
+])
+def test_not_precharge_complete(hil, n_pchg_cmplt_set, sdc_set, expected_resistor):
+    """Not precharge complete"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     n_pchg_cmplt = hil.dout("a_box", "NotPrechargeComplete")
     sdc          = hil.dout("a_box", "SDC")
     bat_p        = hil.dout("a_box", "Batt+")
 
-    # Inputs
+    # HIL inputs (hil reads)
     resistor = hil.din("a_box", "NetK1_4") # To precharge resistor
 
     bat_p.state = RLY_ON
 
-    print("Combo 1")
-    n_pchg_cmplt.state = 0
-    sdc.state   = RLY_OFF
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 1, resistor disconnected")
+    n_pchg_cmplt.state = n_pchg_cmplt_set
+    sdc.state = sdc_set
+    time.sleep(0.1)
 
-    print("Combo 2")
-    n_pchg_cmplt.state = 1
-    sdc.state   = RLY_OFF
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 2, resistor disconnected")
+    message = f"not precharge: {n_pchg_cmplt_set}, sdc: {sdc_set} -> resistor: {expected_resistor}"
+    check.equal(resistor.state, expected_resistor, message)
 
-    print("Combo 3")
-    n_pchg_cmplt.state = 1
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 1, "Resistor connected")
-    check.equal(resistor.state, 1, "Combo 3, resistor connected")
+def test_precharge_duration(hil):
+    """Precharge duration"""
 
-    print("Combo 4")
-    n_pchg_cmplt.state = 0
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Resistor disconnected")
-    check.equal(resistor.state, 0, "Combo 4, resistor disconnected")
+    # HIL outputs (hil writes)
+    n_pchg_cmplt = hil.dout("a_box", "NotPrechargeComplete")
+    sdc          = hil.dout("a_box", "SDC")
 
-    # Duration test
+    # HIL inputs (hil reads)
+    resistor = hil.din("a_box", "NetK1_4") # To precharge resistor
+
     time.sleep(1)
     n_pchg_cmplt.state = 1
-    sdc.state   = RLY_ON
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 1, "Duration init")
-    check.equal(resistor.state, 1, "Duration init")
+    sdc.state = RLY_ON
+    time.sleep(0.1)
+    check.equal(resistor.state, 1, "Duration start")
 
     time.sleep(9)
-    # hil.check(resistor.state == 1, "Duration mid")
-    check.equal(resistor.state, 1, "Duration mid")
+    check.equal(resistor.state, 1, "Duration middle")
 
     n_pchg_cmplt.state = 0
-    time.sleep(RLY_DLY)
-    # hil.check(resistor.state == 0, "Duration end")
+    time.sleep(0.1)
     check.equal(resistor.state, 0, "Duration end")
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 
@@ -173,13 +152,12 @@ SUPPLY_VOLTAGE = 24.0
 TIFF_DLY = 0.3
 
 def test_tiffomy(hil):
-    # Begin the test
-    # hil.start_test(test_tiffomy.__name__)
+    """Tractive Isolation Fault Detection"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     bat_p = hil.dout("a_box", "Batt+")
 
-    # Inputs
+    # HIL inputs (hil reads)
     vbat   = hil.ain("a_box", "VBatt")
     imd_hv = hil.din("a_box", "Batt+_Fused")
 
@@ -188,13 +166,12 @@ def test_tiffomy(hil):
 
     utils.log_warning(f"Assuming supply = {SUPPLY_VOLTAGE} V")
     utils.log_warning(f"Do not reverse polarity Vbat, it will kill Arduino ADC")
-    input("Click enter to acknowledge or ctrl+c to cancel")
+    # input("Click enter to acknowledge or ctrl+c to cancel")
 
     bat_p.state = RLY_OFF
     time.sleep(TIFF_DLY)
-    # hil.check_within(vbat.state, 0.0, 0.1, "TIff off")
-    # hil.check(imd_hv.state == 0, "IMD HV off")
-    check.almost_equal(vbat.state, 0.0, abs=0.1, rel=0.0, msg="TIff off")
+
+    check.almost_equal(vbat.state, 0.0, abs=0.1, rel=0.0, msg="Tiff off")
     check.equal(imd_hv.state, 0, "IMD HV off")
 
     bat_p.state = RLY_ON
@@ -202,120 +179,73 @@ def test_tiffomy(hil):
     exp = SUPPLY_VOLTAGE
     #input("press enter, tiff should be getting volts")
     meas = tiff_lv_to_hv(vbat.state)
-    print(f"Tiff HV reading: {meas} V, expect: {SUPPLY_VOLTAGE} V")
-    # hil.check_within(meas, exp, 2.5, "Tiff on")
-    # hil.check(imd_hv.state == 1, "IMD HV on")
     check.almost_equal(meas, exp, abs=2.5, rel=0.0, msg="Tiff on")
     check.equal(imd_hv.state, 1, "IMD HV on")
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
-def test_tmu(hil):
-    # Begin the test
-    # hil.start_test(test_tmu.__name__)
+TMU_TOLERANCE = 100
+TMU_HIGH_VALUE = 1970 # 2148
 
-    # Outputs
-    tmu_a_do = hil.dout("a_box", "TMU_1")
-    tmu_b_do = hil.dout("a_box", "TMU_2")
-    tmu_c_do = hil.dout("a_box", "TMU_3")
-    tmu_d_do = hil.dout("a_box", "TMU_4")
+@pytest.mark.parametrize("mux_value", list(range(16)))
+def test_tmu_mux(hil, mux_value):
+    """Thermal Management Unit MUX"""
 
+    # HIL outputs (hil writes)
     daq_override = hil.daq_var("a_box", "tmu_daq_override")
     daq_therm    = hil.daq_var("a_box", "tmu_daq_therm")
 
-    # Inputs
-    mux_a = hil.din("a_box", "MUX_A_NON_ISO")
-    mux_b = hil.din("a_box", "MUX_B_NON_ISO")
-    mux_c = hil.din("a_box", "MUX_C_NON_ISO")
-    mux_d = hil.din("a_box", "MUX_D_NON_ISO")
-
-    tmu_a_ai = hil.daq_var("a_box", "tmu_1")
-    tmu_b_ai = hil.daq_var("a_box", "tmu_2")
-    tmu_c_ai = hil.daq_var("a_box", "tmu_3")
-    tmu_d_ai = hil.daq_var("a_box", "tmu_4")
+    # HIL inputs (hil reads)
+    mux_a = hil.din("a_box", "MUX_A_NON_BOOST")
+    mux_b = hil.din("a_box", "MUX_B_NON_BOOST")
+    mux_c = hil.din("a_box", "MUX_C_NON_BOOST")
+    mux_d = hil.din("a_box", "MUX_D_NON_BOOST")
 
     daq_therm.state = 0
     daq_override.state = 1
 
-    # mux line test
-    for i in range(0,16):
-        daq_therm.state = i
-        time.sleep(0.05)
-        # hil.check(mux_a.state == bool(i & 0x1), f"Mux A test {i}")
-        # hil.check(mux_b.state == bool(i & 0x2), f"Mux B test {i}")
-        # hil.check(mux_c.state == bool(i & 0x4), f"Mux C test {i}")
-        # hil.check(mux_d.state == bool(i & 0x8), f"Mux D test {i}")
-        check.equal(mux_a.state, bool(i & 0x1), f"Mux A test {i}")
-        check.equal(mux_b.state, bool(i & 0x2), f"Mux B test {i}")
-        check.equal(mux_c.state, bool(i & 0x4), f"Mux C test {i}")
-        check.equal(mux_d.state, bool(i & 0x8), f"Mux D test {i}")
+    daq_therm.state = mux_value
+    time.sleep(0.05)
+
+    expected_a = bool(mux_value & 0x1)
+    expected_b = bool(mux_value & 0x2)
+    expected_c = bool(mux_value & 0x4)
+    expected_d = bool(mux_value & 0x8)
+
+    check.equal(mux_a.state, expected_a, f"Mux A test ({mux_value})")
+    check.equal(mux_b.state, expected_b, f"Mux B test ({mux_value})")
+    check.equal(mux_c.state, expected_c, f"Mux C test ({mux_value})")
+    check.equal(mux_d.state, expected_d, f"Mux D test ({mux_value})")
 
     daq_override.state = 0
-
-    TMU_TOLERANCE = 100
-    TMU_HIGH_VALUE = 1970 #2148
-
-    # thermistors
-    for i in range(0,16):
-        tmu_a_do.state = bool(i & 0x1)
-        tmu_b_do.state = bool(i & 0x2)
-        tmu_c_do.state = bool(i & 0x4)
-        tmu_d_do.state = bool(i & 0x8)
-        time.sleep(1.0)
-        a = int(tmu_a_ai.state)
-        b = int(tmu_b_ai.state)
-        c = int(tmu_c_ai.state)
-        d = int(tmu_d_ai.state)
-        print(f"Readings at therm={i}: {a}, {b}, {c}, {d}")
-        # hil.check_within(a, TMU_HIGH_VALUE if (i & 0x1) else 0, TMU_TOLERANCE, f"TMU 1 test {i}")
-        # hil.check_within(b, TMU_HIGH_VALUE if (i & 0x2) else 0, TMU_TOLERANCE, f"TMU 2 test {i}")
-        # hil.check_within(c, TMU_HIGH_VALUE if (i & 0x4) else 0, TMU_TOLERANCE, f"TMU 3 test {i}")
-        # hil.check_within(d, TMU_HIGH_VALUE if (i & 0x8) else 0, TMU_TOLERANCE, f"TMU 4 test {i}")
-        check.almost_equal(a, TMU_HIGH_VALUE if (i & 0x1) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 1 test {i}")
-        check.almost_equal(b, TMU_HIGH_VALUE if (i & 0x2) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 2 test {i}")
-        check.almost_equal(c, TMU_HIGH_VALUE if (i & 0x4) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 3 test {i}")
-        check.almost_equal(d, TMU_HIGH_VALUE if (i & 0x8) else 0, abs=TMU_TOLERANCE, rel=0.0, msg=f"TMU 4 test {i}")
-
-    # hil.end_test()
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
 def test_imd(hil):
-    # hil.start_test(test_imd.__name__)
+    """Insulation Monitoring Device"""
 
-    # Outputs
+    # HIL outputs (hil writes)
     imd_out = hil.dout('a_box', 'IMD_Status')
 
-    # Inputs
-    imd_in = hil.din('a_box', 'IMD_STATUS_LV_COMP')
+    # HIL inputs (hil reads)
+    imd_in  = hil.din('a_box', 'IMD_STATUS_LV_COMP')
     imd_mcu = hil.mcu_pin('a_box', 'IMD_STATUS_LV_COMP')
 
-
     imd_out.state = RLY_OFF
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
-    # hil.check(imd_in.state == 0, 'IMD LV OFF')
-    # hil.check(imd_mcu.state == 0, 'IMD MCU OFF')
-    check.equal(imd_in.state, 0, 'IMD LV OFF')
-    check.equal(imd_mcu.state, 0, 'IMD MCU OFF')
+    check.equal(imd_in.state, 0, 'IMD LV off')
+    check.equal(imd_mcu.state, 0, 'IMD MCU off')
 
     imd_out.state = RLY_ON
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
-    # hil.check(imd_in.state == 1, 'IMD LV ON')
-    # hil.check(imd_mcu.state == 1, 'IMD MCU ON')
-    check.equal(imd_in.state, 1, 'IMD LV ON')
-    check.equal(imd_mcu.state, 1, 'IMD MCU ON')
+    check.equal(imd_in.state, 1, 'IMD LV on')
+    check.equal(imd_mcu.state, 1, 'IMD MCU on')
 
     imd_out.state = RLY_OFF
-    time.sleep(RLY_DLY)
+    time.sleep(0.1)
 
-    # hil.check(imd_in.state == 0, 'IMD LV BACK OFF')
-    # hil.check(imd_mcu.state == 0, 'IMD MCU BACK OFF')
-    check.equal(imd_in.state, 0, 'IMD LV BACK OFF')
-    check.equal(imd_mcu.state, 0, 'IMD MCU BACK OFF')
-
-    # hil.end_test()
+    check.equal(imd_in.state, 0, 'IMD LV BACK off')
+    check.equal(imd_mcu.state, 0, 'IMD MCU BACK off')
 # ---------------------------------------------------------------------------- #
