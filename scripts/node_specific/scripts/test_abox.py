@@ -196,10 +196,10 @@ def test_tmu_mux(hil, combo):
     daq_therm    = hil.daq_var("a_box", "tmu_daq_therm")
 
     # HIL inputs (hil reads)
-    mux_a = hil.din("a_box", "MUX_A_NON_ISO")
-    mux_b = hil.din("a_box", "MUX_B_NON_ISO")
-    mux_c = hil.din("a_box", "MUX_C_NON_ISO")
-    mux_d = hil.din("a_box", "MUX_D_NON_ISO")
+    mux_a = hil.din("a_box", "MUX_A_NON_BOOST")
+    mux_b = hil.din("a_box", "MUX_B_NON_BOOST")
+    mux_c = hil.din("a_box", "MUX_C_NON_BOOST")
+    mux_d = hil.din("a_box", "MUX_D_NON_BOOST")
 
     daq_therm.state = 0
     daq_override.state = 1
