@@ -31,10 +31,10 @@ def hil():
 
 # ---------------------------------------------------------------------------- #
 @pytest.mark.parametrize("tsms_set, hv_plus_set, discharge_plus_expected", [
-    (0, 0, 0), # TSMS low, HV+ low -> discharge disconnected (0)
-    (1, 0, 0), # TSMS high, HV+ low -> discharge connected but no voltage (0)
-    (0, 1, 0), # TSMS low, HV+ high -> discharge disconnected (0)
-    (1, 1, 1), # TSMS high, HV+ high -> discharge connected with voltage (1)
+    (1, 0, 0), # TSMS low = relay open, HV+ low -> discharge disconnected (0)
+    (0, 0, 0), # TSMS high = relay closed, HV+ low -> discharge connected but no voltage (0)
+    (1, 1, 0), # TSMS low = relay open, HV+ high -> discharge disconnected (0)
+    (0, 1, 1), # TSMS high = relay closed, HV+ high -> discharge connected with voltage (1)
 ])
 def test_main_relay(hil, tsms_set, hv_plus_set, discharge_plus_expected):
     # HIL outputs (hil writes)
