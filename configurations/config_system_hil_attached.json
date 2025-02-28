@@ -21,7 +21,7 @@
         {"board":"Discharge", "harness_connections":[
             {"dut":{"connector":"P7","pin":3},  "hil":{"device":"RearTester", "port":"DI3"}},
             {"dut":{"connector":"P1","pin":1},  "hil":{"device":"RearTester", "port":"AI1"}},
-            {"dut":{"connector":"P2","pin":10}, "hil":{"device":"RearTester", "port":"AI2"}}
+            {"dut":{"connector":"P2","pin":10}, "hil":{"device":"RearTester", "port":"RLY1"}}
         ]}
     ],
     "hil_devices":[

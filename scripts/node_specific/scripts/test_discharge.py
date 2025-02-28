@@ -38,15 +38,18 @@ def hil():
 ])
 def test_main_relay(hil, tsms_set, hv_plus_set, discharge_plus_expected):
     # HIL outputs (hil writes)
-    tsms    = hil.dout("Discharge", "SDC15 - TSMS")
+
+    # WIRING NOTE: SDC15 - TSMS is 24V logic, Arudino max voltage is 5V
+    # So instead, HIL will control the relay and 24V will be wired through the relay
+    tsms_hil_relay = hil.dout("Discharge", "SDC15 - TSMS")
     hv_plus = hil.dout("Discharge", "HV+")
 
     # HIL inputs (hil reads)
     discharge_plus = hil.din("Discharge", "discharge+")
 
-    tsms.state = tsms_set
+    tsms_hil_relay.state = not tsms_set # HIL relay is inverted
     hv_plus.state = hv_plus_set
-    time.sleep(0.1)
+    time.sleep(0.2)
 
     message = f"TSMS: {tsms_set}, HV+: {hv_plus_set} -> Discharge+: {discharge_plus_expected}"
     check.equal(discharge_plus.state, discharge_plus_expected, message)
