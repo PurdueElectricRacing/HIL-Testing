@@ -30,9 +30,7 @@ const int TESTER_ID = 1;
 	#define DAC_SCL 24
 
 	Adafruit_MCP4706 dacs[NUM_DACS];
-
-	// DFRobot_MCP4725 dacs[NUM_DACS];
-	// uint8_t dac_power_down[NUM_DACS];
+	bool dac_power_down[NUM_DACS];
 #endif
 
 #ifdef DIGIPOT_EN
@@ -80,19 +78,15 @@ void setup() {
 	SERIAL_CON.begin(115200);
 
 #ifdef DAC_EN
-	// dacs[0].init(0x62, dac_vref);
-	// dacs[1].init(0x63, dac_vref);
-	// dacs[0].setMode(MCP4725_POWER_DOWN_500KRES);
-	// dacs[1].setMode(MCP4725_POWER_DOWN_500KRES);
-	// dac_power_down[0] = 1;
-	// dac_power_down[1] = 1;
-
 	DAC_WIRE.setSDA(DAC_SDA);
 	DAC_WIRE.setSCL(DAC_SCL);
 
 	for (int i = 0; i < NUM_DACS; i++) {
 		uint8_t addr = 0x60 + i;
 		dacs[i].begin(addr, DAC_WIRE);
+
+		dacs[i].setMode(MCP4706_PWRDN_500K);
+		dac_power_down[i] = true; // start with power down
 	}
 #endif
 
@@ -136,13 +130,14 @@ void loop() {
 		}
 		case GpioCommand::READ_GPIO: {
 			int pin = data[1];
-			// #ifdef DAC_EN
-			// 	if (pin >= 200 && pin < 200 + NUM_DACS) {
-			// 		dacs[pin - 200].setMode(MCP4725_POWER_DOWN_500KRES);
-			// 		dac_power_down[pin - 200] = 1;
-			// 		SERIAL_CON.write(0x01);
-			// 	} else
-			// #endif
+			#ifdef DAC_EN
+				if (pin >= 200 && pin < 200 + NUM_DACS) {
+					int dac_idx = pin - 200;
+					dacs[dac_idx].setMode(MCP4706_PWRDN_500K);
+					dac_power_down[dac_idx] = true;
+					SERIAL_CON.write(0x01);
+				} else
+			#endif
 				{
 					pinMode(pin, INPUT);
 					int val = digitalRead(pin);
@@ -153,16 +148,14 @@ void loop() {
 		case GpioCommand::WRITE_DAC: {
 			int pin = data[1];
 			uint8_t value = data[2];
-			// int value = (data[2] << 8) | data[3];
 			#ifdef DAC_EN
-				if (pin >= 200 && pin < 200 + NUM_DACS) {
-					// if (dac_power_down[pin-200]) {
-					// 	dacs[pin-200].setMode(MCP4725_NORMAL_MODE);
-					// 	dac_power_down[pin - 200] = 0;
-					// }
-					// dacs[pin - 200].outputVoltage(value);
-					int dac_pin = pin - 200;
-					dacs[dac_pin].setVoltage(value);
+				int dac_idx = pin - 200;
+				if (dac_idx >= 0 && dac_idx < NUM_DACS) {
+					if (dac_power_down[dac_idx]) {
+						dacs[dac_idx].setMode(MCP4706_AWAKE);
+						dac_power_down[dac_idx] = false;
+					}
+					dacs[dac_idx].setVoltage(value);
 				}
 			#endif
 			#ifdef STM32
