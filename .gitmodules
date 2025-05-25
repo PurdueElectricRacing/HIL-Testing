@@ -1,3 +1,0 @@
-[submodule "TestBench/lib/MCP4706_Driver"]
-	path = TestBench/lib/MCP4706_Driver
-	url = https://github.com/LelsersLasers/MCP4706_Driver.git
