@@ -1,0 +1,3 @@
+[submodule "MCP4706_Driver"]
+	path = MCP4706_Driver
+	url = https://github.com/LelsersLasers/MCP4706_Driver.git
