@@ -2,7 +2,7 @@
     "$schema": "./emulator_schema.json",
     "communication_mode":"serial",
     "_": "All the ports are wrong",
-    "mux_note": "Generates ports for: [mux_name]_#, where # starts from 0",
+    "mux_note": "Use ports like: [mux_name]_#, where # starts from 0",
     "muxs": [
         { "name": "24vMUX", "capabilities": ["AI"], "select_ports": [-1, -1, -1, -1], "port": -1 },
         { "name": "5vMUX",  "capabilities": ["AI"], "select_ports": [-1, -1, -1], "port": -1 }
