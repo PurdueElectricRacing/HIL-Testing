@@ -1,0 +1,40 @@
+{
+    "$schema": "./emulator_schema.json",
+    "communication_mode":"serial",
+    "_": "All the ports are wrong",
+    "mux_note": "Generates ports for: [mux_name]_#, where # starts from 0",
+    "muxs": [
+        { "name": "24vMUX", "capabilities": ["AI"], "select_ports": [-1, -1, -1, -1], "port": -1 },
+        { "name": "5vMUX",  "capabilities": ["AI"], "select_ports": [-1, -1, -1], "port": -1 }
+    ],
+    "ports":[
+        {"port":10, "name":"RLY1", "capabilities":["DO"], "notes":"relay"},
+        {"port":11, "name":"RLY2", "capabilities":["DO"], "notes":"relay"},
+        {"port":12, "name":"RLY3", "capabilities":["DO"], "notes":"relay"},
+        {"port":13, "name":"RLY4", "capabilities":["DO"], "notes":"relay"},
+
+        {"port":-1, "name":"24vSW1", "capabilities":["DO"], "notes":"24V switch"},
+        {"port":-1, "name":"24vSW2", "capabilities":["DO"], "notes":"24V switch"},
+
+        {"port":-1, "name":"DAI1", "capabilities":["AI"], "notes":"Direct 24v Scaled Analog Input"},
+        {"port":-1, "name":"DAI2", "capabilities":["AI"], "notes":"Direct 5v Scaled Analog Input"},
+
+        {"port":-1, "name":"DO1",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO2",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO3",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO4",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO5",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO6",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO7",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO8",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO9",  "capabilities":["DO"], "notes":"5v Digital Output"},
+        {"port":-1, "name":"DO10", "capabilities":["DO"], "notes":"5v Digital Output"},
+
+        {"port":9, "name":"3v3ref", "capabilities":["AI"], "notes":"TODO! 3V3 input reference"}
+    ],
+    "TODO:": "v",
+    "adc_config":{"bit_resolution":10, "reference_v":5.0},
+    "dac_config":{"bit_resolution":8, "reference_v":5.0},
+    "pot_config":{"bit_resolution":7},
+    "calibrate_rail":true
+}
