@@ -30,6 +30,18 @@
         {"port":-1, "name":"DO9",  "capabilities":["DO"], "notes":"5v Digital Output"},
         {"port":-1, "name":"DO10", "capabilities":["DO"], "notes":"5v Digital Output"},
 
+        {"port":200, "name":"DAC1", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":201, "name":"DAC2", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":202, "name":"DAC3", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":203, "name":"DAC4", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":204, "name":"DAC5", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":205, "name":"DAC6", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":206, "name":"DAC7", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+        {"port":207, "name":"DAC8", "capabilities":["AO"], "notes":"5V 8-bit DAC"},
+
+        {"port":1, "name":"POT1", "capabilities":["POT"], "notes":"7-bit Digipot"},
+        {"port":2, "name":"POT2", "capabilities":["POT"], "notes":"7-bit Digipot"},
+
         {"port":9, "name":"3v3ref", "capabilities":["AI"], "notes":"TODO! 3V3 input reference"}
     ],
     "TODO:": "v",
