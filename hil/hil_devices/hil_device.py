@@ -136,6 +136,9 @@ class HilDevice():
         self.sm.send_data(self.id, data)
 
     def read_mux(self, select: int, read_pin: int, select_pins: list[int]) -> float:
+        if select >= 2**len(select_pins) or select < 0:
+            raise ValueError("select out of range for given select_pins")
+
         for i, pin in enumerate(select_pins):
             bit = 1 if (select & (1 << i)) else 0
             self.write_gpio(pin, bit)
