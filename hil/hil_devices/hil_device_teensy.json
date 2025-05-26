@@ -33,7 +33,7 @@
         {"port":9, "name":"3v3ref", "capabilities":["AI"], "notes":"TODO! 3V3 input reference"}
     ],
     "TODO:": "v",
-    "adc_config":{"bit_resolution":10, "reference_v":5.0},
+    "adc_config":{"bit_resolution":10, "reference_v":3.3},
     "dac_config":{"bit_resolution":8, "reference_v":5.0},
     "pot_config":{"bit_resolution":7},
     "calibrate_rail":true
