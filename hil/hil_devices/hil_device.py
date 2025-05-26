@@ -71,8 +71,35 @@ class HilDevice():
                         utils.log_warning([p['name'] for p in self.config['ports'] if mode in p['capabilities']])
                         utils.log_warning("Change connection and try again.")
                         return -1
+        for m in self.config['muxs']:
+            if port_name.startswith(m['name']):
+                if mode in m['capabilities']:
+                    return m['port']
+                else:
+                    utils.log_warning(f"Mux named {m['name']} on {self.name} does not have capability {mode}")
+                    return -1
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
+    
+    def get_mux_info(self, port_name: str) -> tuple[int, int, list[int]]:
+        """
+            Returns: mux_select, mux_read_port, mux_select_ports.
+            port_name = f"{mux_name}_{mux_select}" (ex: "24vMUX_13")
+        """
+        name_parts = port_name.split('_')
+        if len(name_parts) != 2:
+            utils.log_error(f"Invalid mux port name {port_name} for {self.name}")
+            return (-1, -1, [])
+        try:
+            mux_select = int(name_parts[1])
+        except ValueError:
+            utils.log_error(f"Invalid mux select value {name_parts[1]} for {self.name}")
+            return (-1, -1, [])
+    
+        mux_name = name_parts[0]
+        for m in self.config['muxs']:
+            if m['name'] == mux_name:
+                return (mux_select, m['port'], m['pins'])
 
     def write_gpio(self, pin: int, value: int) -> None: 
         data = [(HIL_CMD_WRITE_GPIO & SERIAL_MASK), (pin & SERIAL_MASK), value]
@@ -106,3 +133,9 @@ class HilDevice():
         value = min(self.pot_max, max(0, int(value * self.pot_max)))
         data = [(HIL_CMD_WRITE_POT & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
+
+    def read_mux(self, select: int, read_pin: int, select_pins: list[int]) -> float:
+        for i, pin in enumerate(select_pins):
+            bit = 1 if (select & (1 << i)) else 0
+            self.write_gpio(pin, bit)
+        return self.read_analog(read_pin)

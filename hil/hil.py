@@ -179,6 +179,9 @@ class HIL():
     def pot(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'POT')
     
+    def mux(self, board: str, net: str) -> Component:
+        return self.add_component(board, net, 'MUX')
+    
     def daq_var(self, board: str, var_name: str) -> DAQVariable:
         try:
             return utils.signals[utils.b_str][board][f"daq_response_{board.upper()}"][var_name]
