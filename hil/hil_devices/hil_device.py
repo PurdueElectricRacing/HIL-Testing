@@ -1,4 +1,5 @@
 import os
+import time
 from hil.hil_devices.serial_manager import SerialManager
 
 import hil.utils as utils
@@ -138,4 +139,5 @@ class HilDevice():
         for i, pin in enumerate(select_pins):
             bit = 1 if (select & (1 << i)) else 0
             self.write_gpio(pin, bit)
+        time.sleep(0.01)
         return self.read_analog(read_pin)
