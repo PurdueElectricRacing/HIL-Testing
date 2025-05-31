@@ -170,8 +170,11 @@ class HIL():
     def dout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'DO')
     
-    def ain(self, board: str, net: str) -> Component:
-        return self.add_component(board, net, 'AI')
+    def ain(self, board: str, net: str, v_mode: int) -> Component:
+        if v_mode not in [5, 24]:
+            self.handle_error(f"Invalid voltage mode {v_mode} for analog input on {board} net {net}. Must be 5 or 24.")
+        mode_str = 'AI5' if v_mode == 5 else 'AI24'
+        return self.add_component(board, net, mode_str)
     
     def aout(self, board: str, net: str) -> Component:
         return self.add_component(board, net, 'AO')

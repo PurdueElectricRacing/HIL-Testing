@@ -71,8 +71,10 @@ class Component():
                     self.read_func = lambda : not dev.read_gpio(hil_port_num)
                 else:
                     self.read_func = lambda : dev.read_gpio(hil_port_num)
-            elif (mode == "AI"):
-                self.read_func = lambda : dev.read_analog(hil_port_num)
+            elif mode == "AI5":
+                self.read_func = lambda : dev.read_analog(hil_port_num, 5)
+            elif mode == "AI24":
+                self.read_func = lambda : dev.read_analog(hil_port_num, 24)
             elif (mode == "DO"):
                 if self.inv_emul:
                     self.write_func = lambda s: dev.write_gpio(hil_port_num, not s)
