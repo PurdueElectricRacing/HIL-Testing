@@ -64,17 +64,17 @@ class HilDevice():
     def get_port_number(self, port_name: str, mode: str) -> int:
         for p in self.config['ports']:
             if port_name == p['name']:
-                    if mode in p['capabilities']:
+                    if mode == p['mode']:
                         return p['port']
                     else:
                         utils.log_warning(f"Port {port_name} on {self.name} does not have capability {mode}")
                         utils.log_warning(f"Ports with {mode} capability for {self.name} include:")
-                        utils.log_warning([p['name'] for p in self.config['ports'] if mode in p['capabilities']])
+                        utils.log_warning([p['name'] for p in self.config['ports'] if mode == p['mode']])
                         utils.log_warning("Change connection and try again.")
                         return -1
         for m in self.config['muxs']:
             if port_name.startswith(m['name']):
-                if mode in m['capabilities']:
+                if mode == m['mode']:
                     return m['port']
                 else:
                     utils.log_warning(f"Mux named {m['name']} on {self.name} does not have capability {mode}")
