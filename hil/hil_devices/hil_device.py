@@ -24,46 +24,26 @@ class HilDevice():
         self.id: int = id
         self.sm: SerialManager = serial_manager
 
-        self.config = utils.load_json_config(os.path.join(HIL_DEVICES_PATH, f"hil_device_{self.type}.json"), None) # TODO: validate w/ schema
+        self.config: dict = utils.load_json_config(os.path.join(HIL_DEVICES_PATH, f"hil_device_{self.type}.json"), None) # TODO: validate w/ schema
 
-        self.rail_5v = 0
-        if "calibrate_rail" in self.config and self.config['calibrate_rail']:
-            # Measure 3V3 rail and find dac reference
-            p = self.get_port_number('3v3ref', 'AI')
-            if p >= 0:
-                self.adc_max = pow(2, self.config['adc_config']['bit_resolution']) - 1
-                meas_3v3 = self.read_analog(p)
-                # 3.3V = meas_3v3 / adc_max * 5V
-                # 5V = 3.3V * adc_max / meas_3v3
-                self.rail_5v = 3.3 * self.adc_max / meas_3v3
-                utils.log(f"5V rail measured to be {self.rail_5v:.3}V on {self.name}")
-
-        self.adc_to_volts = {
+        self.adc_to_volts: dict[int, float] = {
             5: 0.0,
             24: 0.0,
         }
-        self.adc_max = 0
+        self.adc_max: int = 0
         if "adc_config" in self.config:
             self.adc_max = pow(2, self.config['adc_config']['bit_resolution']) - 1
             # Note: Xv looks like xv_reference_v due to voltage divider
             self.adc_to_volts[5]  = (5.0  / self.config['adc_config']['5v_reference_v'])  * self.config['adc_config']['reference_v'] / self.adc_max
             self.adc_to_volts[24] = (24.0 / self.config['adc_config']['24v_reference_v']) * self.config['adc_config']['reference_v'] / self.adc_max
             
-            # if self.rail_5v == 0:
-            #     self.adc_to_volts = float(self.config['adc_config']['reference_v']) / self.adc_max
-            # else:
-            #     self.adc_to_volts = self.rail_5v / self.adc_max
-
-        self.volts_to_dac = 0.0
-        self.dac_max = 0
+        self.volts_to_dac: float = 0.0
+        self.dac_max: int = 0
         if "dac_config" in self.config:
             self.dac_max = pow(2, self.config['dac_config']['bit_resolution']) - 1
-            if self.rail_5v == 0:
-                self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v']) 
-            else:
-                self.volts_to_dac = self.dac_max / self.rail_5v
+            self.volts_to_dac = self.dac_max / float(self.config['dac_config']['reference_v']) 
         
-        self.pot_max = 0
+        self.pot_max:int = 0
         if "pot_config" in self.config:
             self.pot_max = pow(2, self.config['pot_config']['bit_resolution']) - 1
 
