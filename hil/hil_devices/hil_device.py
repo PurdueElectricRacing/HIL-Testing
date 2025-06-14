@@ -68,25 +68,25 @@ class HilDevice():
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
     
-    def get_mux_info(self, port_name: str) -> tuple[int, int, list[int]]:
+    def get_mux_info(self, port_name: str) -> tuple[int, int, list[int], str]:
         """
-            Returns: mux_select, mux_read_port, mux_select_ports.
+            Returns: mux_select, mux_read_port, mux_select_ports, mode.
             port_name = f"{mux_name}_{mux_select}" (ex: "24vMUX_13")
         """
         name_parts = port_name.split('_')
         if len(name_parts) != 2:
             utils.log_error(f"Invalid mux port name {port_name} for {self.name}")
-            return (-1, -1, [])
+            return (-1, -1, [], "")
         try:
             mux_select = int(name_parts[1])
         except ValueError:
             utils.log_error(f"Invalid mux select value {name_parts[1]} for {self.name}")
-            return (-1, -1, [])
+            return (-1, -1, [], "")
     
         mux_name = name_parts[0]
         for m in self.config['muxs']:
             if m['name'] == mux_name:
-                return (mux_select, m['port'], m['pins'])
+                return (mux_select, m['port'], m['pins'], m['mode'])
 
     def write_gpio(self, pin: int, value: int) -> None: 
         data = [(HIL_CMD_WRITE_GPIO & SERIAL_MASK), (pin & SERIAL_MASK), value]
@@ -121,7 +121,7 @@ class HilDevice():
         data = [(HIL_CMD_WRITE_POT & SERIAL_MASK), (pin & SERIAL_MASK), value]
         self.sm.send_data(self.id, data)
 
-    def read_mux(self, select: int, read_pin: int, select_pins: list[int]) -> float:
+    def read_mux(self, select: int, read_pin: int, select_pins: list[int], mode: str) -> float:
         if select >= 2**len(select_pins) or select < 0:
             raise ValueError("select out of range for given select_pins")
 
@@ -129,4 +129,13 @@ class HilDevice():
             bit = 1 if (select & (1 << i)) else 0
             self.write_gpio(pin, bit)
         time.sleep(0.01)
-        return self.read_analog(read_pin)
+        
+        if mode == "AI5":
+            return self.read_analog(read_pin, 5)
+        elif mode == "AI24":
+            return self.read_analog(read_pin, 24)
+        elif mode == "DI":
+            return self.read_gpio(read_pin)
+        else:
+            utils.log_error(f"Unrecognized mux mode {mode} for {self.name}")
+            return 0.0
