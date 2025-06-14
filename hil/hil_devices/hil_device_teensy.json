@@ -6,6 +6,7 @@
     "muxs": [
         { "name": "24vMUX", "mode": "AI24", "select_ports": [37, 36, 35, -34], "port": 38 },
         { "name": "5vMUX",  "mode": "AI5", "select_ports": [27, 28, 29],       "port": 26 },
+        { "TODO": "DIG MUX"}
     ],
     "ports":[
         {"port":20, "name":"RLY1", "mode": "DO", "notes":"relay"},
