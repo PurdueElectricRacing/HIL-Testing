@@ -1,6 +1,11 @@
-
+#include <FlexCAN_T4.h>
 #include <Arduino.h>
 #include <Wire.h>
+
+
+#define SERIAL_BAUDRATE 115200
+const int TESTER_ID = 1;
+
 
 // #define STM32
 #ifdef STM32
@@ -10,7 +15,6 @@
 	#define SERIAL_CON Serial
 #endif
 
-const int TESTER_ID = 1;
 
 #define DAC_EN
 #define DIGIPOT_EN
@@ -95,40 +99,40 @@ bool data_ready = false;
 
 
 void setup() {
-	SERIAL_CON.begin(115200);
+	SERIAL_CON.begin(SERIAL_BAUDRATE);
 
-#ifdef DAC_EN
-	DAC_WIRE.setSDA(DAC_SDA);
-	DAC_WIRE.setSCL(DAC_SCL);
+	#ifdef DAC_EN
+		DAC_WIRE.setSDA(DAC_SDA);
+		DAC_WIRE.setSCL(DAC_SCL);
 
-	for (int i = 0; i < NUM_DACS; i++) {
-		uint8_t addr = 0x60 + i;
-		dacs[i].begin(addr, DAC_WIRE);
+		for (int i = 0; i < NUM_DACS; i++) {
+			uint8_t addr = 0x60 + i;
+			dacs[i].begin(addr, DAC_WIRE);
 
-		dacs[i].setMode(MCP4706_PWRDN_500K);
-		dac_power_down[i] = true; // start with power down
-	}
-#endif
+			dacs[i].setMode(MCP4706_PWRDN_500K);
+			dac_power_down[i] = true; // start with power down
+		}
+	#endif
 
-#ifdef DIGIPOT_EN
-	DIGIPOT_1_WIRE.setSDA(DIGIPOT_1_SDA);
-	DIGIPOT_1_WIRE.setSCL(DIGIPOT_1_SCL);
-	digipot1.begin(MCP4017ADDRESS, DIGIPOT_1_WIRE);
+	#ifdef DIGIPOT_EN
+		DIGIPOT_1_WIRE.setSDA(DIGIPOT_1_SDA);
+		DIGIPOT_1_WIRE.setSCL(DIGIPOT_1_SCL);
+		digipot1.begin(MCP4017ADDRESS, DIGIPOT_1_WIRE);
 
-	DIGIPOT_2_WIRE.setSDA(DIGIPOT_2_SDA);
-	DIGIPOT_2_WIRE.setSCL(DIGIPOT_2_SCL);
-	digipot2.begin(MCP4017ADDRESS, DIGIPOT_2_WIRE);
-#endif
+		DIGIPOT_2_WIRE.setSDA(DIGIPOT_2_SDA);
+		DIGIPOT_2_WIRE.setSCL(DIGIPOT_2_SCL);
+		digipot2.begin(MCP4017ADDRESS, DIGIPOT_2_WIRE);
+	#endif
 
-#ifdef CAN_EN
-	vCan.begin();
-	vCan.setBaudRate(CAN_BAUDRATE);
-	vCan.enableFIFO();
+	#ifdef CAN_EN
+		vCan.begin();
+		vCan.setBaudRate(CAN_BAUDRATE);
+		vCan.enableFIFO();
 
-	mCan.begin();
-	mCan.setBaudRate(CAN_BAUDRATE);
-	mCan.enableFIFO();
-#endif
+		mCan.begin();
+		mCan.setBaudRate(CAN_BAUDRATE);
+		mCan.enableFIFO();
+	#endif
 }
 
 void error(String error_string) {
