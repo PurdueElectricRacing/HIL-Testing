@@ -56,6 +56,7 @@ const int TESTER_ID = 1;
 #ifdef CAN_EN
 	#include <FlexCAN_T4.h>
 
+	#define CAN_BAUDRATE 500000
 	#define CAN_RX RX_SIZE_256
 	#define CAN_TX TX_SIZE_16
 
@@ -117,6 +118,16 @@ void setup() {
 	DIGIPOT_2_WIRE.setSDA(DIGIPOT_2_SDA);
 	DIGIPOT_2_WIRE.setSCL(DIGIPOT_2_SCL);
 	digipot2.begin(MCP4017ADDRESS, DIGIPOT_2_WIRE);
+#endif
+
+#ifdef CAN_EN
+	vCan.begin();
+	vCan.setBaudRate(CAN_BAUDRATE);
+	vCan.enableFIFO();
+
+	mCan.begin();
+	mCan.setBaudRate(CAN_BAUDRATE);
+	mCan.enableFIFO();
 #endif
 }
 
