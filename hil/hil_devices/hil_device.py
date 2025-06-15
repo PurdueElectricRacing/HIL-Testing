@@ -145,7 +145,7 @@ class HilDevice():
             utils.log_error(f"Unrecognized mux mode {mode} for {self.name}")
             return 0.0
         
-    def read_can(self, bus: int, id: int) -> Optional[list[int]]
+    def read_can(self, bus: int, id: int) -> Optional[list[int]]:
         id_bit1 = (id >> 8) & SERIAL_MASK
         id_bit2 = id & SERIAL_MASK
         data = [(HIL_CMD_READ_CAN & SERIAL_MASK), (bus & SERIAL_MASK), id_bit1, id_bit2]
