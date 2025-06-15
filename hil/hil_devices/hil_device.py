@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Optional
 from hil.hil_devices.serial_manager import SerialManager
 
 import hil.utils as utils
@@ -10,6 +11,10 @@ HIL_CMD_WRITE_DAC  = 2 # command, pin, value (2 bytes)
 HIL_CMD_WRITE_GPIO = 3 # command, pin, value
 HIL_CMD_READ_ID    = 4 # command
 HIL_CMD_WRITE_POT  = 5 # command, pin, value
+HIL_CMD_READ_CAN   = 6 # command, bus, id bit 1, id bit 2
+
+CAN_RESPONSE_NO_MESSAGE = 0x01
+CAN_RESPONSE_FOUND      = 0x02
 
 SERIAL_MASK = 0xFF # 2^8 - 1
 SERIAL_BITS = 8 # char
@@ -139,3 +144,35 @@ class HilDevice():
         else:
             utils.log_error(f"Unrecognized mux mode {mode} for {self.name}")
             return 0.0
+        
+    def read_can(self, bus: int, id: int) -> Optional[list[int]]
+        id_bit1 = (id >> 8) & SERIAL_MASK
+        id_bit2 = id & SERIAL_MASK
+        data = [(HIL_CMD_READ_CAN & SERIAL_MASK), (bus & SERIAL_MASK), id_bit1, id_bit2]
+        self.sm.send_data(self.id, data)
+
+        d_status = self.sm.read_data(self.id, 1)
+        if len(d_status) != 1:
+            utils.log_error(f"Failed to read reponse from CAN bus {bus} with id {id} on {self.name}")
+            return []
+        d_status = int.from_bytes(d_status, "big")
+
+        if d_status == CAN_RESPONSE_NO_MESSAGE:
+            return None
+        elif d_status != CAN_RESPONSE_FOUND:
+            utils.log_error(f"Unexpected CAN response {d_status} for bus {bus} with id {id} on {self.name}")
+            return []
+        
+        d_len = self.sm.read_data(self.id, 1)
+        if len(d_len) != 1:
+            utils.log_error(f"Failed to read length of CAN message on bus {bus} with id {id} on {self.name}")
+            return []
+        d_len = int.from_bytes(d_len, "big")
+
+        if d_len < 1 or d_len > 8:
+            utils.log_error(f"Invalid CAN message length {d_len} for bus {bus} with id {id} on {self.name}")
+            return []
+        
+        d = self.sm.read_data(self.id, d_len)
+        if len(d) == d_len:
+            return [int.from_bytes(d[i:i+1], "big") for i in range(d_len)]

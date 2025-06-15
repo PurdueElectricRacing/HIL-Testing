@@ -14,6 +14,7 @@ const int TESTER_ID = 1;
 
 #define DAC_EN
 #define DIGIPOT_EN
+#define CAN_EN
 
 
 #ifdef STM32
@@ -52,6 +53,20 @@ const int TESTER_ID = 1;
 	MCP4017 digipot2(DIGIPOT_MAX_STEPS, DIGIPOT_MAX_OHMS);
 #endif
 
+#ifdef CAN_EN
+	#include <FlexCAN_T4.h>
+
+	#define CAN_RX RX_SIZE_256
+	#define CAN_TX TX_SIZE_16
+
+	#define CAN_RESPONSE_NO_MESSAGE 0x01
+	#define CAN_RESPONSE_FOUND      0x02
+
+	FlexCAN_T4<CAN1, CAN_RX, CAN_TX> vCan; // id: 1
+	FlexCAN_T4<CAN3, CAN_RX, CAN_TX> mCan; // id: 2
+#endif
+
+
 enum GpioCommand {
 	READ_ADC   = 0, 
 	READ_GPIO  = 1, 
@@ -59,6 +74,7 @@ enum GpioCommand {
 	WRITE_GPIO = 3,
 	READ_ID    = 4,
 	WRITE_POT  = 5,
+	READ_CAN   = 6,
 };
 
 int TO_READ[] = { // Parrallel to GpioCommand
@@ -68,6 +84,7 @@ int TO_READ[] = { // Parrallel to GpioCommand
 	3, // WRITE_GPIO - command, pin, value
 	1, // READ_ID - command
 	3, // WRITE_POT - command, pin, value
+	4, // READ_CAN - command, bus, id bit 1, id bit 2
 };
 
 // 4 = max(TO_READ)
@@ -192,6 +209,41 @@ void loop() {
 				{
 					error("POT PIN COUNT EXCEEDED");
 				}
+			break;
+		}
+		case GpioCommand::READ_CAN: {
+			int bus = data[1];
+			uint32_t id = (data[2] << 8) | data[3]; // 11-bit ID
+			#ifdef CAN_EN
+				CAN_message_t msg;
+				bool found = false;
+
+				if (bus == 1) {
+					while (vCan.read(msg)) {
+						if (msg.id == id) { found = true; break; }
+					}
+				} else if (bus == 2) {
+					while (mCan.read(msg)) {
+						if (msg.id == id) { found = true; break; }
+					}
+				} else {
+					error("CAN BUS NOT SUPPORTED");
+				}
+
+				if (found) {
+					SERIAL_CON.write(CAN_RESPONSE_FOUND);
+					SERIAL_CON.write(msg.id >> 8);
+					SERIAL_CON.write(msg.id & 0xFF);
+					SERIAL_CON.write(msg.len);
+					for (int i = 0; i < msg.len; i++) {
+						SERIAL_CON.write(msg.buf[i]);
+					}
+				} else {
+					SERIAL_CON.write(CAN_RESPONSE_NO_MESSAGE);
+				}
+			#else
+				error("CAN NOT ENABLED");
+			#endif
 			break;
 		}
 		}

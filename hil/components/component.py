@@ -90,6 +90,8 @@ class Component():
                 self.write_func = lambda s: dev.write_pot(hil_port_num, s)
             elif (mode == "MUX"):
                 self.read_func = lambda : dev.read_mux(*dev.get_mux_info(hil_con[1]))
+            elif (mode == "CAN"):
+                self.read_func = lambda : dev.read_can(hil_port_num)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:

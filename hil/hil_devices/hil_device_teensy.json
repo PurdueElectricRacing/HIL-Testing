@@ -41,7 +41,10 @@
         {"port":207, "name":"DAC8", "mode": "AO", "notes":"5V 8-bit DAC"},
 
         {"port":1, "name":"POT1", "mode": "POT", "notes":"7-bit Digipot"},
-        {"port":2, "name":"POT2", "mode": "POT", "notes":"7-bit Digipot"}
+        {"port":2, "name":"POT2", "mode": "POT", "notes":"7-bit Digipot"},
+
+        {"port":1, "name":"VCAN", "mode": "CAN", "notes":"Vechicle CAN Bus"},
+        {"port":2, "name":"MCAN", "mode": "CAN", "notes":"Motor    CAN Bus"}
     ],
     "adc_config": {
         "bit_resolution": 10,
