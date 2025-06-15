@@ -70,6 +70,13 @@ class HilDevice():
                 else:
                     utils.log_warning(f"Mux named {m['name']} on {self.name} does not have capability {mode}")
                     return -1
+        for c in self.config['can']:
+            if port_name.startswith(c['name']):
+                if mode == "CAN":
+                    return c['port']
+                else:
+                    utils.log_warning(f"CAN bus named {c['name']} on {self.name} does not have capability {mode}")
+                    return -1
         utils.log_error(f"Port {port_name} not found for hil device {self.name}")
         return -1
     
@@ -92,6 +99,29 @@ class HilDevice():
         for m in self.config['muxs']:
             if m['name'] == mux_name:
                 return (mux_select, m['port'], m['pins'], m['mode'])
+            
+    def get_can_info(self, port_name: str) -> tuple[int, int]:
+        """
+            Returns: can_bus, can_message_id.
+            port_name = f"{can_name}_{can_message_id}" (ex: "CAN1_123")
+        """
+        name_parts = port_name.split('_')
+        if len(name_parts) != 2:
+            utils.log_error(f"Invalid CAN port name {port_name} for {self.name}")
+            return (-1, -1)
+        try:
+            can_id = int(name_parts[1])
+        except ValueError:
+            utils.log_error(f"Invalid CAN id value {name_parts[1]} for {self.name}")
+            return (-1, -1)
+    
+        can_name = name_parts[0]
+        for c in self.config['can']:
+            if c['name'] == can_name:
+                return (c['port'], can_id)
+        
+        utils.log_error(f"CAN bus {can_name} not found for {self.name}")
+        return (-1, -1)
 
     def write_gpio(self, pin: int, value: int) -> None: 
         data = [(HIL_CMD_WRITE_GPIO & SERIAL_MASK), (pin & SERIAL_MASK), value]

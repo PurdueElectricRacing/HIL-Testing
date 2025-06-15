@@ -1,13 +1,13 @@
 {
     "$schema": "./emulator_schema.json",
-    "communication_mode":"serial",
-    "_": "All the ports are wrong",
+    
     "mux_note": "Use ports like: [mux_name]_#, where # starts from 0",
     "muxs": [
         { "name": "24vMUX", "mode": "AI24", "select_ports": [37, 36, 35, -34], "port": 38 },
         { "name": "5vMUX",  "mode": "AI5",  "select_ports": [27, 28, 29],      "port": 26 },
         { "name": "DMUX",   "mode": "DI",   "select_ports": [2, 3, 4, 5],      "port": 6 }
     ],
+    
     "ports":[
         {"port":20, "name":"RLY1", "mode": "DO", "notes":"relay"},
         {"port":21, "name":"RLY2", "mode": "DO", "notes":"relay"},
@@ -41,11 +41,15 @@
         {"port":207, "name":"DAC8", "mode": "AO", "notes":"5V 8-bit DAC"},
 
         {"port":1, "name":"POT1", "mode": "POT", "notes":"7-bit Digipot"},
-        {"port":2, "name":"POT2", "mode": "POT", "notes":"7-bit Digipot"},
+        {"port":2, "name":"POT2", "mode": "POT", "notes":"7-bit Digipot"}
+    ],
 
+    "can_note": "Use CAN like: [can_name]_#, where # is the can message ID",
+    "can": [
         {"port":1, "name":"VCAN", "mode": "CAN", "notes":"Vechicle CAN Bus"},
         {"port":2, "name":"MCAN", "mode": "CAN", "notes":"Motor    CAN Bus"}
     ],
+    
     "adc_config": {
         "bit_resolution": 10,
         "adc_reference_v": 3.3,
