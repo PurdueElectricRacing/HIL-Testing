@@ -24,6 +24,7 @@ const int TESTER_ID = 1;
 
 #ifdef DAC_EN
 	#include "Adafruit_MCP4706.h"
+	
 	#define NUM_DACS 8
 	#define DAC_WIRE Wire
 	#define DAC_SDA 17
@@ -35,6 +36,7 @@ const int TESTER_ID = 1;
 
 #ifdef DIGIPOT_EN
 	#include "SW_MCP4017.h"
+	
 	#define DIGIPOT_1_WIRE Wire1
 	#define DIGIPOT_1_SDA 25
 	#define DIGIPOT_1_SCL 16
