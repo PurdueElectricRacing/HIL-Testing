@@ -15,6 +15,7 @@ HIL_CMD_READ_CAN   = 6 # command, bus, id bit 1, id bit 2
 
 CAN_RESPONSE_NO_MESSAGE = 0x01
 CAN_RESPONSE_FOUND      = 0x02
+CAN_IGNORE_ID           = 0xFF
 
 SERIAL_MASK = 0xFF # 2^8 - 1
 SERIAL_BITS = 8 # char
@@ -176,9 +177,15 @@ class HilDevice():
             return 0.0
         
     def read_can(self, bus: int, id: int) -> Optional[list[int]]:
-        id_bit1 = (id >> 8) & SERIAL_MASK
-        id_bit2 = id & SERIAL_MASK
-        data = [(HIL_CMD_READ_CAN & SERIAL_MASK), (bus & SERIAL_MASK), id_bit1, id_bit2]
+        if id < 0:
+            ignore_id = CAN_IGNORE_ID
+            id_bit1 = 0
+            id_bit2 = 0
+        else:
+            ignore_id = 0
+            id_bit1 = (id >> 8) & SERIAL_MASK
+            id_bit2 = id & SERIAL_MASK
+        data = [(HIL_CMD_READ_CAN & SERIAL_MASK), (bus & SERIAL_MASK), (ignore_id & SERIAL_MASK), id_bit1, id_bit2]
         self.sm.send_data(self.id, data)
 
         d_status = self.sm.read_data(self.id, 1)

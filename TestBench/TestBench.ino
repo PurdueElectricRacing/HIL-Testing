@@ -66,6 +66,7 @@ const int TESTER_ID = 1;
 
 	#define CAN_RESPONSE_NO_MESSAGE 0x01
 	#define CAN_RESPONSE_FOUND      0x02
+	#define CAN_IGNORE_ID           0xFF
 
 	FlexCAN_T4<CAN1, CAN_RX, CAN_TX> vCan; // id: 1
 	FlexCAN_T4<CAN3, CAN_RX, CAN_TX> mCan; // id: 2
@@ -89,11 +90,11 @@ int TO_READ[] = { // Parrallel to GpioCommand
 	3, // WRITE_GPIO - command, pin, value
 	1, // READ_ID - command
 	3, // WRITE_POT - command, pin, value
-	4, // READ_CAN - command, bus, id bit 1, id bit 2
+	5, // READ_CAN - command, bus, ignore id, id bit 1, id bit 2
 };
 
-// 4 = max(TO_READ)
-uint8_t data[4] = { 0 };
+// 5 = max(TO_READ)
+uint8_t data[5] = { 0 };
 int data_index = 0;
 bool data_ready = false;
 
@@ -228,18 +229,19 @@ void loop() {
 		}
 		case GpioCommand::READ_CAN: {
 			int bus = data[1];
-			uint32_t id = (data[2] << 8) | data[3]; // 11-bit ID
+			uint8_t ignore_id = data[2];
+			uint32_t id = (data[3] << 8) | data[4]; // 11-bit ID
 			#ifdef CAN_EN
 				CAN_message_t msg;
 				bool found = false;
 
 				if (bus == 1) {
 					while (vCan.read(msg)) {
-						if (msg.id == id) { found = true; break; }
+						if (msg.id == id || ignore_id == CAN_IGNORE_ID) { found = true; break; }
 					}
 				} else if (bus == 2) {
 					while (mCan.read(msg)) {
-						if (msg.id == id) { found = true; break; }
+						if (msg.id == id || ignore_id == CAN_IGNORE_ID) { found = true; break; }
 					}
 				} else {
 					error("CAN BUS NOT SUPPORTED");
