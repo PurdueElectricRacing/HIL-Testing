@@ -1,0 +1,13 @@
+{
+    "$schema": "./config_schema.json",
+    "dut_connections":[
+        {"board":"Irving", "harness_connections":[
+            {"dut":{"connector":"P1","pin":1},  "hil":{"device":"HIL2", "port":"DAC1"}},
+            {"dut":{"connector":"P1","pin":2},  "hil":{"device":"HIL2", "port":"DAC2"}},
+            {"dut":{"connector":"VCAN","pin":1}, "hil":{"device":"HIL2", "port":"VCAN_-1"}}
+        ]}
+    ],
+    "hil_devices":[
+        {"name":"HIL2",  "type":"teensy", "id":1}
+    ]
+}

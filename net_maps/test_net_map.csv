@@ -1,0 +1,4 @@
+Board,Net,Component,Designator,Connector Name,,
+Irving,DAC1,P1,1,Test
+Irving,DAC2,P1,2,Test
+Irving,FAULT_CAN,VCAN,1,Test
