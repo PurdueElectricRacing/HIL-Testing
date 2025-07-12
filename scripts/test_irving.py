@@ -39,13 +39,13 @@ def hil():
 
 
 # ---------------------------------------------------------------------------- #
-def test_fault(hil):
+def test_fault(hil: HIL):
     # Outputs (HIL writes)
     dac1 = hil.aout("Irving", "DAC1")
     dac2 = hil.aout("Irving", "DAC2")
 
     # Inputs (HIL reads)
-    fault_can = hil.can_var("Irving", "FAULT_CAN")
+    fault_can = hil.can("Irving", "FAULT_CAN")
 
     # Setup initial state
     dac1.state = DAC_VOLTAGE
