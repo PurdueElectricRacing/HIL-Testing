@@ -28,7 +28,7 @@ def hil():
     hil_instance = HIL()
 
     hil_instance.load_config("config_irving.json")
-    hil_instance.load_pin_map("test_net_map.csv", "stm32f407_pin_map.csv")
+    hil_instance.load_pin_map("irving_net_map.csv", "stm32f407_pin_map.csv")
 
     # hil_instance.init_can()
 
