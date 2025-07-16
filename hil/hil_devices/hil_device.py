@@ -40,8 +40,8 @@ class HilDevice():
         if "adc_config" in self.config:
             self.adc_max = pow(2, self.config['adc_config']['bit_resolution']) - 1
             # Note: Xv looks like xv_reference_v due to voltage divider
-            self.adc_to_volts[5]  = (5.0  / self.config['adc_config']['5v_reference_v'])  * self.config['adc_config']['reference_v'] / self.adc_max
-            self.adc_to_volts[24] = (24.0 / self.config['adc_config']['24v_reference_v']) * self.config['adc_config']['reference_v'] / self.adc_max
+            self.adc_to_volts[5]  = (5.0  / self.config['adc_config']['5v_reference_v'])  * self.config['adc_config']['adc_reference_v'] / self.adc_max
+            self.adc_to_volts[24] = (24.0 / self.config['adc_config']['24v_reference_v']) * self.config['adc_config']['adc_reference_v'] / self.adc_max
             
         self.volts_to_dac: float = 0.0
         self.dac_max: int = 0
