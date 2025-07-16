@@ -3,7 +3,7 @@
     
     "mux_note": "Use ports like: [mux_name]_#, where # starts from 0",
     "muxs": [
-        { "name": "24vMUX", "mode": "AI24", "select_ports": [37, 36, 35, -34], "port": 38 },
+        { "name": "24vMUX", "mode": "AI24", "select_ports": [37, 36, 35, 34], "port": 38 },
         { "name": "5vMUX",  "mode": "AI5",  "select_ports": [27, 28, 29],      "port": 26 },
         { "name": "DMUX",   "mode": "DI",   "select_ports": [2, 3, 4, 5],      "port": 6 }
     ],
