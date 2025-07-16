@@ -9,10 +9,9 @@ class SerialManager():
         self.devices: dict[int, serial.Serial] = {}
 
     def discover_devices(self) -> None:
-        # print([a[0] for  a in serial.tools.list_ports.comports()])
-        ports = [a[0] for a in serial.tools.list_ports.comports() if ("Arduino" in a[1] or "USB Serial Device" in a[1])]
+        ports = [a[0] for a in serial.tools.list_ports.comports() if "USB Serial" in a[1]]
         self.devices = {}
-        print('Arduinos found on ports ' + str(ports))
+        print('Teensys found on ports ' + str(ports))
         for p in ports:
             ard = serial.Serial(p,115200, timeout=0.1, 
                                 bytesize=serial.EIGHTBITS,
