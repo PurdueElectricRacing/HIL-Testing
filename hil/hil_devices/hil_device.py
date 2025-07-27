@@ -2,6 +2,8 @@ import os
 import time
 from typing import Optional
 from hil.hil_devices.serial_manager import SerialManager
+import cantools.database.can.database
+
 
 import hil.utils as utils
 
@@ -176,7 +178,7 @@ class HilDevice():
             utils.log_error(f"Unrecognized mux mode {mode} for {self.name}")
             return 0.0
         
-    def read_can(self, bus: int, id: int) -> Optional[list[int]]:
+    def read_can(self, bus: int, id: int, db: cantools.database.can.database.Database) -> Optional[dict]:
         if id < 0:
             ignore_id = CAN_IGNORE_ID
             id_bit1 = 0
@@ -191,25 +193,35 @@ class HilDevice():
         d_status = self.sm.read_data(self.id, 1)
         if len(d_status) != 1:
             utils.log_error(f"Failed to read reponse from CAN bus {bus} with id {id} on {self.name}")
-            return []
+            return None
         d_status = int.from_bytes(d_status, "big")
 
         if d_status == CAN_RESPONSE_NO_MESSAGE:
             return None
         elif d_status != CAN_RESPONSE_FOUND:
             utils.log_error(f"Unexpected CAN response {d_status} for bus {bus} with id {id} on {self.name}")
-            return []
+            return None
         
-        d_len = self.sm.read_data(self.id, 1)
-        if len(d_len) != 1:
-            utils.log_error(f"Failed to read length of CAN message on bus {bus} with id {id} on {self.name}")
-            return []
-        d_len = int.from_bytes(d_len, "big")
+        raw_msg_id = self.sm.read_data(self.id, 4)
+        if len(raw_msg_id) != 4:
+            utils.log_error(f"Failed to read CAN message id on bus {bus} with id {id} on {self.name}")
+            return None
+        msg_id = int.from_bytes(raw_msg_id, "big")
 
-        if d_len < 1 or d_len > 8:
-            utils.log_error(f"Invalid CAN message length {d_len} for bus {bus} with id {id} on {self.name}")
-            return []
+        raw_len = self.sm.read_data(self.id, 1)
+        if len(raw_len) != 1:
+            utils.log_error(f"Failed to read length of CAN message on bus {bus} with id {id} on {self.name}")
+            return None
+        msg_len = int.from_bytes(raw_len, "big")
+        if msg_len < 1 or msg_len > 8:
+            utils.log_error(f"Invalid CAN message length {msg_len} for bus {bus} with id {id} on {self.name}")
+            return None
+    
+        raw_data = self.sm.read_data(self.id, 8)
+        if len(raw_data) != 8:
+            utils.log_error(f"Failed to read CAN message data on bus {bus} with id {id} on {self.name}")
+            return None
+        data = [int.from_bytes(raw_data[i:i+1], "big") for i in range(msg_len)]
         
-        d = self.sm.read_data(self.id, d_len)
-        if len(d) == d_len:
-            return [int.from_bytes(d[i:i+1], "big") for i in range(d_len)]
+        signals = db.decode_message(msg_id, data)
+        return signals

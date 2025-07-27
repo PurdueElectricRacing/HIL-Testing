@@ -91,7 +91,11 @@ class Component():
             elif (mode == "MUX"):
                 self.read_func = lambda : dev.read_mux(*dev.get_mux_info(hil_con[1]))
             elif (mode == "CAN"):
-                self.read_func = lambda : dev.read_can(*dev.get_can_info(hil_con[1]))
+                if hil.db is None:
+                    utils.log_error("CAN database not loaded. Please initialize CAN before using CAN components.")
+                    can_info = dev.get_can_info(hil_con[1])
+                    can_info.append(hil.db)
+                self.read_func = lambda : dev.read_can(*can_info)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:

@@ -232,7 +232,7 @@ void loop() {
 			uint8_t ignore_id = data[2];
 			uint32_t id = (data[3] << 8) | data[4]; // 11-bit ID
 			#ifdef CAN_EN
-				CAN_message_t msg;
+				CAN_message_t msg = { 0 };
 				bool found = false;
 
 				if (bus == 1) {
@@ -249,12 +249,9 @@ void loop() {
 
 				if (found) {
 					SERIAL_CON.write(CAN_RESPONSE_FOUND);
-					SERIAL_CON.write(msg.id >> 8);
-					SERIAL_CON.write(msg.id & 0xFF);
+					SERIAL_CON.write((uint8_t *)&msg.id, 4);
 					SERIAL_CON.write(msg.len);
-					for (int i = 0; i < msg.len; i++) {
-						SERIAL_CON.write(msg.buf[i]);
-					}
+					SERIAL_CON.write(msg.buf, 8);
 				} else {
 					SERIAL_CON.write(CAN_RESPONSE_NO_MESSAGE);
 				}
