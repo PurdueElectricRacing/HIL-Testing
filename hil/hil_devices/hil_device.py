@@ -13,7 +13,8 @@ HIL_CMD_WRITE_DAC  = 2 # command, pin, value (2 bytes)
 HIL_CMD_WRITE_GPIO = 3 # command, pin, value
 HIL_CMD_READ_ID    = 4 # command
 HIL_CMD_WRITE_POT  = 5 # command, pin, value
-HIL_CMD_READ_CAN   = 6 # command, bus, id bit 1, id bit 2
+HIL_CMD_READ_CAN   = 6 # command, bus, ignore_id, id_bit1, id_bit2
+HIL_CMD_WRITE_CAN  = 7 # command, bus, id bit 1, id bit 2, len, data (8 bytes)
 
 CAN_RESPONSE_NO_MESSAGE = 0x01
 CAN_RESPONSE_FOUND      = 0x02
@@ -222,6 +223,31 @@ class HilDevice():
             utils.log_error(f"Failed to read CAN message data on bus {bus} with id {id} on {self.name}")
             return None
         data = [int.from_bytes(raw_data[i:i+1], "big") for i in range(msg_len)]
-        
+
         signals = db.decode_message(msg_id, data)
         return signals
+    
+    def write_can(self, bus: int, id: int, db: cantools.database.can.database.Database, data: dict) -> None:
+        if id < 0:
+            utils.log_error(f"Need to specify a valid CAN id for bus {bus} on {self.name}")
+            return
+        
+        id_bit1 = (id >> 8) & SERIAL_MASK
+        id_bit2 = id & SERIAL_MASK
+        
+        msg_data = db.encode_message(id, data)
+        len_msg_data = len(msg_data)
+        if len_msg_data > 8:
+            utils.log_error(f"CAN message data exceeds maximum length of 8 bytes for bus {bus} with id {id} on {self.name}")
+            return
+        elif len_msg_data < 8:
+            msg_data += [0] * (8 - len(msg_data))
+        
+        data_to_send = [
+            (HIL_CMD_WRITE_CAN & SERIAL_MASK),
+            (bus & SERIAL_MASK),
+            (id_bit1 & SERIAL_MASK),
+            (id_bit2 & SERIAL_MASK),
+            (len_msg_data & SERIAL_MASK)
+        ] + msg_data
+        self.sm.send_data(self.id, data_to_send)

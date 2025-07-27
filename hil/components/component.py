@@ -93,9 +93,8 @@ class Component():
             elif (mode == "CAN"):
                 if hil.db is None:
                     utils.log_error("CAN database not loaded. Please initialize CAN before using CAN components.")
-                    can_info = dev.get_can_info(hil_con[1])
-                    can_info.append(hil.db)
-                self.read_func = lambda : dev.read_can(*can_info)
+                self.read_func = lambda : dev.read_can(*dev.get_can_info(hil_con[1]), hil.db)
+                self.write_func = lambda s: dev.write_can(*dev.get_can_info(hil_con[1]), hil.db, s)
             else:
                 utils.log_error(f"Unrecognized emulation/measurement mode {mode} for component {self.name}")
         else:

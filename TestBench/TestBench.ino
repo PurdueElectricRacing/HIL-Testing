@@ -81,6 +81,7 @@ enum GpioCommand {
 	READ_ID    = 4,
 	WRITE_POT  = 5,
 	READ_CAN   = 6,
+	WRITE_CAN  = 7
 };
 
 int TO_READ[] = { // Parrallel to GpioCommand
@@ -91,10 +92,11 @@ int TO_READ[] = { // Parrallel to GpioCommand
 	1, // READ_ID - command
 	3, // WRITE_POT - command, pin, value
 	5, // READ_CAN - command, bus, ignore id, id bit 1, id bit 2
+	13 // WRITE_CAN - command, bus, id bit 1, id bit 2, len, data (8 bytes)
 };
 
-// 5 = max(TO_READ)
-uint8_t data[5] = { 0 };
+// 13 = max(TO_READ)
+uint8_t data[13] = { 0 };
 int data_index = 0;
 bool data_ready = false;
 
@@ -260,6 +262,31 @@ void loop() {
 			#endif
 			break;
 		}
+		case GpioCommand::WRITE_CAN: {
+			int bus = data[1];
+			#ifdef CAN_EN
+				CAN_message_t msg = { 0 };
+				msg.id = (data[2] << 8) | data[3]; // 11-bit ID
+				msg.len = data[4];
+				memcpy(msg.buf, &data[5], msg.len);
+
+				msg.len = 8;
+				msg.edl = 0;
+				msg.brs = 0;
+				msg.esi = 0;
+				msg.flags.extended = false; 
+
+				if (bus == 1) {
+					vCan.write(msg);
+				} else if (bus == 2) {
+					mCan.write(msg);
+				} else {
+					error("CAN BUS NOT SUPPORTED");
+				}
+			#else
+				error("CAN NOT ENABLED");
+			#endif
+			break;
 		}
 	} else {
 		if (SERIAL_CON.available() > 0) {
