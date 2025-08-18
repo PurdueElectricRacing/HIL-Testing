@@ -1,0 +1,55 @@
+{
+    "ports": [
+        { "port":0,  "name":"DO@0",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":1,  "name":"DO@1",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":2,  "name":"DO@2",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":3,  "name":"DO@3",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":4,  "name":"DO@4",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":5,  "name":"DO@5",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":6,  "name":"DO@6",  "mode": "DO", "notes":"3.3v Digital Output" },
+        { "port":7,  "name":"D0@7",  "mode": "DI", "notes":"3.3v Digital Output" },
+        { "port":8,  "name":"D0@8",  "mode": "DI", "notes":"3.3v Digital Output" },
+        { "port":9,  "name":"D0@9",  "mode": "DI", "notes":"3.3v Digital Output" },
+        { "port":10, "name":"D0@10", "mode": "DI", "notes":"3.3v Digital Output" },
+        { "port":11, "name":"D0@11", "mode": "DI", "notes":"3.3v Digital Output" },
+        { "port":12, "name":"D0@12", "mode": "DI", "notes":"3.3v Digital Output" },
+
+        { "port":14, "name":"AI@14", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":15, "name":"AI@15", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":16, "name":"AI@16", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":17, "name":"AI@17", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":18, "name":"AI@18", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":19, "name":"AI@19", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":20, "name":"AI@20", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":21, "name":"AI@21", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":22, "name":"AI@22", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":23, "name":"AI@23", "mode": "AI", "notes":"3.3v Analog Input" },
+
+        { "port":24, "name":"AI@24", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":25, "name":"AI@25", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":26, "name":"AI@26", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":27, "name":"AI@27", "mode": "AI", "notes":"3.3v Analog Input" },
+
+        { "port":38, "name":"AI@38", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":39, "name":"AI@39", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":40, "name":"AI@40", "mode": "AI", "notes":"3.3v Analog Input" },
+        { "port":41, "name":"AI@41", "mode": "AI", "notes":"3.3v Analog Input" },
+
+        { "port":28, "name":"DI@28", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":29, "name":"DI@29", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":30, "name":"DI@30", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":31, "name":"DI@31", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":32, "name":"DI@32", "mode": "DI", "notes":"3.3v Digital Input" },
+        
+        { "port":33, "name":"DI@33", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":34, "name":"DI@34", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":35, "name":"DI@35", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":36, "name":"DI@36", "mode": "DI", "notes":"3.3v Digital Input" },
+        { "port":37, "name":"DI@37", "mode": "DI", "notes":"3.3v Digital Input" }
+    ],
+
+    "adc_config": {
+        "bit_resolution": 10,
+        "adc_reference_v": 3.3
+    }
+}
