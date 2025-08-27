@@ -34,9 +34,12 @@ class CanMessageManager:
                        will be returned (if any) regardless of the signal/id
         :return: The last CAN message with the specified signal, or None if not found
         """
-        return next(
-            filter(lambda msg: msg.signal == signal, reversed(self._messages)), None
-        )
+        if signal is None:
+            return self._messages[-1] if self._messages else None
+        for msg in reversed(self._messages):
+            if msg.signal == signal:
+                return msg
+        return None
 
     def get_all(self, signal: Optional[str | int] = None) -> list[CanMessage]:
         """

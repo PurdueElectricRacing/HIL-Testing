@@ -1,6 +1,6 @@
 import json
 
-import hil_errors
+from . import hil_errors
 
 
 # HIL DUT Connection ------------------------------------------------------------------#

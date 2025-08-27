@@ -1,6 +1,6 @@
 from typing import Callable, Optional
 
-import can_helper
+from . import can_helper
 
 
 # Shutdownable component interface ----------------------------------------------------#

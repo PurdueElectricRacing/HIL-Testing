@@ -1,6 +1,6 @@
 import csv
 
-import hil_errors
+from . import hil_errors
 
 
 # Board net pairing -------------------------------------------------------------------#
@@ -15,14 +15,14 @@ class BoardNet:
         :param board: The name of the board (ex: 'Dashboard')
         :param net: The name of the net (ex: 'BRK_STAT')
         """
-        self._board: str = board
-        self._net: str = net
+        self.board: str = board
+        self.net: str = net
 
     def __hash__(self):
-        return hash((self._board, self._net))
+        return hash((self.board, self.net))
 
     def __eq__(self, other):
-        return self._board == other.board and self._net == other.net
+        return self.board == other.board and self.net == other.net
 
     def __neq__(self, other):
         return not (self == other)

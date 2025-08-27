@@ -6,12 +6,12 @@ import threading
 
 import cantools.database.can.database as cantools_db
 
-import action
-import can_helper
-import commands
-import dut_cons
-import hil_errors
-import serial_helper
+from . import action
+from . import can_helper
+from . import commands
+from . import dut_cons
+from . import hil_errors
+from . import serial_helper
 
 
 # Peripheral configuration ------------------------------------------------------------#
@@ -53,7 +53,7 @@ class AdcConfig:
         :param raw_value: The raw ADC value to convert
         :return: The converted voltage value
         """
-        if raw_value < 0 or raw_value >= (2**self.bit_resolution - 1):
+        if raw_value < 0 or raw_value > (2**self.bit_resolution - 1):
             raise hil_errors.RangeError(f"ADC raw value {raw_value} out of range")
         return (raw_value / (2**self.bit_resolution - 1)) * self.adc_reference_v
 

@@ -7,8 +7,8 @@ import time
 import serial
 import serial.tools.list_ports
 
-import commands
-import hil_errors
+from . import commands
+from . import hil_errors
 
 SERIAL_BAUDRATE = 115200
 SERIAL_TIMEOUT = 0.1

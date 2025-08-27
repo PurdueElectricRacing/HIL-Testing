@@ -65,21 +65,23 @@ CAN_message_t recv_msg = { 0 };
 
 // Serial commands -----------------------------------------------------------//
 enum SerialCommand : uint8_t {
-    READ_ID    = 0, // command                    -> READ_ID, id
-    WRITE_GPIO = 1, // command, pin, value        -> []
-    READ_GPIO  = 2, // command, pin               -> READ_GPIO, value
-    WRITE_DAC  = 3, // command, pin/offset, value -> []
-    HIZ_DAC    = 4, // command, pin/offset        -> []
-    READ_ADC   = 5, // command, pin               -> READ_ADC, value high, value low
-    WRITE_POT  = 6, // command, pin/offset, value -> []
-    SEND_CAN   = 7, // command, bus, signal high, signal low, length, data (8 bytes) -> []
-    RECV_CAN   = 8, // <async>                    -> CAN_MESSAGE, bus, signal high, signal low, length, data (length bytes)
-    ERROR      = 9, // <async/any>                -> ERROR, command
+    READ_ID    = 0,  // command                    -> READ_ID, id
+    WRITE_GPIO = 1,  // command, pin, value        -> []
+    HIZ_GPIO   = 2,  // command, pin               -> []
+    READ_GPIO  = 3,  // command, pin               -> READ_GPIO, value
+    WRITE_DAC  = 4,  // command, pin/offset, value -> []
+    HIZ_DAC    = 5,  // command, pin/offset        -> []
+    READ_ADC   = 6,  // command, pin               -> READ_ADC, value high, value low
+    WRITE_POT  = 7,  // command, pin/offset, value -> []
+    SEND_CAN   = 8,  // command, bus, signal high, signal low, length, data (8 bytes) -> []
+    RECV_CAN   = 9,  // <async>                    -> CAN_MESSAGE, bus, signal high, signal low, length, data (length bytes)
+    ERROR      = 10, // <async/any>                -> ERROR, command
 };
 
 size_t TO_READ[] = { // Parrallel to SerialCommand
     1,  // READ_ID
     3,  // WRITE_GPIO
+    2,  // HIZ_GPIO
     2,  // READ_GPIO
     3,  // WRITE_DAC
     2,  // HIZ_DAC
@@ -158,6 +160,11 @@ void loop() {
             uint8_t value = g_serial_data[2];
             pinMode(pin, OUTPUT);
             digitalWrite(pin, value);
+            break;
+        }
+        case SerialCommand::HIZ_GPIO: {
+            uint8_t pin = g_serial_data[1];
+            pinMode(pin, INPUT);
             break;
         }
         case SerialCommand::READ_GPIO: {
@@ -259,7 +266,7 @@ void loop() {
         SERIAL_CON.write(recv_msg.buf, recv_msg.len); // g_serial_data
     } else if (mCan.read(recv_msg)) {
         SERIAL_CON.write(RECV_CAN);
-        SERIAL_CON.write(MCAN_BUS)                    // bus 2
+        SERIAL_CON.write(MCAN_BUS);                   // bus 2
         SERIAL_CON.write((recv_msg.id >> 8) & 0xFF);  // signal high
         SERIAL_CON.write(recv_msg.id & 0xFF);         // signal low
         SERIAL_CON.write(recv_msg.len);               // length

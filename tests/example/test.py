@@ -1,22 +1,37 @@
 import hil2.hil2 as hil2
 import mk_assert.mk_assert as mka
 
+import logging
+
 
 def do_test(h: hil2.Hil2):
-    do_2 = h.do("MainTester", "DO@2")
-    di_28 = h.di("MainTester", "DI@28")
+    do_2 = h.do("HIL2Bread", "DO@2")
+    di_28 = h.di("HIL2Bread", "DI@28")
+    ai_14 = h.ai("HIL2Bread", "AI@14")
 
     do_2.set(True)
     val = di_28.get()
+    a = ai_14.get()
+    print(f"DI@28: {val}, AI@14: {a}")
     mka.assert_true(val, "DI@28 should be True after setting DO@2 to True")
+    mka.assert_eqf(a, 3.3, 0.5, "AI@14 should be approximately 3.3V")
+
+    do_2.set(False)
+    val = di_28.get()
+    a = ai_14.get()
+    print(f"DI@28: {val}, AI@14: {a}")
+    mka.assert_false(val, "DI@28 should be False after setting DO@2 to False")
+    mka.assert_eqf(a, 0.0, 0.5, "AI@14 should be approximately 0.0V")
 
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
+    
     with hil2.Hil2(
         "./tests/example/config.json",
         "device_configs",
-        "netmap.csv",
-        "can.dbc",
+        None,
+        None
     ) as h:
         mka.add_test(do_test, h)
 

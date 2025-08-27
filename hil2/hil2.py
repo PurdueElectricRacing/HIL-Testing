@@ -6,13 +6,13 @@ import os
 import cantools
 import cantools.database.can.database as cantools_db
 
-import action
-import can_helper
-import component
-import dut_cons
-import hil_errors
-import net_map
-import test_device
+from . import action
+from . import can_helper
+from . import component
+from . import dut_cons
+from . import hil_errors
+from . import net_map
+from . import test_device
 
 
 class Hil2:

@@ -80,11 +80,11 @@ class SetPot:
 
     __match_args__ = ("value",)
 
-    def __init__(self, value: int):
+    def __init__(self, value: float):
         """
         :param value: The value (in ohms) to set the potentiometer to
         """
-        self.value: int = value
+        self.value: float = value
 
 
 # CAN actions -------------------------------------------------------------------------#
