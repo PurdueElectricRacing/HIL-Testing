@@ -1,0 +1,19 @@
+{
+	"dut_connections":[
+        { "board":"Dashboard", "harness_connections":[
+            {"_": "BRK1_RAW",     "dut":{"connector":"J1","pin":9},  "hil":{"device":"HIL2", "port":"DAC1"   }},
+			{"_": "BRK2_RAW",     "dut":{"connector":"J1","pin":10}, "hil":{"device":"HIL2", "port":"DAC2"   }},
+            {"_": "THRTL1_RAW",   "dut":{"connector":"J1","pin":11}, "hil":{"device":"HIL2", "port":"DAC3"   }},
+            {"_": "THRTL2_RAW",   "dut":{"connector":"J1","pin":12}, "hil":{"device":"HIL2", "port":"DAC4"   }},
+            {"_": "SDC",          "dut":{"connector":"J?","pin":-1}, "hil":{"device":"HIL2", "port":"DMUX_0" }},
+            {"_": "UP",           "dut":{"connector":"P3","pin":3},  "hil":{"device":"HIL2", "port":"D01"    }},
+            {"_": "DOWN",         "dut":{"connector":"P3","pin":4},  "hil":{"device":"HIL2", "port":"D02"    }},
+            {"_": "SELECT",       "dut":{"connector":"P3","pin":5},  "hil":{"device":"HIL2", "port":"D03"    }},
+            {"_": "START",        "dut":{"connector":"P3","pin":6},  "hil":{"device":"HIL2", "port":"D04"    }},
+            {"_": "USART_LCD_TX", "dut":{"connector":"P3","pin":1},  "hil":{"device":"HIL2", "port":"DMUX_0" }}
+        ] }
+    ],
+    "hil_devices": [
+        { "name":"HIL2", "config":"teensy_pcb.json", "id":1 }
+    ]
+}
