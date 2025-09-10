@@ -29,14 +29,14 @@
         { "port":40, "name":"DO9",  "mode": "DO", "notes":"3.3v Digital Output" },
         { "port":39, "name":"DO10", "mode": "DO", "notes":"3.3v Digital Output" },
 
-        { "port":200, "name":"DAC1", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":201, "name":"DAC2", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":202, "name":"DAC3", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":203, "name":"DAC4", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":204, "name":"DAC5", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":205, "name":"DAC6", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":206, "name":"DAC7", "mode": "AO", "notes":"5V 8-bit DAC" },
-        { "port":207, "name":"DAC8", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":0, "name":"DAC1", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":1, "name":"DAC2", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":2, "name":"DAC3", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":3, "name":"DAC4", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":4, "name":"DAC5", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":5, "name":"DAC6", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":6, "name":"DAC7", "mode": "AO", "notes":"5V 8-bit DAC" },
+        { "port":7, "name":"DAC8", "mode": "AO", "notes":"5V 8-bit DAC" },
 
         { "port":0, "name":"POT1", "mode": "POT", "notes":"10k Ω 7-bit Digipot" },
         { "port":1, "name":"POT2", "mode": "POT", "notes":"10k Ω 7-bit Digipot" }
