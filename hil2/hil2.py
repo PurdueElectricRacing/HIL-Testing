@@ -3,7 +3,6 @@ from typing import Optional
 import logging
 import os
 
-import cantools
 import cantools.database.can.database as cantools_db
 
 from . import action
@@ -22,13 +21,14 @@ class Hil2:
         test_config_path: str,
         device_config_fpath: str,
         net_map_path: Optional[str] = None,
-        can_dbc_path: Optional[str] = None,
+        can_dbc_fpath: Optional[str] = None,
     ):
         """
         :param test_config_path: The path to the test configuration JSON file
         :param device_config_fpath: The path to the device configuration JSON folder
         :param net_map_path: The path to the net map (exported from Altium) file
-        :param can_dbc_path: The path to the CAN DBC file (optional)
+                             (optional)
+        :param can_dbc_path: The path to the CAN DBC folder (optional)
         """
         self._test_device_manager: test_device.TestDeviceManager = (
             test_device.TestDeviceManager.from_json(
@@ -36,24 +36,15 @@ class Hil2:
             )
         )
         self._dut_cons: dut_cons.DutCons = dut_cons.DutCons.from_json(test_config_path)
-
-        match net_map_path:
-            case None:
-                self._maybe_net_map: Optional[net_map.NetMap] = None
-            case path_str:
-                self._maybe_net_map: Optional[net_map.NetMap] = net_map.NetMap.from_csv(
-                    path_str
-                )
-
-        match can_dbc_path:
-            case None:
-                self._can_dbc: Optional[cantools_db.Database] = None
-            case path_str:
-                self._can_dbc: Optional[cantools_db.Database] = cantools.db.load_file(
-                    os.path.join(can_dbc_path)
-                )
-
-        # Components that need to be "shut down" when HIL2 exits
+        self._maybe_net_map: Optional[net_map.NetMap] = (
+            None if net_map_path is None else net_map.NetMap.from_csv(net_map_path)
+        )
+        self._can_dbc: Optional[cantools_db.Database] = (
+            None
+            if can_dbc_fpath is None
+            else can_helper.load_can_dbcs(os.path.join(can_dbc_fpath))
+        )
+        # Components that need to be "shutdown" when HIL2 exits
         self._shutdown_components: dict[
             net_map.BoardNet, component.ShutdownableComponent
         ] = {}

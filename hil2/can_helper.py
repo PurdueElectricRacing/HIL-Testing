@@ -1,5 +1,37 @@
 from typing import Optional
 
+import os
+
+import cantools.database.can.database as cantools_db
+
+
+# Helper functions --------------------------------------------------------------------#
+def load_can_dbcs(dbc_fpath: str, recursive: bool = False) -> cantools_db.Database:
+    """
+    Scans a folder (and optionally all subfolders) for DBC files and loads them into a
+    single CAN database.
+
+    :param dbc_fpath: The path to the CAN DBC folder
+    :param recursive: Whether to search subdirectories recursively (default: False)
+    :return: The loaded CAN database
+    """
+    db = cantools_db.Database()
+
+    if not dbc_fpath or not os.path.isdir(dbc_fpath):
+        return db
+
+    if recursive:
+        for root, _, files in os.walk(dbc_fpath):
+            for file in files:
+                if file.endswith(".dbc"):
+                    db.add_dbc_file(os.path.join(root, file))
+    else:
+        for file in os.listdir(dbc_fpath):
+            if file.endswith(".dbc"):
+                db.add_dbc_file(os.path.join(dbc_fpath, file))
+
+    return db
+
 
 # CAN Message struct ------------------------------------------------------------------#
 class CanMessage:
