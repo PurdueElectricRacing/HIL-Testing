@@ -1,5 +1,5 @@
 {
     "hil_devices": [
-        { "name":"HIL2Bread", "config":"teensy_breadboard.json", "id":1 }
+        { "name":"HIL2", "config":"teensy_pcb.json", "id":1 }
     ]
 }
